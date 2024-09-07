@@ -2,8 +2,7 @@
 
 
 
-# Team Contract (goals, norms, rewards, how you work,
-when you meet)
+# Team Contract (goals, norms, rewards, how you work, when you meet)
 
 We will discuss after the test2
 
