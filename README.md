@@ -1,10 +1,42 @@
 # SWEN225 Group Project
 
+# Team Members & Module Assignments
+- Domain: [Assigned Member]
+- App: [Assigned Member]
+- Renderer: [Assigned Member]
+- Persistency: [Assigned Member]
+- Recorder: [Assigned Member]
+- Fuzz Testing: [Assigned Member]
+
+(It is required that members of your team choose one module to be responsible for. The
+assignment must happen before integration day, and must be defined in a markdown file
+team.md located in the root folder of the repository that contains a table)
 
 
-# Team Contract (goals, norms, rewards, how you work, when you meet)
+# Team Contract
+We will discuss after test2
 
-We will discuss after the test2
+### Goals
+[Team goals to be discussed and listed here]
+
+### Norms
+[Team norms to be discussed and listed here]
+
+### Rewards
+[Reward system, if any, to be discussed and listed here]
+
+### Work Methodology
+[How the team will work together]
+
+### Meeting Schedule
+[Regular meeting times and any additional meetings as needed]
+
+## Tasks and Deadlines
+- [Task 1]: [Deadline]
+- [Task 2]: [Deadline]
+- ...
+
+
 
 ## Getting started
 
