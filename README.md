@@ -18,18 +18,42 @@ We will discuss after test2
 
 ### Goals
 [Team goals to be discussed and listed here]
+- short-term and long-term project goals?
+- Individual learning objectives?
+- Quality standards?
+- Set performance targets?
+
 
 ### Norms
 [Team norms to be discussed and listed here]
+- Communication expectations (response times, preferred channels)
+- Meeting etiquette (punctuality, preparation, participation)
+- Decision-making process
+- Conflict resolution strategies
+- Work-life balance considerations
+- Code of conduct (respect, inclusivity, professionalism)
+
 
 ### Rewards
 [Reward system, if any, to be discussed and listed here]
+??????
+I have no idea
 
 ### Work Methodology
 [How the team will work together]
+- Task allocation process
+- Version control practices
+- Code review process
+- Documentation standards
+- Testing and quality assurance
+- Integration and deployment
 
 ### Meeting Schedule
 [Regular meeting times and any additional meetings as needed]
+- Regular meeting times??
+- Format (in-person, virtual, hybrid)
+- Roles (facilitator, note-taker, timekeeper)????
+- Agenda setting and minutes distribution process
 
 ## Tasks and Deadlines
 - [Task 1]: [Deadline]
