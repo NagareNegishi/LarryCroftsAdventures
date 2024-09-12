@@ -1,12 +1,12 @@
 # SWEN225 Group Project
 
 # Team Members & Module Assignments
-- Domain: [Assigned Member]
-- App: [Assigned Member]
-- Renderer: [Assigned Member]
-- Persistency: [Assigned Member]
-- Recorder: [Assigned Member]
-- Fuzz Testing: [Assigned Member]
+- Domain: Ben
+- App: Nagi
+- Renderer: Marwan
+- Persistency: Adam
+- Recorder: Josh
+- Fuzz Testing: Anthony
 
 (It is required that members of your team choose one module to be responsible for. The
 assignment must happen before integration day, and must be defined in a markdown file
@@ -14,46 +14,47 @@ team.md located in the root folder of the repository that contains a table)
 
 
 # Team Contract
-We will discuss after test2
+
 
 ### Goals
-[Team goals to be discussed and listed here]
-- short-term and long-term project goals?
-- Individual learning objectives?
-- Quality standards?
-- Set performance targets?
-
+Get an A-
+Intergration between all the Modules and having a playable game
+Learn how to be good team members and being a good Group
+effective Communication
 
 ### Norms
-[Team norms to be discussed and listed here]
-- Communication expectations (response times, preferred channels)
-- Meeting etiquette (punctuality, preparation, participation)
-- Decision-making process
-- Conflict resolution strategies
-- Work-life balance considerations
-- Code of conduct (respect, inclusivity, professionalism)
-
+Each person to have a branch that they edit to, and before merging, they must make a request that 
+another member must approve before merging to main branch
 
 ### Rewards
-[Reward system, if any, to be discussed and listed here]
-??????
-I have no idea
+Once a great Milsetone has been made, we can celebrate with some form of event.
+could be food, gaming, whatever we're feeling at the time XD
+
 
 ### Work Methodology
-[How the team will work together]
-- Task allocation process
-- Version control practices
-- Code review process
-- Documentation standards
-- Testing and quality assurance
-- Integration and deployment
+
+You're completly free to look at other people's module's
+Ask permissions before changing other people's module's
+
+if some form of clashing occurs, or any advice can be given
+please give them either in the comment of the commit, or just talking
+
+Don't be a dick =D
+
+
+Stick to Issues and keep it simple
+
+
+interpersonal conflicts should be dealt as a group and go to Craig.
+
 
 ### Meeting Schedule
-[Regular meeting times and any additional meetings as needed]
-- Regular meeting times??
-- Format (in-person, virtual, hybrid)
-- Roles (facilitator, note-taker, timekeeper)????
-- Agenda setting and minutes distribution process
+Minimum once a week in person
+we can always do it online and have small meetups between individuals when needed
+
+Communication will be through Discord online
+
+Meeting Date still to be finalized, but generally sometime from Monday, Tuesday or Wednsday
 
 ## Tasks and Deadlines
 - [Task 1]: [Deadline]
