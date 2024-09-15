@@ -1,0 +1,52 @@
+package nz.ac.wgtn.swen225.lc.domain;
+
+public class Maze {
+
+	// could be renamed to grid or similar if confusing
+	private Tile[][] maze;
+	private int rows;
+    private int cols;
+	
+	public Maze(int rows, int cols) {
+		this.rows = rows;
+		this.cols = cols;
+		maze = new Tile[rows][cols];
+		}
+	
+	public int getRows() { return rows; }
+    public int getCols() { return cols; }
+    
+	// retrieve Tile that is at specified coords
+	public Tile getTile(int row, int col) {return maze[row][col];}
+	
+	// set tile of maze to a specified tile, will add an assert to check inside method
+	public void setTile(int row, int col, Tile tile) {
+		if (row < 0 || row >= maze.length || col < 0 || col >= maze[0].length) {
+	        throw new IllegalArgumentException("Row or column is outside the bounds of the maze.");
+	    }
+		
+		maze[row][col] = tile;
+		
+		// TODO: assert to check tile is correctly inserted
+		// assert tile instanceof ...
+	}
+	
+	public boolean validMove(int row, int col) {
+		return maze[row][col].canMoveTo();
+	}
+	
+	// helper method for creating a maze with FreeTiles in the middle and WallTiles on the outside
+	public static Maze createBasicMaze(int rows, int cols) {
+		Maze maze = new Maze(rows, cols);
+		for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (row == 0 || row == rows -1 || col == 0 || col == cols -1) {
+                    maze.setTile(row, col, new WallTile());
+                } else {
+                    maze.setTile(row, col, new FreeTile());
+                }
+            }
+        }
+		return maze;
+	}
+}
