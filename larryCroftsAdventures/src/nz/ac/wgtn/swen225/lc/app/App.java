@@ -4,23 +4,17 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout; // task 2
-import java.awt.event.KeyAdapter; // task 2
-import java.awt.event.KeyEvent; // task 2
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.HashMap; // task 2
-import java.util.Map; // task 2
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel; // task 2
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-class Compact extends JFrame{
+class App extends JFrame{
   private static final long serialVersionUID= 1L;
 
   private JLabel timeLabel, levelLabel, keysLabel, treasuresLabel;
@@ -43,7 +37,7 @@ class Compact extends JFrame{
   private boolean isPaused = false;
 
 
-  Compact(){
+  App(){
     setTitle("Larry Croft's Adventures");//or something else
 
 
