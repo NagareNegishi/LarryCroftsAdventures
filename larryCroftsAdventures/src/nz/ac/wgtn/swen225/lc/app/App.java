@@ -4,9 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout; // task 2
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -18,13 +20,26 @@ class App extends JFrame{
   private static final long serialVersionUID= 1L;
 
   private JLabel timeLabel, levelLabel, keysLabel, treasuresLabel;
-  private JPanel gamePanel;
+  private JPanel gamePanel; // placeholder for "render"
+  private JPanel recorderPanel; // placeholder for "recorder UI"
+  private JPanel DomainPanel; // placeholder for Jpanel i want to pass to the domain as interface keysLabel, treasuresLabel will be this
   private Timer gameTimer;
   private int timeLeft = 60; // 1 minute for level 1??
   private int currentLevel = 1;
-  private int keysCollected = 0; //or List<Key> keysCollected or items???
+  private int keysCollected = 0; //or List<Key> keysCollected or items??? but in that case i shouldnt involeve the process
   private int treasuresLeft = 10; // Example value
   //private int score = 0; // not requirement????
+
+  /** It should also offer buttons and menu items to pause and exit the game, 
+   * to save the game state and to resume a saved game,
+   *  and to display a help page with game rules.
+   * 
+   * it should be different interface but for now keep it in app
+   */
+  private MenuPanel menuPanel; // placeholder for "menu UI"
+
+  
+
 
 
   Runnable closePhase= ()->{};
@@ -57,6 +72,9 @@ class App extends JFrame{
     });
   }
 
+  
+
+
 
   private void initializeUI() {
 
@@ -71,6 +89,11 @@ class App extends JFrame{
     infoPanel.add(keysLabel);
     infoPanel.add(treasuresLabel);
     add(infoPanel, BorderLayout.NORTH);
+
+
+
+    menuPanel = new MenuPanel(e -> handleMenuAction(e.getActionCommand()));
+    add(menuPanel, BorderLayout.SOUTH); // or wherever you want to place it
 
     // Center panel for game rendering (placeholder)
     gamePanel = new JPanel();
@@ -107,6 +130,47 @@ private void initializeGameTimer() {
     }
 
 
+
+    private void handleMenuAction(String actionCommand) {
+      switch(actionCommand){
+        case "pause" -> pauseGame();
+        case "save" -> saveGame();
+        case "load" -> loadGame();
+        case "help" -> showHelp();
+        case "exit" -> System.exit(0);// need proper method later
+      }
+      assert false: "Unknown action command: " + actionCommand;
+    }
+
+    private void showHelp() {
+        JOptionPane.showMessageDialog(this, "Help:\n" +
+                "Use the arrow keys to move the hero.\n" +
+                "Collect all treasures to complete the level.\n" +
+                "Collect keys to unlock doors.\n" +
+                "Avoid enemies.\n" +
+                "Press Ctrl + X to exit without saving.\n" +
+                "Press Ctrl + S to save the game.\n" +
+                "Press Ctrl + R to resume a saved game.\n" +
+                "Press Ctrl + 1 to start a new game at level 1.\n" +
+                "Press Ctrl + 2 to start a new game at level 2.\n" +
+                "Press Space to pause the game.\n" +
+                "Press Esc to resume the game.\n", "Help", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void saveGame() {
+        //GameSaver.saveGame(game, "saved_game.json");
+        JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void loadGame() {
+        //Game loadedGame = GameLoader.loadGame("saved_game.json");
+        //if (loadedGame != null) {
+            //game = loadedGame;
+            //renderer.updateGame(game);
+            //updateInfoLabels();
+            JOptionPane.showMessageDialog(this, "Game Loaded", "Load", JOptionPane.INFORMATION_MESSAGE);
+        //}
+    }
 /**
     private void saveGame() {
       GameSaver.saveGame(game, "saved_game.json");

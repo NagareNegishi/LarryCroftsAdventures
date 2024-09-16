@@ -7,16 +7,16 @@ public enum Direction {
     DOWN(0, -1),
     LEFT(-1, 0);
 
-    private final int dx;
-    private final int dy;
+    private final int x;
+    private final int y;
 
-    Direction(int dx, int dy) {
-        this.dx = dx;
-        this.dy = dy;
+    Direction(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
-    public int getDx() { return dx; }
-    public int getDy() { return dy; }
+    public int getX() { return x; }
+    public int getY() { return y; }
     Direction up(){ return UP; }
     Direction right(){ return RIGHT; }
     Direction down(){ return DOWN; }

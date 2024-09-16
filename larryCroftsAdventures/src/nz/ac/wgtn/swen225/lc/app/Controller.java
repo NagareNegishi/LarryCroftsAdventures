@@ -12,9 +12,7 @@ class Controller extends Keys{
  
 /**
    * Constructor for the Controller class
-   * @param c Camera object
-   *
-   * @param keyBindings Map of key bindings
+   * @param c MockCamera object expecting "Chap" object
    */
     Controller(MockCamera c){
     setAction(KeyEvent.VK_UP, c.set(Direction::up), c.set(Direction::none));

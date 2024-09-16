@@ -7,6 +7,9 @@ import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
+/**
+ * Keys class to handle key events
+ */
 class Keys implements KeyListener {
     private final Map<Integer,Runnable> actionsPressed= new HashMap<>();
     private final Map<Integer,Runnable> actionsReleased= new HashMap<>();
