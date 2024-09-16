@@ -4,11 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout; // task 2
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -30,16 +28,7 @@ class App extends JFrame{
   private int treasuresLeft = 10; // Example value
   //private int score = 0; // not requirement????
 
-  /** It should also offer buttons and menu items to pause and exit the game, 
-   * to save the game state and to resume a saved game,
-   *  and to display a help page with game rules.
-   * 
-   * it should be different interface but for now keep it in app
-   */
-  private MenuPanel menuPanel; // placeholder for "menu UI"
-
-  
-
+  private MenuPanel menuPanel;
 
 
   Runnable closePhase= ()->{};
@@ -79,11 +68,11 @@ class App extends JFrame{
   private void initializeUI() {
 
     // Top panel for game info
-    JPanel infoPanel = new JPanel(new GridLayout(1, 4));
+    JPanel infoPanel = new JPanel(new GridLayout(1, 4)); //make new class for this
     timeLabel = new JLabel("Time: 60");
     levelLabel = new JLabel("Level: 1");
-    keysLabel = new JLabel("Keys: 0");
-    treasuresLabel = new JLabel("Treasures left: 10");
+    keysLabel = new JLabel("Keys: 0"); // if images, i need to pass it to renderer
+    treasuresLabel = new JLabel("Treasures left: 10"); // i need to pass it to domain
     infoPanel.add(timeLabel);
     infoPanel.add(levelLabel);
     infoPanel.add(keysLabel);
@@ -91,9 +80,18 @@ class App extends JFrame{
     add(infoPanel, BorderLayout.NORTH);
 
 
-
+/**
+ * note:
+ * Jbutton need action listener
+ * action listener is functional interface
+ * Im implementing public void actionPerformed(ActionEvent e) here
+ * in MenuPanel, i set action command for each button/ action event
+ * so i can use getActionCommand() to get the action command
+ * action command is string discribe the action
+ * so i can use switch case to handle the action
+ */
     menuPanel = new MenuPanel(e -> handleMenuAction(e.getActionCommand()));
-    add(menuPanel, BorderLayout.SOUTH); // or wherever you want to place it
+    add(menuPanel, BorderLayout.SOUTH); // temporary
 
     // Center panel for game rendering (placeholder)
     gamePanel = new JPanel();
@@ -101,46 +99,58 @@ class App extends JFrame{
     add(gamePanel, BorderLayout.CENTER);
 }
 
+/**
+ * Handle menu actions
+ * @param actionCommand
+ */
+  private void handleMenuAction(String actionCommand) {
+    switch(actionCommand){
+      case "pause" -> pauseGame();
+      case "unpause" -> unpauseGame();
+      case "save" -> saveGame();
+      case "load" -> loadGame();
+      case "help" -> showHelp();
+      case "exit" -> System.exit(0);// need proper method later
+    }
+    assert false: "Unknown action command: " + actionCommand;
+  }
+
+  private void initializeController(){
+
+    controller = new Controller(new MockCamera());//camera will be hero
+    addKeyListener(controller);
+    setFocusable(true);//could be remove??
+  }
+
+  //1000ms = 1s
+  private void initializeGameTimer() {
+      gameTimer = new Timer(1000, e -> {
+          timeLeft--;
+          timeLabel.setText("Time: " + timeLeft);
+      });
+      gameTimer.start();
+  }
 
 
-private void initializeController(){
 
-  controller = new Controller(new MockCamera());//camera will be hero
-  addKeyListener(controller);
-  setFocusable(true);//could be remove??
+private void pauseGame() {
+    if (gameTimer.isRunning()) {
+        gameTimer.stop();
+        JOptionPane.showMessageDialog(this, "Game Paused", "Paused", JOptionPane.INFORMATION_MESSAGE);
+        menuPanel.setPauseButton("Unpause");
+    }
 }
 
-//1000ms = 1s
-private void initializeGameTimer() {
-    gameTimer = new Timer(1000, e -> {
-        timeLeft--;
-        timeLabel.setText("Time: " + timeLeft);
-    });
-    gameTimer.start();
+private void unpauseGame() {
+  assert !gameTimer.isRunning(): "Game is already running";
+  gameTimer.start();
+  JOptionPane.showMessageDialog(this, "Game Unpaused", "Unpaused", JOptionPane.INFORMATION_MESSAGE);
+  menuPanel.setPauseButton("Pause");
 }
 
 
 
-    private void pauseGame() {
-        if (gameTimer.isRunning()) {
-            gameTimer.stop();
-            JOptionPane.showMessageDialog(this, "Game Paused", "Paused", JOptionPane.INFORMATION_MESSAGE);
-            gameTimer.start();
-        }
-    }
 
-
-
-    private void handleMenuAction(String actionCommand) {
-      switch(actionCommand){
-        case "pause" -> pauseGame();
-        case "save" -> saveGame();
-        case "load" -> loadGame();
-        case "help" -> showHelp();
-        case "exit" -> System.exit(0);// need proper method later
-      }
-      assert false: "Unknown action command: " + actionCommand;
-    }
 
     private void showHelp() {
         JOptionPane.showMessageDialog(this, "Help:\n" +
