@@ -41,6 +41,7 @@ class App extends JFrame{
   private boolean isPaused = false;
 
 
+
   App(){
     setTitle("Larry Croft's Adventures");//or something else
 
@@ -117,7 +118,7 @@ class App extends JFrame{
 
   private void initializeController(){
 
-    controller = new Controller(new MockCamera());//camera will be hero
+    controller = new Controller(new MockCamera(), this::pauseGame, this::unpauseGame);//camera will be hero
     addKeyListener(controller);
     setFocusable(true);//could be remove??
   }
@@ -132,9 +133,9 @@ class App extends JFrame{
   }
 
 
-
 private void pauseGame() {
     if (gameTimer.isRunning()) {
+        isPaused = true;// which should be first to stop?? is it makes difference??
         gameTimer.stop();
         JOptionPane.showMessageDialog(this, "Game Paused", "Paused", JOptionPane.INFORMATION_MESSAGE);
         menuPanel.setPauseButton("Unpause");
@@ -144,6 +145,7 @@ private void pauseGame() {
 private void unpauseGame() {
   assert !gameTimer.isRunning(): "Game is already running";
   gameTimer.start();
+  isPaused = false;
   JOptionPane.showMessageDialog(this, "Game Unpaused", "Unpaused", JOptionPane.INFORMATION_MESSAGE);
   menuPanel.setPauseButton("Pause");
 }
@@ -168,27 +170,31 @@ private void unpauseGame() {
     }
 
     private void saveGame() {
-        //GameSaver.saveGame(game, "saved_game.json");
+        //GameSaver.saveGame();
         JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void loadGame() {
-        //Game loadedGame = GameLoader.loadGame("saved_game.json");
+        //Game loadedGame = GameLoader.loadGame();
         //if (loadedGame != null) {
             //game = loadedGame;
-            //renderer.updateGame(game);
-            //updateInfoLabels();
             JOptionPane.showMessageDialog(this, "Game Loaded", "Load", JOptionPane.INFORMATION_MESSAGE);
         //}
     }
 /**
     private void saveGame() {
-      GameSaver.saveGame(game, "saved_game.json");
+      GameSaver.saveGame();// i want to pass 2 runnable and int for level
       JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
   }
 
   private void loadGame() {
-      Game loadedGame = GameLoader.loadGame("saved_game.json");
+  // i think i need to pop up file chooser
+  // and get json file
+  // then pass it to persistency
+
+  JsonFile jsonFile = new JsonFile();?????
+//do i need to check it here? or in persistency??
+      Game loadedGame = GameLoader.loadGame(jsonFile);
       if (loadedGame != null) {
           game = loadedGame;
           renderer.updateGame(game);
@@ -219,12 +225,12 @@ private void unpauseGame() {
   void setPhase(MockPhase p){
     //set up the viewport and the timer
     MockView v= new MockView();   // pass model to it (p.model());
-    v.addKeyListener(new Controller(new MockCamera()));
+    v.addKeyListener(new Controller(new MockCamera(), this::pauseGame, this::unpauseGame));//or just controller? can i reuse? i guess depend on others code
     v.setFocusable(true);
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
 
-      if (!isPaused) { //isPaused may not be pretty solution.....
+      if (!isPaused) { //isPaused may not be pretty solution..... should i use timer.running() instead??
         new MockModel().ping();//p.model().ping();
         v.repaint();
       }
