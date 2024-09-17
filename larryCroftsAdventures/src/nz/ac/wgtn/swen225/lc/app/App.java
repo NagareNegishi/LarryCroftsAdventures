@@ -32,6 +32,8 @@ class App extends JFrame{
   //private int score = 0; // not requirement????
 
   private MenuPanel menuPanel;
+  private PauseDialog pauseDialog;
+  
 
 
   Runnable closePhase= ()->{};
@@ -96,12 +98,14 @@ class App extends JFrame{
  */
     menuPanel = new MenuPanel(e -> handleMenuAction(e.getActionCommand()));
     //menuPanel.disableKeyStroke();
-    add(menuPanel, BorderLayout.SOUTH); // temporary
+    add(menuPanel, BorderLayout.EAST); // temporary
 
     // Center panel for game rendering (placeholder)
     gamePanel = new JPanel();
     gamePanel.setBackground(Color.BLACK);
     add(gamePanel, BorderLayout.CENTER);
+
+    pauseDialog = new PauseDialog(this);
 }
 
 /**
@@ -153,7 +157,7 @@ class App extends JFrame{
     if (isPaused) return;
     isPaused = true;
     gameTimer.stop();
-    JOptionPane.showMessageDialog(this, "Game Paused", "Paused", JOptionPane.INFORMATION_MESSAGE);
+    pauseDialog.setVisible(true);
   }
 
   private void unpauseGame() {
@@ -162,7 +166,7 @@ class App extends JFrame{
     isPaused = false;
     assert !gameTimer.isRunning(): "Game is already running";
     gameTimer.start();
-    JOptionPane.showMessageDialog(this, "Game Unpaused", "Unpaused", JOptionPane.INFORMATION_MESSAGE);
+    pauseDialog.setVisible(false);
   }
 
 
