@@ -3,12 +3,10 @@ package nz.ac.wgtn.swen225.lc.app;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridLayout; // task 2
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel; // task 2
 import javax.swing.SwingUtilities;
@@ -20,22 +18,23 @@ import nz.ac.wgtn.swen225.lc.domain.Maze;
 class App extends JFrame{
   private static final long serialVersionUID= 1L;
 
-  private JLabel timeLabel, levelLabel, keysLabel, treasuresLabel;
-  private JPanel gamePanel; // placeholder for "render"
-  private JPanel recorderPanel; // placeholder for "recorder UI"
-  private JPanel DomainPanel; // placeholder for Jpanel i want to pass to the domain as interface keysLabel, treasuresLabel will be this
+  private GameInfoPanel gameInfoPanel;
+  private MenuPanel menuPanel;
+  private PauseDialog pauseDialog;
+
   private Timer gameTimer;
   private int timeLeft = 60; // 1 minute for level 1??
   private int currentLevel = 1;
   private int keysCollected = 0; //or List<Key> keysCollected or items??? but in that case i shouldnt involeve the process
   private int treasuresLeft = 10; // Example value
+
+
+
+  private JPanel gamePanel; // placeholder for "render"
+  private JPanel recorderPanel; // placeholder for "recorder UI"
+  private JPanel DomainPanel; // placeholder for Jpanel i want to pass to the domain as interface keysLabel, treasuresLabel will be this
+
   //private int score = 0; // not requirement????
-
-  private MenuPanel menuPanel;
-  private PauseDialog pauseDialog;
-
-  
-
 
   Runnable closePhase= ()->{};
   //Phase currentPhase;
@@ -75,16 +74,8 @@ class App extends JFrame{
   private void initializeUI() {
 
     // Top panel for game info
-    JPanel infoPanel = new JPanel(new GridLayout(1, 4)); //make new class for this
-    timeLabel = new JLabel("Time: 60");
-    levelLabel = new JLabel("Level: 1");
-    keysLabel = new JLabel("Keys: 0"); // if images, i need to pass it to renderer
-    treasuresLabel = new JLabel("Treasures left: 10"); // i need to pass it to domain
-    infoPanel.add(timeLabel);
-    infoPanel.add(levelLabel);
-    infoPanel.add(keysLabel);
-    infoPanel.add(treasuresLabel);
-    add(infoPanel, BorderLayout.NORTH);
+    gameInfoPanel = new GameInfoPanel();
+    add(gameInfoPanel, BorderLayout.EAST);
 
 
 /**
@@ -99,7 +90,7 @@ class App extends JFrame{
  */
     menuPanel = new MenuPanel(e -> handleMenuAction(e.getActionCommand()));
     //menuPanel.disableKeyStroke();
-    add(menuPanel, BorderLayout.EAST); // temporary
+    add(menuPanel, BorderLayout.WEST); // temporary
 
     // Center panel for game rendering (placeholder)
     gamePanel = new JPanel();
@@ -142,7 +133,7 @@ class App extends JFrame{
   private void initializeGameTimer() {
       gameTimer = new Timer(1000, e -> {
           timeLeft--;
-          timeLabel.setText("Time: " + timeLeft);
+          gameInfoPanel.setTime(timeLeft);
       });
       gameTimer.start();
   }
@@ -252,6 +243,13 @@ class App extends JFrame{
 
       if (!isPaused) { //isPaused may not be pretty solution..... should i use timer.running() instead??
         new MockModel().ping();//p.model().ping();
+        /**
+         * its not pretty solution
+         * but i can take keys/ treasure info from the model and update the gameInfoPanel here
+         * 
+         */
+
+
         v.repaint();
       }
     });
