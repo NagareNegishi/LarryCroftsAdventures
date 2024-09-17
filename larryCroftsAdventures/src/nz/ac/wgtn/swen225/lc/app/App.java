@@ -133,6 +133,11 @@ class App extends JFrame{
   }
 
 
+  /**
+   * maybe i need separate button?
+   * key and button conbination messing conditions
+   * 
+   */
 private void pauseGame() {
     if (gameTimer.isRunning()) {
         isPaused = true;// which should be first to stop?? is it makes difference??
