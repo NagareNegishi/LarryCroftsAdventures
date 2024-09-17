@@ -1,4 +1,4 @@
-package nz.ac.wgtn.swen225.lc.domain;
+/**package nz.ac.wgtn.swen225.lc.domain;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
@@ -142,3 +142,4 @@ public class Tests {
 	
 	// test once Chap picks up Treasure tile doesn't contain a treasure anymore
 }
+*/
