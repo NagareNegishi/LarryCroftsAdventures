@@ -23,7 +23,7 @@ public class Chap {
 	
 	// helper method to move chap anywhere in the maze, good for debugging
 	public void move(int newRow, int newCol, Maze maze) {
-		if(!maze.validMove(newRow, newCol)) {throw new IllegalArgumentException("Invalid move");} // could add more in textfield for debugging
+		if(!maze.validMove(newRow, newCol)) {throw new IllegalArgumentException("Invalid move");}
 		this.row = newRow;
 		this.col = newCol;
 		assert this.row == newRow && this.col == newCol : "Move failed";
@@ -75,19 +75,11 @@ public class Chap {
 	
 	public List<Item> inventory(){return inventory;}
 	
-	// might be a helpful method for laying out chaps inventory
+	// helpful method for laying out chaps inventory
 	public void inventoryDescription() {
 		System.out.println("Chap's inventory contains: "); 
 		inventory.forEach(s -> System.out.println(s.description()));
 		}
 	
 	// can add methods to directly check tile next to chap in each direction
-	
-	/*
-	 *public Tile tileAbove(){}
-	 *public Tile tileBelow(){}
-	 *public Tile tileLeft(){}
-	 *public Tile tileRight(){}
-	 */
-	 
 }

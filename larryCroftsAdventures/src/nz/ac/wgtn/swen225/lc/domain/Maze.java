@@ -42,7 +42,11 @@ public class Maze {
             for (int col = 0; col < cols; col++) {
                 if (row == 0 || row == rows -1 || col == 0 || col == cols -1) {
                     maze.setTile(row, col, new WallTile());
-                } else {
+                } 
+                    //creating a treasure tile for testing
+                else if(row == 3 && col == 3) {
+                	maze.setTile(row, col, new TreasureTile());
+                }else {
                     maze.setTile(row, col, new FreeTile());
                 }
             }
