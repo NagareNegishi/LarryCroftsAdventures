@@ -38,6 +38,7 @@ public class MenuPanel extends JPanel{
       JButton button = new JButton(text);
       button.setActionCommand(actionCommand);
       button.addActionListener(listener);
+      button.setFocusable(false); // remove focus from buttons
       return button;
   }
 
@@ -49,4 +50,13 @@ public class MenuPanel extends JPanel{
       pauseButton.setText(text);
       pauseButton.setActionCommand(text.toLowerCase());
   }
+
+  /** public void disableKeyStroke() {
+    for (Component comp : getComponents()) {
+        if (comp instanceof JButton) {
+            JButton button = (JButton) comp;
+            button.getInputMap().put(KeyStroke.getKeyStroke("SPACE"), "none");
+        }
+    }
+}*/
 }

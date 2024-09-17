@@ -17,10 +17,10 @@ class Controller extends Keys{
    * Constructor for the Controller class
    * @param c MockCamera object expecting "Chap" object
    */
-    Controller(Chap chap, Maze maze, Runnable pause, Runnable unpause){
+    Controller(Chap chap, Maze maze, Runnable pause,Runnable unpause){
         this.chap = chap;
         this.maze = maze;
-        setAction(KeyEvent.VK_UP, () -> chap.moveUp(maze), () -> {});
+        setAction(KeyEvent.VK_UP, () -> {chap.moveUp(maze); System.out.println("up");}, () -> {});
         setAction(KeyEvent.VK_DOWN, () -> chap.moveDown(maze), () -> {});
         setAction(KeyEvent.VK_LEFT, () -> chap.moveLeft(maze), () -> {});
         setAction(KeyEvent.VK_RIGHT, () -> chap.moveRight(maze), () -> {});
@@ -39,7 +39,6 @@ class Controller extends Keys{
         // Other keys
         setAction(KeyEvent.VK_SPACE, pause, () -> {});
         setAction(KeyEvent.VK_ESCAPE, unpause, () -> {});
-   
 }
 
 

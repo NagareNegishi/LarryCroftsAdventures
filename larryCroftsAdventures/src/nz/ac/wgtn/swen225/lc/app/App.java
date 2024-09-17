@@ -14,6 +14,9 @@ import javax.swing.JPanel; // task 2
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import nz.ac.wgtn.swen225.lc.domain.Chap;
+import nz.ac.wgtn.swen225.lc.domain.Maze;
+
 class App extends JFrame{
   private static final long serialVersionUID= 1L;
 
@@ -92,6 +95,7 @@ class App extends JFrame{
  * so i can use switch case to handle the action
  */
     menuPanel = new MenuPanel(e -> handleMenuAction(e.getActionCommand()));
+    //menuPanel.disableKeyStroke();
     add(menuPanel, BorderLayout.SOUTH); // temporary
 
     // Center panel for game rendering (placeholder)
@@ -106,8 +110,14 @@ class App extends JFrame{
  */
   private void handleMenuAction(String actionCommand) {
     switch(actionCommand){
-      case "pause" -> pauseGame();
-      case "unpause" -> unpauseGame();
+      case "pause" -> {
+        pauseGame();
+        menuPanel.setPauseButton("Unpause");
+      }
+      case "unpause" -> {
+        unpauseGame();
+        menuPanel.setPauseButton("Pause");
+      }
       case "save" -> saveGame();
       case "load" -> loadGame();
       case "help" -> showHelp();
@@ -118,7 +128,7 @@ class App extends JFrame{
 
   private void initializeController(){
 
-    controller = new Controller(new MockCamera(), this::pauseGame, this::unpauseGame);//camera will be hero
+    controller = new Controller(new Chap(2,2), new Maze(5,5), this::pauseGame, this::unpauseGame);//temp maze and chap
     addKeyListener(controller);
     setFocusable(true);//could be remove??
   }
@@ -138,54 +148,54 @@ class App extends JFrame{
    * key and button conbination messing conditions
    * 
    */
-private void pauseGame() {
-    if (gameTimer.isRunning()) {
-        isPaused = true;// which should be first to stop?? is it makes difference??
-        gameTimer.stop();
-        JOptionPane.showMessageDialog(this, "Game Paused", "Paused", JOptionPane.INFORMATION_MESSAGE);
-        menuPanel.setPauseButton("Unpause");
-    }
-}
+  private void pauseGame() {
+    System.out.println("Game Paused");
+    if (isPaused) return;
+    isPaused = true;
+    gameTimer.stop();
+    JOptionPane.showMessageDialog(this, "Game Paused", "Paused", JOptionPane.INFORMATION_MESSAGE);
+  }
 
-private void unpauseGame() {
-  assert !gameTimer.isRunning(): "Game is already running";
-  gameTimer.start();
-  isPaused = false;
-  JOptionPane.showMessageDialog(this, "Game Unpaused", "Unpaused", JOptionPane.INFORMATION_MESSAGE);
-  menuPanel.setPauseButton("Pause");
-}
-
-
+  private void unpauseGame() {
+    System.out.println("Game Unpaused");
+    if (!isPaused) return;
+    isPaused = false;
+    assert !gameTimer.isRunning(): "Game is already running";
+    gameTimer.start();
+    JOptionPane.showMessageDialog(this, "Game Unpaused", "Unpaused", JOptionPane.INFORMATION_MESSAGE);
+  }
 
 
 
-    private void showHelp() {
-        JOptionPane.showMessageDialog(this, "Help:\n" +
-                "Use the arrow keys to move the hero.\n" +
-                "Collect all treasures to complete the level.\n" +
-                "Collect keys to unlock doors.\n" +
-                "Avoid enemies.\n" +
-                "Press Ctrl + X to exit without saving.\n" +
-                "Press Ctrl + S to save the game.\n" +
-                "Press Ctrl + R to resume a saved game.\n" +
-                "Press Ctrl + 1 to start a new game at level 1.\n" +
-                "Press Ctrl + 2 to start a new game at level 2.\n" +
-                "Press Space to pause the game.\n" +
-                "Press Esc to resume the game.\n", "Help", JOptionPane.INFORMATION_MESSAGE);
-    }
 
-    private void saveGame() {
-        //GameSaver.saveGame();
-        JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
-    }
 
-    private void loadGame() {
-        //Game loadedGame = GameLoader.loadGame();
-        //if (loadedGame != null) {
-            //game = loadedGame;
-            JOptionPane.showMessageDialog(this, "Game Loaded", "Load", JOptionPane.INFORMATION_MESSAGE);
-        //}
-    }
+  private void showHelp() {
+      JOptionPane.showMessageDialog(this, "Help:\n" +
+              "Use the arrow keys to move the hero.\n" +
+              "Collect all treasures to complete the level.\n" +
+              "Collect keys to unlock doors.\n" +
+              "Avoid enemies.\n" +
+              "Press Ctrl + X to exit without saving.\n" +
+              "Press Ctrl + S to save the game.\n" +
+              "Press Ctrl + R to resume a saved game.\n" +
+              "Press Ctrl + 1 to start a new game at level 1.\n" +
+              "Press Ctrl + 2 to start a new game at level 2.\n" +
+              "Press Space to pause the game.\n" +
+              "Press Esc to resume the game.\n", "Help", JOptionPane.INFORMATION_MESSAGE);
+  }
+
+  private void saveGame() {
+      //GameSaver.saveGame();
+      JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
+  }
+
+  private void loadGame() {
+      //Game loadedGame = GameLoader.loadGame();
+      //if (loadedGame != null) {
+          //game = loadedGame;
+          JOptionPane.showMessageDialog(this, "Game Loaded", "Load", JOptionPane.INFORMATION_MESSAGE);
+      //}
+  }
 /**
     private void saveGame() {
       GameSaver.saveGame();// i want to pass 2 runnable and int for level
@@ -230,7 +240,7 @@ private void unpauseGame() {
   void setPhase(MockPhase p){
     //set up the viewport and the timer
     MockView v= new MockView();   // pass model to it (p.model());
-    v.addKeyListener(new Controller(new MockCamera(), this::pauseGame, this::unpauseGame));//or just controller? can i reuse? i guess depend on others code
+    v.addKeyListener(controller);//or just controller? can i reuse? i guess depend on others code
     v.setFocusable(true);
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
