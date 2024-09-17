@@ -33,6 +33,7 @@ class App extends JFrame{
   private JPanel gamePanel; // placeholder for "render"
   private JPanel recorderPanel; // placeholder for "recorder UI"
   private JPanel DomainPanel; // placeholder for Jpanel i want to pass to the domain as interface keysLabel, treasuresLabel will be this
+  //currently directly making the parameter from domain
 
   //private int score = 0; // not requirement????
 
@@ -143,13 +144,8 @@ class App extends JFrame{
   }
 
 
-  /**
-   * maybe i need separate button?
-   * key and button conbination messing conditions
-   * 
-   */
+
   private void pauseGame() {
-    System.out.println("Game Paused");
     if (isPaused) return;
     isPaused = true;
     gameTimer.stop();
@@ -157,7 +153,6 @@ class App extends JFrame{
   }
 
   private void unpauseGame() {
-    System.out.println("Game Unpaused");
     if (!isPaused) return;
     isPaused = false;
     assert !gameTimer.isRunning(): "Game is already running";

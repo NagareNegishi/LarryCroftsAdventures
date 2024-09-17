@@ -18,6 +18,7 @@ public class GameInfoPanel extends JPanel {
     public GameInfoPanel() {
         setLayout(new BorderLayout(0,10));
 
+        //*need better layout */
         JPanel timerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         timeTextLabel = new JLabel("Time:");
         timeTextLabel.setFont(getFont().deriveFont(20.0f));
@@ -52,6 +53,11 @@ public class GameInfoPanel extends JPanel {
     public void setTreasures(int treasures) {
         treasuresLabel.setText("Treasures left: " + treasures);
     }
+
+    /**
+     * change it to switch later
+     * @param time
+     */
     public void updateTimerColor(int time) {
         if (time < 10) {
             timeLabel.setForeground(Color.RED);
