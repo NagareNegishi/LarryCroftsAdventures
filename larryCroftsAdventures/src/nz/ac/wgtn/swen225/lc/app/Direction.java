@@ -1,5 +1,7 @@
 package nz.ac.wgtn.swen225.lc.app;
 
+
+//current inplementation do not require this class
 public enum Direction {
     NONE(0, 0),
     UP(0, 1),
