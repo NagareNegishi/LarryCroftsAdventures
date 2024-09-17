@@ -134,6 +134,10 @@ class App extends JFrame{
       gameTimer = new Timer(1000, e -> {
           timeLeft--;
           gameInfoPanel.setTime(timeLeft);
+          if (timeLeft == 0) {
+              gameTimer.stop();
+              //showGameOverScreen();
+          }
       });
       gameTimer.start();
   }
