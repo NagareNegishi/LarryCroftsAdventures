@@ -17,24 +17,24 @@ public class PauseDialog extends JDialog {
     private static final long serialVersionUID = 1L;
     
 
-    public PauseDialog(JFrame parent) {
+    public PauseDialog(JFrame parent, String text, Color backgroundColor, Color textColor) {
         super(parent, "Game Paused", false);
-        initializeUI();
+        initializeUI(text, backgroundColor, textColor);
     }
 
-    private void initializeUI() {
+    private void initializeUI(String text, Color backgroundColor, Color textColor) {
         setUndecorated(true); // remove title bar
-        setBackground(new Color(0, 0, 0, 150)); // semi-transparent
+        setBackground(new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 150)); // semi-transparent
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setOpaque(false);
 
-        JLabel label = new JLabel("Game is paused", JLabel.CENTER);
+        JLabel label = new JLabel(text, JLabel.CENTER);
         label.setFont(new Font("Arial", Font.BOLD, 50));
-        label.setForeground(new Color(150, 150, 0));
+        label.setForeground(textColor);
         panel.add(label);
         setContentPane(panel);// takeover the dialog
 
-        setSize(500, 400); // get size later
+        setSize(580, 360); // get size later
         setLocationRelativeTo(getParent());
         setResizable(false);
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // do nothing on close

@@ -26,6 +26,8 @@ class App extends JFrame{
   private GameInfoPanel gameInfoPanel;
   private MenuPanel menuPanel;
   private PauseDialog pauseDialog;
+  private PauseDialog startDialog;
+  private PauseDialog gameoverDialog;
 
   private Timer gameTimer;
   private int timeLeft = 60; // 1 minute for level 1??
@@ -105,7 +107,10 @@ class App extends JFrame{
     gamePanel.setBackground(Color.BLACK);
     add(gamePanel, BorderLayout.CENTER);
 
-    pauseDialog = new PauseDialog(this);
+    pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0));
+    startDialog = new PauseDialog(this, "Press Space to start", Color.GREEN, Color.YELLOW);
+    gameoverDialog = new PauseDialog(this, "Game Over", Color.RED, Color.BLACK);
+    startDialog.setVisible(true);
 }
 
 /**
@@ -157,7 +162,7 @@ class App extends JFrame{
           gameInfoPanel.setTime(timeLeft);
           if (timeLeft == 0) {
               gameTimer.stop();
-              //showGameOverScreen();
+              gameoverDialog.setVisible(true);
           }
       });
       gameTimer.start();
@@ -170,6 +175,7 @@ class App extends JFrame{
     isPaused = true;
     gameTimer.stop();
     pauseDialog.setVisible(true);
+    //startDialog.setVisible(false);// should optimize this
   }
 
   private void unpauseGame() {
@@ -178,10 +184,11 @@ class App extends JFrame{
     assert !gameTimer.isRunning(): "Game is already running";
     gameTimer.start();
     pauseDialog.setVisible(false);
+    gameoverDialog.setVisible(false);// should optimize this
   }
 
 
-
+  
 
 
   private void showHelp() {
