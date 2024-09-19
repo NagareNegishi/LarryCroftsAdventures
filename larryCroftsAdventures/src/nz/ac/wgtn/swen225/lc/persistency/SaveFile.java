@@ -1,9 +1,12 @@
 package nz.ac.wgtn.swen225.lc.persistency;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.FileOutputStream;
 
 import test.nz.ac.wgtn.swen225.lc.persistency.*;
+import nz.ac.wgtn.swen225.lc.domain.*;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +14,7 @@ import java.io.IOException;
 // TODO
 public class SaveFile implements Saver{
 
-    public static boolean saveGame(String fileName, GameController gameControl){
+    public static boolean saveGame(String fileName, DomainController gameControl){
 
         assert gameControl != null;
         assert fileName != null && !fileName.isEmpty();
@@ -55,6 +58,60 @@ public class SaveFile implements Saver{
         return false;
     	
     }
+    
+    
+    
+    
+    
+    /**
+     * Generic save for all objects. DOES NOT WORK
+     * @param <T>
+     * @param fileName
+     * @param obj
+     * @return
+     */
+    public static boolean saveCanary(String fileName, Canary obj) {
+    	
+    	assert obj != null;
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	try{
+            mapper.writeValue( new FileOutputStream(fileName), obj);
+            return true;
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+        // Failed to send
+        return false;
+    	
+    }
+    
+    
+    /**
+     * Generic method to save JSON of any object
+     * @param <T>
+     * @param fileName
+     * @param obj
+     * @return
+     */
+    public static <T> boolean saveObj(String fileName, T obj) {
+    	assert obj != null;
+    	
+    	ObjectMapper mapper = new ObjectMapper();
+    	
+    	try{
+            mapper.writeValue( new FileOutputStream(fileName), obj);
+            return true;
+        } catch(IOException e){
+            e.printStackTrace();
+        }
+        // Failed to send
+        return false;
+    	
+    }
+    
+    
+    
     
 }
 

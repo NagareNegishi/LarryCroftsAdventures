@@ -1,5 +1,8 @@
 package test.nz.ac.wgtn.swen225.lc.persistency;
 
+import nz.ac.wgtn.swen225.lc.persistency.*;
+
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,7 +10,6 @@ import nz.ac.wgtn.swen225.lc.persistency.*;
 
 // Domain imports
 //import nz.ac.wgtn.swen225.lc.domain.GameController;
-
 
 
 public class PersistencyTest {
@@ -29,6 +31,20 @@ public class PersistencyTest {
     public void testSave() {
     	String info = "Hello did this work?";
     	assert SaveFile.saveString("testSave", info);
+    }
+    
+    
+    /**
+     * Check how Canary serialises into JSON
+     */
+    @Test public void canaryTest() {
+    	Canary c = new Canary("Lary", 500);
+    	assert SaveFile.saveCanary("BestLarry", c);
+    }
+    
+    @Test public void objTest() {
+    	Canary c = new Canary("ObjBird", 1000);
+    	assert SaveFile.saveObj("ObjectTest", c);
     	
     }
     

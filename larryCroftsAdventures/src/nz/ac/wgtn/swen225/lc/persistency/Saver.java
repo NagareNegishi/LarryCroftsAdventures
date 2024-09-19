@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.*;
 import java.io.File;
 import java.io.IOException;
 
+import nz.ac.wgtn.swen225.lc.domain.*;
+
+
 
 /**
  * Used to save game state
