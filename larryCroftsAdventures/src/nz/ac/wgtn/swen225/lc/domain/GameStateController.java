@@ -17,7 +17,7 @@ public class GameStateController {
         this.maze = Maze.createCustomMaze(mazeRows, mazeCols);
         this.chap = new Chap(startRow, startCol);
         this.gameState = new GameState(maze, chap, totalTreasures);
-    }
+	}
 	
 	
 	public void moveChap(Direction direction) {gameState.moveChap(direction);}

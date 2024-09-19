@@ -44,10 +44,10 @@ public class Maze {
                     maze.setTile(row, col, new WallTile());
                 } 
                 //creating a treasure tile for testing
-                else if(row == 2 && col == 3) {
-                	maze.setTile(row, col, new TreasureTile());}
+                else if(row == 5 && col == 3) {
+                	maze.setTile(row, col, new LockedDoorTile("Blue"));}
                 // creating a KeyTile for testng
-                else if(row == 3 && col == 3) {
+                else if(row == 4 && col == 3) {
                 	maze.setTile(row, col, new KeyTile(new Key("Blue")));
                 }else {
                     maze.setTile(row, col, new FreeTile());

@@ -57,7 +57,24 @@ public class Chap {
 	    assert this.row == newRow && this.col == newCol : "Move failed";
 	}
 
-	public enum Direction { Up, Down, Left, Right;}
+	// enum to store the directions Chap can move as well as functionality to see what direction Chap will move next
+	public enum Direction { 
+		Up(-1,0), 
+		Down(1,0), 
+		Left(0,-1), 
+		Right(0,1);
+		
+		private int rowDir;
+		private int colDir;
+		
+		Direction(int row, int col){
+			this.rowDir = row;
+			this.colDir = col;
+		}
+		
+		public int rowDirection() {return rowDir;}
+		public int colDirection() {return colDir;}
+	}
 	
 	// picks up an item and if it is a treasure marks it as collected
 	public void pickUpItem(Item item) {

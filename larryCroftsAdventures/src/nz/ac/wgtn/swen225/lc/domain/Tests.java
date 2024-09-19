@@ -168,8 +168,94 @@ public class Tests {
 			}
 
 	// test Chap picks up key and key is in inventory of correct colour
-	
-	// test Chap picks up a key AND a treasure and both are in inventory and provide descriptions
-	
+		@Test
+		public void testChapCanPickUpKey() {
+			Maze maze = Maze.createBasicMaze(5, 5);
+			Chap chap = new Chap(2,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.setTile(2, 3, new KeyTile(new Key("Blue")));
+			test.moveChap(Direction.Right);
+			assert chap.inventory().get(0) instanceof Key;
+			Key key = (Key) chap.inventory().get(0);
+			assert key.colour().equals("Blue");
+			}
+	// test Chap picks up a key AND a treasure and both are in inventory 
+		@Test
+		public void testChapCanPickUpKeyAndTreasure() {
+			Maze maze = Maze.createBasicMaze(5, 5);
+			Chap chap = new Chap(2,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.setTile(2, 3, new KeyTile(new Key("Blue")));
+			maze.setTile(3, 3, new TreasureTile());
+			test.moveChap(Direction.Right);
+			test.moveChap(Direction.Down);
+			assert chap.inventory().get(0) instanceof Key;
+			Key key = (Key) chap.inventory().get(0);
+			assert key.colour().equals("Blue");
+			assert chap.inventory().get(1) instanceof Treasure;
+			assert test.getTreasuresCollected() == 1;
+			}
+		
 	// test KeyTile turns into FreeTile when Chap picks up the key
+		@Test
+		public void testKeyTileTurnsIntoFreeTile() {
+			Maze maze = Maze.createBasicMaze(5, 5);
+			Chap chap = new Chap(2,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.setTile(2, 3, new KeyTile(new Key("Blue")));
+			test.moveChap(Direction.Right);
+			assert maze.getTile(2, 3) instanceof FreeTile;
+		}
+		
+	// test Chap can unlock a LockedDoorTile when he has the correct colour Key, move to it and turn it into a FreeTile
+		@Test
+		public void testLockedDoorTileUnlocksAndTurnsIntoFreeTile() {
+			Maze maze = Maze.createBasicMaze(5, 5);
+			Chap chap = new Chap(2,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.setTile(2, 3, new KeyTile(new Key("Blue")));
+			maze.setTile(3, 3, new LockedDoorTile("Blue"));
+			test.moveChap(Direction.Right);
+			assert chap.inventory().get(0) instanceof Key;
+			Key key = (Key) chap.inventory().get(0);
+			assert key.colour().equals("Blue");
+			assert maze.getTile(3, 3) instanceof LockedDoorTile;
+			test.moveChap(Direction.Down);
+			assert maze.getTile(3, 3) instanceof FreeTile;
+			
+		}
+	// test Chap cannot move to a LockedDoorTile if he doesn't have a Key
+		@Test
+		public void testChapCantMoveToLockedDoorWithoutKey() {
+			Maze maze = Maze.createBasicMaze(5, 5);
+			Chap chap = new Chap(2,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.setTile(2, 3, new LockedDoorTile("Blue"));
+			assert maze.getTile(2, 3) instanceof LockedDoorTile;
+			test.moveChap(Direction.Right);
+			assert maze.getTile(2, 3) instanceof LockedDoorTile;
+			assertEquals(2,chap.getRow());
+			assertEquals(2,chap.getCol());
+
+			
+		}
+	// test Chap cannot move to a LockedDoorTile if he has a key of a different colour
+		@Test
+		public void testChapCantMoveToLockedDoorWithWrongKey() {
+			Maze maze = Maze.createBasicMaze(5, 5);
+			Chap chap = new Chap(2,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.setTile(2, 3, new KeyTile(new Key("Red")));
+			maze.setTile(3, 3, new LockedDoorTile("Blue"));
+			test.moveChap(Direction.Right);
+			assert chap.inventory().get(0) instanceof Key;
+			Key key = (Key) chap.inventory().get(0);
+			assert key.colour().equals("Red");
+			assert maze.getTile(3, 3) instanceof LockedDoorTile;
+			test.moveChap(Direction.Down);
+			assert maze.getTile(3, 3) instanceof LockedDoorTile;
+			assertEquals(2,chap.getRow());
+			assertEquals(3,chap.getCol());
+			
+		}
 }
