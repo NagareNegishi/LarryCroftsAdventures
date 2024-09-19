@@ -3,7 +3,7 @@ package nz.ac.wgtn.swen225.lc.domain;
 import java.util.List;
 
 // Entry point for other modules to access 
-public class GameController {
+public class GameController implements DomainController {
 
 	private Maze maze;
 	private GameState gameState;
