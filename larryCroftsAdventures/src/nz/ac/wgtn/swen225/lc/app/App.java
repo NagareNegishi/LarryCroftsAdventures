@@ -175,7 +175,7 @@ class App extends JFrame{
     isPaused = true;
     gameTimer.stop();
     pauseDialog.setVisible(true);
-    //startDialog.setVisible(false);// should optimize this
+    startDialog.setVisible(false);// should optimize this
   }
 
   private void unpauseGame() {
