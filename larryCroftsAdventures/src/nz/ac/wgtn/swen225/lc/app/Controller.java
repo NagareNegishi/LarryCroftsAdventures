@@ -25,6 +25,14 @@ class Controller extends Keys{
         setAction(KeyEvent.VK_LEFT, () -> chap.moveLeft(maze), () -> {});
         setAction(KeyEvent.VK_RIGHT, () -> chap.moveRight(maze), () -> {});
 
+/**
+ * it should work after next domain merge
+ *      setAction(KeyEvent.VK_UP, () -> chap.move(Chap.Direction.Up, maze), () -> {});
+        setAction(KeyEvent.VK_DOWN, () -> chap.move(Chap.Direction.Down, maze), () -> {});
+        setAction(KeyEvent.VK_LEFT, () -> chap.move(Chap.Direction.Left, maze), () -> {});
+        setAction(KeyEvent.VK_RIGHT, () -> chap.move(Chap.Direction.Right, maze), () -> {});
+ */
+
 
 
         /**
