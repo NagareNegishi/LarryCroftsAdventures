@@ -22,50 +22,43 @@ public class Chap {
 	public String getPosition() {return "Chap is at row: " + row + ", column: " + col;}
 	
 	// helper method to move chap anywhere in the maze, good for debugging
-	public void move(int newRow, int newCol, Maze maze) {
+	public void moveTo(int newRow, int newCol, Maze maze) {
 		if(!maze.validMove(newRow, newCol)) {throw new IllegalArgumentException("Invalid move");}
 		this.row = newRow;
 		this.col = newCol;
 		assert this.row == newRow && this.col == newCol : "Move failed";
 	}
 	
-	// movement methods for each direction, could change later to not include a maze parameter for ease of use
-	public void moveUp(Maze maze) {
-		int newRow = row - 1;
-		if (!maze.validMove(newRow, col)) {
-			throw new IllegalArgumentException("Invalid move: Cannot move up.");
-		}
-		this.row = newRow;
-		assert this.row == newRow: "Move up failed.";
-		}
-	
-	public void moveDown(Maze maze) {
-		int newRow = row + 1;
-        if (!maze.validMove(newRow, col)) {
-            throw new IllegalArgumentException("Invalid move: Cannot move down.");
-        }
-        this.row = newRow;
-        assert this.row == newRow: "Move down failed.";
-	}
-	
-	public void moveLeft(Maze maze) {
-		int newCol = col - 1;
-        if (!maze.validMove(row, newCol)) {
-            throw new IllegalArgumentException("Invalid move: Cannot move left.");
-        }
-        this.col = newCol;
-        assert this.col == newCol : "Move left failed.";
-	}
-
-	public void moveRight(Maze maze) {
-		int newCol = col + 1;
-        if (!maze.validMove(row, newCol)) {
-            throw new IllegalArgumentException("Invalid move: Cannot move right.");
-        }
-        this.col = newCol;
-        assert this.col == newCol : "Move right failed.";
+	public void move(Direction direction, Maze maze) {
+	    int newRow = this.row;
+	    int newCol = this.col;
+	    
+	    switch (direction) {
+	        case Up:
+	            newRow--;
+	            break;
+	        case Down:
+	            newRow++;
+	            break;
+	        case Left:
+	            newCol--;
+	            break;
+	        case Right:
+	            newCol++;
+	            break;
+	    }
+	    
+	    if (!maze.validMove(newRow, newCol)) {
+	        throw new IllegalArgumentException("Invalid move: Cannot move " + direction.name() + ".");
+	    }
+	  
+	    this.row = newRow;
+	    this.col = newCol;
+	    assert this.row == newRow && this.col == newCol : "Move failed";
 	}
 
+	public enum Direction { Up, Down, Left, Right;}
+	
 	// picks up an item and if it is a treasure marks it as collected
 	public void pickUpItem(Item item) {
 		inventory.add(item);
@@ -80,6 +73,4 @@ public class Chap {
 		System.out.println("Chap's inventory contains: "); 
 		inventory.forEach(s -> System.out.println(s.description()));
 		}
-	
-	// can add methods to directly check tile next to chap in each direction
 }

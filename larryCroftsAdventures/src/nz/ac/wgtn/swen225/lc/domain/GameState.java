@@ -3,6 +3,8 @@ package nz.ac.wgtn.swen225.lc.domain;
 import java.util.HashMap;
 import java.util.Map;
 
+import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
+
 public class GameState {
 	
 	private Maze maze;
@@ -24,23 +26,25 @@ public class GameState {
 	}
 	
 	public int totalTreasures() {return totalTreasures;}
-	
-	public int treasureCollected() {return treasuresCollected;}
+	public int getTreasuresCollected() {return treasuresCollected;}
+	public void treasureCollected() {this.treasuresCollected++;}	
+	public boolean allTreasureCollected() {return treasuresCollected == totalTreasures ? true : false;}
 	
 	//public Map<Key,String> keysCollected(){return keysCollected;}
 	
-	public boolean allTreasureCollected() {return treasuresCollected == totalTreasures ? true : false;}
-	
 	public String chapPosition(){return chap.getPosition();}
 	
-	// method to check that the tile Chap is moving to contains an item, if so pick it up
-	// can change later if poor design
-	// may need to move to gameController
+	public void moveChap(Direction direction) {
+	    chap.move(direction, maze);
+	    checkForItem();
+	}
+
 	public void checkForItem() {
 		Tile currentTile = maze.getTile(chap.getRow(), chap.getCol());
         if (currentTile.hasItem()) {
             Item item = currentTile.getItem();
             chap.pickUpItem(item);
+            if(item instanceof Treasure) {this.treasureCollected();}
             currentTile.removeItem();
             maze.setTile(chap.getRow(), chap.getCol() , new FreeTile());
 	}

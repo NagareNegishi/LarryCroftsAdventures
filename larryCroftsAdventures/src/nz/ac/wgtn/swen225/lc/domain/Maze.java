@@ -35,17 +35,20 @@ public class Maze {
 		return maze[row][col].canMoveTo();
 	}
 	
-	// helper method for creating a maze with FreeTiles in the middle and WallTiles on the outside
-	public static Maze createBasicMaze(int rows, int cols) {
+	// helper method for creating a custom maze for testing different tiles
+	public static Maze createCustomMaze(int rows, int cols) {
 		Maze maze = new Maze(rows, cols);
 		for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 if (row == 0 || row == rows -1 || col == 0 || col == cols -1) {
                     maze.setTile(row, col, new WallTile());
                 } 
-                    //creating a treasure tile for testing
+                //creating a treasure tile for testing
+                else if(row == 2 && col == 3) {
+                	maze.setTile(row, col, new TreasureTile());}
+                // creating a KeyTile for testng
                 else if(row == 3 && col == 3) {
-                	maze.setTile(row, col, new TreasureTile());
+                	maze.setTile(row, col, new KeyTile(new Key("Blue")));
                 }else {
                     maze.setTile(row, col, new FreeTile());
                 }
@@ -53,4 +56,20 @@ public class Maze {
         }
 		return maze;
 	}
+	
+	// helper method for creating a maze with FreeTiles in the middle and WallTiles on the outside
+	public static Maze createBasicMaze(int rows, int cols) {
+		Maze maze = new Maze(rows, cols);
+		for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (row == 0 || row == rows -1 || col == 0 || col == cols -1) {
+                    maze.setTile(row, col, new WallTile());    
+                }else {
+                    maze.setTile(row, col, new FreeTile());
+                }
+            }
+		}
+                return maze;
+	}
+	
 }

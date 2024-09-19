@@ -3,6 +3,7 @@ package nz.ac.wgtn.swen225.lc.domain;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
+import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
 public class Tests {
 	
@@ -36,7 +37,7 @@ public class Tests {
 		public void testChapMoveIsCorrect() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2);
-			chap.move(3, 3, maze);
+			chap.moveTo(3, 3, maze);
 			assertEquals(3,chap.getRow());
 			assertEquals(3,chap.getCol());
 		}
@@ -47,7 +48,7 @@ public class Tests {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(3,3);
 			assertThrows(IllegalArgumentException.class, () -> {
-				chap.move(4,4, maze);
+				chap.moveTo(4,4, maze);
 			});
 		}
 		
@@ -56,7 +57,7 @@ public class Tests {
 		public void testChapMoveUp() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2);
-			chap.moveUp(maze);
+			chap.move(Direction.Up,maze);
 			assertEquals(1,chap.getRow());
 			assertEquals(2,chap.getCol());
 		}
@@ -66,7 +67,7 @@ public class Tests {
 		public void testChapMoveDown() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2);
-			chap.moveDown(maze);
+			chap.move(Direction.Down,maze);
 			assertEquals(3,chap.getRow());
 			assertEquals(2,chap.getCol());
 		}
@@ -76,7 +77,7 @@ public class Tests {
 		public void testChapMoveLeft() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2);
-			chap.moveLeft(maze);
+			chap.move(Direction.Left,maze);
 			assertEquals(2,chap.getRow());
 			assertEquals(1,chap.getCol());
 		}
@@ -86,7 +87,7 @@ public class Tests {
 		public void testChapMoveRight() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2);
-			chap.moveRight(maze);
+			chap.move(Direction.Right,maze);
 			assertEquals(2,chap.getRow());
 			assertEquals(3,chap.getCol());
 		}
@@ -98,7 +99,7 @@ public class Tests {
 			//System.out.println("Tile at 0,0 is: " + maze.getTile(0, 0).tileType());
 			Chap chap = new Chap(1,0);
 			assertThrows(IllegalArgumentException.class, () -> {
-				chap.moveUp(maze);
+				chap.move(Direction.Up,maze);
 			});
 		}
 		
@@ -108,7 +109,7 @@ public class Tests {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(3,0);
 			assertThrows(IllegalArgumentException.class, () -> {
-				chap.moveDown(maze);
+				chap.move(Direction.Down,maze);
 			});
 		}
 		
@@ -118,7 +119,7 @@ public class Tests {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(0,1);
 			assertThrows(IllegalArgumentException.class, () -> {
-				chap.moveLeft(maze);
+				chap.move(Direction.Left,maze);
 			});
 		}
 		
@@ -128,17 +129,47 @@ public class Tests {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(0,3);
 			assertThrows(IllegalArgumentException.class, () -> {
-				chap.moveRight(maze);
+				chap.move(Direction.Right,maze);
 			});
 		}
 		
-	// test Chap picks up treasure and treasure is in inventory
-	
+	// test Chap picks up treasure and treasure is in inventory and treasure collected increases by one
+		@Test
+		public void testChapPicksUpTreasure() {
+			Maze maze = Maze.createBasicMaze(5, 5);
+			Chap chap = new Chap(2,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.setTile(2, 3, new TreasureTile());
+			test.moveChap(Direction.Right);
+			assert test.getTreasuresCollected() == 1;
+		    assert chap.inventory().get(0) instanceof Treasure;
+		}
+		
+	// test treasure tile turns into free tile when treasure is picked up
+		@Test
+		public void testTreasureTileTurnsIntoFreeTile() {
+			Maze maze = Maze.createBasicMaze(5, 5);
+			Chap chap = new Chap(2,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.setTile(2, 3, new TreasureTile());
+			test.moveChap(Direction.Right);
+			assert maze.getTile(2, 3) instanceof FreeTile;
+		}
+
+	// test true when treasures collected is same as total treasures
+		@Test
+		public void testAllTreasuresCollected() {
+			Maze maze = Maze.createBasicMaze(5, 5);
+			Chap chap = new Chap(2,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.setTile(2, 3, new TreasureTile());
+			test.moveChap(Direction.Right);
+			assert test.allTreasureCollected() == true;
+			}
+
 	// test Chap picks up key and key is in inventory of correct colour
 	
-	// test Chap picks up a key AND a treasure and both are in iventory and provide descriptions
+	// test Chap picks up a key AND a treasure and both are in inventory and provide descriptions
 	
 	// test KeyTile turns into FreeTile when Chap picks up the key
-	
-	// test once Chap picks up Treasure tile doesn't contain a treasure anymore
 }
