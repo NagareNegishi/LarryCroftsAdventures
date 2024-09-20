@@ -22,7 +22,7 @@ public class SaveFile implements Saver{
         ObjectMapper mapper = new ObjectMapper();
 
         //final String  pathPrefix = "../../levels/";
-        final String pathPrefix = "";
+        final String pathPrefix = "saves/";
         
         // Map obj to JSON file
         try{
