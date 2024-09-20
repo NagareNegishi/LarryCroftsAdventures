@@ -10,6 +10,8 @@ import nz.ac.wgtn.swen225.lc.persistency.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Optional;
+
 // Domain imports
 
 
@@ -54,6 +56,12 @@ public class PersistencyTest {
     @Test public void GameControlTest() {
     	GameStateControllerInterface gs = new GameStateController(5, 5, 2, 2, 1);
     	assert SaveFile.saveGame("GameSaveTest", gs);
+    }
+    
+    @Test public void GameLoad() {
+    	Optional<GameStateControllerInterface> gsOp = LoadFile.loadSave("GameSaveTest");
+    	GameStateControllerInterface gs = gsOp.get();
+
     }
     
     

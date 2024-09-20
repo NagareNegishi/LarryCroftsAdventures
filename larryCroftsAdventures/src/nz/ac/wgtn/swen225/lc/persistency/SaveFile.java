@@ -21,12 +21,11 @@ public class SaveFile implements Saver{
 
         ObjectMapper mapper = new ObjectMapper();
 
-        //final String  pathPrefix = "../../levels/";
         final String pathPrefix = "saves/";
         
         // Map obj to JSON file
         try{
-            mapper.writeValue( new File(pathPrefix + fileName), gameControl );
+            mapper.writeValue( new File(pathPrefix + fileName + ".json"), gameControl );
             return true;
         } catch(IOException e){
             e.printStackTrace();
@@ -51,7 +50,7 @@ public class SaveFile implements Saver{
     	ObjectMapper mapper = new ObjectMapper();
     	
     	try{
-            mapper.writeValue( new FileOutputStream(fileName), obj);
+            mapper.writeValue( new FileOutputStream(fileName + ".json"), obj);
             return true;
         } catch(IOException e){
             e.printStackTrace();
