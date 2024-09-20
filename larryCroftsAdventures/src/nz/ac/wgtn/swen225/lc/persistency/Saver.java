@@ -23,7 +23,7 @@ public interface Saver {
      * @param gameState: GameState, instance describing all game objects
      * @return boolean, success or failure of save
      */
-    public static boolean saveGame(String fileName, GameController gameControl){
+    public static boolean saveGame(String fileName, GameStateControllerInterface gameStateControl){
         return false;
     };
 }

@@ -1,15 +1,16 @@
 package test.nz.ac.wgtn.swen225.lc.persistency;
 
+import nz.ac.wgtn.swen225.lc.domain.*;
+import nz.ac.wgtn.swen225.lc.domain.GameStateControllerInterface;
+import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+
 import nz.ac.wgtn.swen225.lc.persistency.*;
 
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import nz.ac.wgtn.swen225.lc.persistency.*;
-
 // Domain imports
-//import nz.ac.wgtn.swen225.lc.domain.GameController;
 
 
 public class PersistencyTest {
@@ -46,6 +47,19 @@ public class PersistencyTest {
     	Canary c = new Canary("ObjBird", 1000);
     	assert SaveFile.saveObj("ObjectTest", c);
     	
+    }
+    
+    @Test public void GameStateTest() {
+    	Maze maze = Maze.createBasicMaze(5, 5);
+		Chap chap = new Chap(2,2);
+		GameStateInterface test = new GameState(maze,chap,1);
+		//assert SaveFile.save
+    	
+    }
+    
+    @Test public void GameControlTest() {
+    	GameStateControllerInterface gs = new GameStateController(5, 5, 2, 2, 1);
+    	assert SaveFile.saveGame("GameSaveTest", gs);
     }
     
     
