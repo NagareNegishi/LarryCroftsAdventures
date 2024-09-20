@@ -22,19 +22,11 @@ class Controller extends Keys{
     Controller(Chap chap, Maze maze, Map<String, Runnable> actionBindings){
         this.chap = chap;
         this.maze = maze;
-        setAction(KeyEvent.VK_UP, 0, () -> {chap.moveUp(maze); System.out.println("up");}, () -> {});
-        setAction(KeyEvent.VK_DOWN, 0, () -> chap.moveDown(maze), () -> {});
-        setAction(KeyEvent.VK_LEFT, 0, () -> chap.moveLeft(maze), () -> {});
-        setAction(KeyEvent.VK_RIGHT, 0, () -> chap.moveRight(maze), () -> {});
+        setAction(KeyEvent.VK_UP, 0,() -> chap.move(Chap.Direction.Up, maze), () -> {});
+        setAction(KeyEvent.VK_DOWN, 0,() -> chap.move(Chap.Direction.Down, maze), () -> {});
+        setAction(KeyEvent.VK_LEFT, 0,() -> chap.move(Chap.Direction.Left, maze), () -> {});
+        setAction(KeyEvent.VK_RIGHT, 0,() -> chap.move(Chap.Direction.Right, maze), () -> {});
 
-/**
- * it should work after next domain merge
- *      setAction(KeyEvent.VK_UP, () -> chap.move(Chap.Direction.Up, maze), () -> {});
-        setAction(KeyEvent.VK_DOWN, () -> chap.move(Chap.Direction.Down, maze), () -> {});
-        setAction(KeyEvent.VK_LEFT, () -> chap.move(Chap.Direction.Left, maze), () -> {});
-        setAction(KeyEvent.VK_RIGHT, () -> chap.move(Chap.Direction.Right, maze), () -> {});
- */
-        
         // Ctrl key combinations
         // InputEvent since getKeyStroke() is expecting InputEvent
         setAction(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK, actionBindings.get("exitWithoutSaving"), () -> {});
