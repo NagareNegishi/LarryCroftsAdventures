@@ -1,6 +1,10 @@
 package nz.ac.wgtn.swen225.lc.persistency;
 
+import java.util.Optional;
+
+
 import java.io.IOException;
+
 
 import nz.ac.wgtn.swen225.lc.domain.*;
 
@@ -8,18 +12,24 @@ public interface Loader {
 	
 	
 	
-	
-	public static GameStateControllerInterface loadLevel(String level) throws IOException {
+	/**
+	 * Loads level from JSON
+	 * @param String level : name of level file excluding .json
+	 * @return Optional<GameStateControllerInterface> 
+	 * @throws IOException
+	 */
+	public static Optional<GameStateControllerInterface> loadLevel(String level) throws IOException {
 		throw new IOException("Default method");
 	}
 	
 	
 	/**
+	 * 
 	 * Used to load game from saves folder
 	 * @param fileName
 	 * @return
 	 */
-	public static boolean loadSave(String fileName) throws IOException {
+	public static Optional<GameStateControllerInterface> loadSave(String fileName) throws IOException {
 		throw new IOException("Default method");
 	}
 }
