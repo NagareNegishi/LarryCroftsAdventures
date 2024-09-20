@@ -19,6 +19,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
+import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
 class App extends JFrame{
   private static final long serialVersionUID= 1L;
@@ -36,8 +37,7 @@ class App extends JFrame{
   private int treasuresLeft = 10; // Example value
 
 
-
-  private JPanel gamePanel; // placeholder for "render"
+  private JPanel renderer;
   private JPanel recorderPanel; // placeholder for "recorder UI"
   private JPanel DomainPanel; // placeholder for Jpanel i want to pass to the domain as interface keysLabel, treasuresLabel will be this
   //currently directly making the parameter from domain
@@ -103,9 +103,9 @@ class App extends JFrame{
     add(menuPanel, BorderLayout.WEST); // temporary
 
     // Center panel for game rendering (placeholder)
-    gamePanel = new JPanel();
-    gamePanel.setBackground(Color.BLACK);
-    add(gamePanel, BorderLayout.CENTER);
+    renderer = new Renderer();
+    renderer.setPreferredSize(new Dimension(800, 400)); 
+    add(renderer, BorderLayout.CENTER);
 
     pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0));
     startDialog = new PauseDialog(this, "Press Space to start", Color.GREEN, Color.YELLOW);
@@ -309,9 +309,9 @@ class App extends JFrame{
  */
   void setPhase(MockPhase p){
     //set up the viewport and the timer
-    MockView v= new MockView();   // pass model to it (p.model());
-    v.addKeyListener(controller);//or just controller? can i reuse? i guess depend on others code
-    v.setFocusable(true);
+    //MockView v= new MockView();   // pass model to it (p.model());
+    renderer.addKeyListener(controller);//or just controller? can i reuse? i guess depend on others code
+    renderer.setFocusable(true);
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
 
@@ -324,15 +324,15 @@ class App extends JFrame{
          */
 
 
-        v.repaint();
+         renderer.repaint();
       }
     });
     closePhase.run();//close phase before adding any element of the new phase
-    closePhase = ()->{ timer.stop(); remove(v); };
-    add(BorderLayout.CENTER, v);//add the new phase viewport
+    closePhase = ()->{ timer.stop(); remove(renderer); };
+    add(BorderLayout.CENTER, renderer);//add the new phase viewport
     setPreferredSize(getSize());//to keep the current size
     pack();                     //after pack
-    v.requestFocus();//need to be after pack
+    renderer.requestFocus();//need to be after pack
     timer.start();
   }
 
