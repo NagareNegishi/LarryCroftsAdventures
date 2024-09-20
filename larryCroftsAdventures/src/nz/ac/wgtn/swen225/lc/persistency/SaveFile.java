@@ -89,7 +89,7 @@ public class SaveFile implements Saver{
     
     /**
      * Generic method to save JSON of any object
-     * @param <T>
+     * @param <T>,  Generic object to serialise
      * @param fileName
      * @param obj
      * @return
@@ -107,7 +107,6 @@ public class SaveFile implements Saver{
         }
         // Failed to send
         return false;
-    	
     }
     
     
