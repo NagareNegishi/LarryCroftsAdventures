@@ -18,6 +18,7 @@ import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap;
+import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
@@ -52,6 +53,8 @@ class App extends JFrame{
   private Renderer renderer;
   private Recorder recorder;*/
   private boolean isPaused = false;
+
+  private GameStateController model;
 
 
 //////////////////////////////
@@ -173,6 +176,7 @@ class App extends JFrame{
   private void pauseGame() {
     if (isPaused) return;
     isPaused = true;
+    // renderer.setFocusable(false); i probably want it
     gameTimer.stop();
     pauseDialog.setVisible(true);
     startDialog.setVisible(false);// should optimize this
@@ -181,6 +185,8 @@ class App extends JFrame{
   private void unpauseGame() {
     if (!isPaused) return;
     isPaused = false;
+    // renderer.setFocusable(true); i probably want it
+    // renderer.requestFocus();
     assert !gameTimer.isRunning(): "Game is already running";
     gameTimer.start();
     pauseDialog.setVisible(false);
@@ -307,9 +313,36 @@ class App extends JFrame{
  * viewport should extend JPanel, so i set it up in the viewport class
  *
  */
-  void setPhase(MockPhase p){
+  void setPhase(MockPhase p){ //MockPhase -> GameStateController? or 
+
+
+    /**
+     * Phase was model + controller and model need rannable to be complete
+     * app has controller, so if i can reuse it, just do so,
+     * if not get chap from model and make new controller
+     * pass it to the renderer
+     * 
+     * app shouldnt check the model,
+     * but for the prototype, i can check win/lose condition here
+     * to final submission, the model should be able to handle it
+     */
+
+
+
+
+
     //set up the viewport and the timer
     //MockView v= new MockView();   // pass model to it (p.model());
+
+    /**
+     * i dont need to make new renderer each time
+     * if renderer has setmethod to update the model(gamestatecontroller)
+     * i can just pass the model to the renderer
+     * so i dont need to risk breaking the jframe
+     */
+
+
+
     renderer.addKeyListener(controller);//or just controller? can i reuse? i guess depend on others code
     renderer.setFocusable(true);
     Timer timer= new Timer(34, unused->{
@@ -317,21 +350,27 @@ class App extends JFrame{
 
       if (!isPaused) { //isPaused may not be pretty solution..... should i use timer.running() instead??
         new MockModel().ping();//p.model().ping();
+
+        //model.ping() or update() or something
+
         /**
          * its not pretty solution
          * but i can take keys/ treasure info from the model and update the gameInfoPanel here
-         * 
          */
-
 
          renderer.repaint();
       }
     });
     closePhase.run();//close phase before adding any element of the new phase
-    closePhase = ()->{ timer.stop(); remove(renderer); };
+    closePhase = ()->{ timer.stop();}; //remove(renderer); };
+/**
+ * I should be able to remove this part
+ *  
     add(BorderLayout.CENTER, renderer);//add the new phase viewport
     setPreferredSize(getSize());//to keep the current size
     pack();                     //after pack
+*/
+
     renderer.requestFocus();//need to be after pack
     timer.start();
   }
