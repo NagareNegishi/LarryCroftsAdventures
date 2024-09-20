@@ -5,7 +5,7 @@ import java.util.Map;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
-public class GameState {
+public class GameState implements GameStateInterface {
 	
 	private Maze maze;
 	private Chap chap;

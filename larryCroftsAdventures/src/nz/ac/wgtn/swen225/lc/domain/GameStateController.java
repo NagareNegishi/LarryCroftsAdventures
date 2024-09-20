@@ -5,7 +5,7 @@ import java.util.List;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
 // Entry point for other modules to access 
-public class GameStateController {
+public class GameStateController implements GameStateControllerInterface {
 
 	private Maze maze;
 	private GameState gameState;
