@@ -5,12 +5,17 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel; // task 2
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
@@ -21,6 +26,8 @@ class App extends JFrame{
   private GameInfoPanel gameInfoPanel;
   private MenuPanel menuPanel;
   private PauseDialog pauseDialog;
+  private PauseDialog startDialog;
+  private PauseDialog gameoverDialog;
 
   private Timer gameTimer;
   private int timeLeft = 60; // 1 minute for level 1??
@@ -45,6 +52,8 @@ class App extends JFrame{
   private Renderer renderer;
   private Recorder recorder;*/
   private boolean isPaused = false;
+
+
 
 
 
@@ -98,7 +107,10 @@ class App extends JFrame{
     gamePanel.setBackground(Color.BLACK);
     add(gamePanel, BorderLayout.CENTER);
 
-    pauseDialog = new PauseDialog(this);
+    pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0));
+    startDialog = new PauseDialog(this, "Press Space to start", Color.GREEN, Color.YELLOW);
+    gameoverDialog = new PauseDialog(this, "Game Over", Color.RED, Color.BLACK);
+    startDialog.setVisible(true);
 }
 
 /**
@@ -116,16 +128,29 @@ class App extends JFrame{
         menuPanel.setPauseButton("Pause");
       }
       case "save" -> saveGame();
-      case "load" -> loadGame();
+      case "load" -> loadFile();
       case "help" -> showHelp();
       case "exit" -> System.exit(0);// need proper method later
     }
     assert false: "Unknown action command: " + actionCommand;
   }
 
+  /**
+   * Initialize the controller for the game
+   * make map of key bindings and pass it to the controller
+   */
   private void initializeController(){
+    Map<String, Runnable> actionBindings =  new HashMap<>();
+    actionBindings.put("exitWithoutSaving", this::exitGameWithoutSaving);
+    actionBindings.put("exitAndSave", this::exitGameAndSave);
+    actionBindings.put("resumeSavedGame", this::resumeSavedGame);
+    actionBindings.put("startNewGame1", () -> startNewGame(1));
+    actionBindings.put("startNewGame2", () -> startNewGame(2));
+    actionBindings.put("pause", this::pauseGame);
+    actionBindings.put("unpause", this::unpauseGame);
 
-    controller = new Controller(new Chap(2,2), new Maze(5,5), this::pauseGame, this::unpauseGame);//temp maze and chap
+
+    controller = new Controller(new Chap(2,2), new Maze(5,5), actionBindings);//temp maze and chap
     addKeyListener(controller);
     setFocusable(true);//could be remove??
   }
@@ -137,7 +162,7 @@ class App extends JFrame{
           gameInfoPanel.setTime(timeLeft);
           if (timeLeft == 0) {
               gameTimer.stop();
-              //showGameOverScreen();
+              gameoverDialog.setVisible(true);
           }
       });
       gameTimer.start();
@@ -150,6 +175,7 @@ class App extends JFrame{
     isPaused = true;
     gameTimer.stop();
     pauseDialog.setVisible(true);
+    startDialog.setVisible(false);// should optimize this
   }
 
   private void unpauseGame() {
@@ -158,10 +184,11 @@ class App extends JFrame{
     assert !gameTimer.isRunning(): "Game is already running";
     gameTimer.start();
     pauseDialog.setVisible(false);
+    gameoverDialog.setVisible(false);// should optimize this
   }
 
 
-
+  
 
 
   private void showHelp() {
@@ -184,13 +211,61 @@ class App extends JFrame{
       JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
   }
 
-  private void loadGame() {
+  private void loadFile() {
+    JFileChooser fileChooser = new JFileChooser();
+    FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON Game files", "json");//expecting json file
+    fileChooser.setFileFilter(filter); // set filter
+    int picked = fileChooser.showOpenDialog(this);
+    if (picked == JFileChooser.APPROVE_OPTION) { // if user picked a file
+      File file = fileChooser.getSelectedFile();
+      //loadedGame = Persistency.loadGameFromFile(file);
+    }
+  }
+
+  /**
+   * I guess i need two kind of load method from persistency
+   * one app need to pass level, onWin, onLose
+   * one app need to pass saved file
+   */
+
+  private void loadGame(int level, Runnable onWin, Runnable onLose) {
       //Game loadedGame = GameLoader.loadGame();
       //if (loadedGame != null) {
           //game = loadedGame;
           JOptionPane.showMessageDialog(this, "Game Loaded", "Load", JOptionPane.INFORMATION_MESSAGE);
       //}
   }
+  
+  private void exitGameWithoutSaving() {
+      System.exit(0);
+  }
+
+  private void exitGameAndSave() {
+      //GameSaver.saveGame();
+      System.exit(0);
+  }
+
+  private void resumeSavedGame() {
+    loadFile();
+      //Game loadedGame = GameLoader.loadGame();
+      //if (loadedGame != null) {
+          //game = loadedGame;
+          JOptionPane.showMessageDialog(this, "Game Loaded", "Load", JOptionPane.INFORMATION_MESSAGE);
+      //}
+  }
+
+  private void startNewGame(int level) {
+    //Persistency.loadGame(level, this::onWin, this::onLose);
+    //setPhase(null);
+  }
+
+
+
+
+
+
+
+
 /**
     private void saveGame() {
       GameSaver.saveGame();// i want to pass 2 runnable and int for level
