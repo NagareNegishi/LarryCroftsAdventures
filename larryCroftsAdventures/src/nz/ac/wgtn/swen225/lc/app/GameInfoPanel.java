@@ -59,18 +59,16 @@ public class GameInfoPanel extends JPanel {
     }
 
     /**
-     * change it to switch later
+     * 
      * @param time
      */
     public void updateTimerColor(int time) {
-        if (time < 10) {
-            timeLabel.setForeground(Color.RED);
-        } else if (time < 20) {
-            timeLabel.setForeground(Color.ORANGE);
-        }
-        else {
-            timeLabel.setForeground(Color.BLACK);
-        }
+        Color color = switch(time/10) {// I can't believe new switch can't limit the scope of the variable
+            case 0  -> Color.RED;
+            case 1 ->Color.ORANGE;
+            default -> Color.BLACK;
+        };
+        timeLabel.setForeground(color);
     }
 
 
