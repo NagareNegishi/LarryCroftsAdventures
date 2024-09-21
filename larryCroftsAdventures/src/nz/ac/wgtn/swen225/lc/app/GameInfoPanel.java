@@ -2,6 +2,7 @@ package nz.ac.wgtn.swen225.lc.app;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
@@ -15,17 +16,20 @@ public class GameInfoPanel extends JPanel {
     private JLabel keysLabel;
     private JLabel treasuresLabel;
     
-    public GameInfoPanel() {
+    public GameInfoPanel(int width, int height) {
         setLayout(new BorderLayout(0,10));
+        setPreferredSize(new Dimension(width, height)); //repetitive?? app will call it later too
 
         //*need better layout */
         JPanel timerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        timeTextLabel = new JLabel("Time:");
-        timeTextLabel.setFont(getFont().deriveFont(20.0f));
+        timerPanel.setPreferredSize(new Dimension(width, height/2));
+        timeTextLabel = new JLabel("Time:    ");
+        timeTextLabel.setFont(getFont().deriveFont((float)width/4));
         timeLabel = new JLabel("60");
-        timeLabel.setFont(getFont().deriveFont(40.0f));
+        timeLabel.setFont(getFont().deriveFont((float)width/2));
         timerPanel.add(timeTextLabel);
         timerPanel.add(timeLabel);
+
         JPanel infoPanel = new JPanel(new GridLayout(3, 1));
         levelLabel = new JLabel("Level: 1");
         keysLabel = new JLabel("Keys: 0");

@@ -57,6 +57,9 @@ class App extends JFrame{
   private boolean isPaused = false;
 
   private GameStateController model;
+  private int width = 800;
+  private int height = 400;
+
 
 
 //////////////////////////////
@@ -74,7 +77,7 @@ class App extends JFrame{
     initializeController();
     initializeGameTimer();
 
-    setPreferredSize(new Dimension(800, 400));
+    setPreferredSize(new Dimension(width, height));
     pack();
     setVisible(true);
     addWindowListener(new WindowAdapter(){
@@ -92,9 +95,14 @@ class App extends JFrame{
   private void initializeUI() {
 
     // Top panel for game info
-    gameInfoPanel = new GameInfoPanel();
+    gameInfoPanel = new GameInfoPanel(width/8, height);
+    gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
     add(gameInfoPanel, BorderLayout.EAST);
 
+
+    sidePanel = new JPanel(new BorderLayout());
+    sidePanel.setPreferredSize(new Dimension(width/8, height));
+    add(sidePanel, BorderLayout.WEST);
 
 /**
  * note:
@@ -106,34 +114,22 @@ class App extends JFrame{
  * action command is string discribe the action
  * so i can use switch case to handle the action
  */
-
-    sidePanel = new JPanel(new BorderLayout());
-    add(sidePanel, BorderLayout.WEST);
-
-
- 
     menuPanel = new MenuPanel(e -> handleMenuAction(e.getActionCommand()));
     sidePanel.add(menuPanel);
 
-    //menuPanel.disableKeyStroke();
-    //add(menuPanel, BorderLayout.WEST); // temporary
     recorderPanel = new RecorderPanel(e -> handleRecorderAction(e.getActionCommand())
     ,slider -> handleSliderChange(slider));//yes! slider value change -. then call handleSliderChange i hope it works
     //recorderPanel.setVisible(false); // initially hidden
 
 
-
-
-
-
     // Center panel for game rendering (placeholder)
     renderer = new Renderer();
-    renderer.setPreferredSize(new Dimension(800, 400)); 
+    //renderer.setPreferredSize(new Dimension(800, 400)); everythingelse is for the renderer
     add(renderer, BorderLayout.CENTER);
 
-    pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0));
-    startDialog = new PauseDialog(this, "Press Space to start", Color.GREEN, Color.YELLOW);
-    gameoverDialog = new PauseDialog(this, "Game Over", Color.RED, Color.BLACK);
+    pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0), 0.75);
+    startDialog = new PauseDialog(this, "Press Space to start", Color.GREEN, Color.YELLOW, 0.75);
+    gameoverDialog = new PauseDialog(this, "Game Over", Color.RED, Color.BLACK, 0.75);
     startDialog.setVisible(true);
 
 
