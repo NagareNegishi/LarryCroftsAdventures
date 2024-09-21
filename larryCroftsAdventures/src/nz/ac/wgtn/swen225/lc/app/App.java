@@ -78,7 +78,10 @@ class App extends JFrame{
     pack();
     setVisible(true);
     addWindowListener(new WindowAdapter(){
-      public void windowClosed(WindowEvent e){ closePhase.run(); }
+      public void windowClosed(WindowEvent e){ 
+        closePhase.run();
+        gameTimer.stop();
+      }
     });
   }
 
