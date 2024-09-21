@@ -298,7 +298,7 @@ class App extends JFrame{
     }
   }
 
-  private Optional<GameStateControllerInterface> loadFile() {
+  private Optional<GameStateController> loadFile() {
     JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Load Game");
     FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON Game files", "json");//expecting json file
@@ -315,9 +315,9 @@ class App extends JFrame{
 
 
   private void loadGame(){//(int level, Runnable onWin, Runnable onLose) {
-    Optional<GameStateControllerInterface> loadedGame = loadFile();
+    Optional<GameStateController> loadedGame = loadFile();
     if (loadedGame.isPresent()) {
-      model = (GameStateController)loadedGame.get();
+      model = loadedGame.get();
       setLevel(model);
     } else {
       JOptionPane.showMessageDialog(this, "Failed to load game", "Load Error", JOptionPane.ERROR_MESSAGE);
