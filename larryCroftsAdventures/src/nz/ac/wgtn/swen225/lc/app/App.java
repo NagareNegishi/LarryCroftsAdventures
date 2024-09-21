@@ -56,7 +56,8 @@ class App extends JFrame{
 
   /**
   private Recorder recorder;*/
-  private boolean isPaused = false;
+  public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY, RECORDING}
+  private AppState state = AppState.NEWGAME;
 
   private GameStateController model;
   private int width = 800;
@@ -235,8 +236,8 @@ class App extends JFrame{
 
 
   private void pauseGame() {
-    if (isPaused) return;
-    isPaused = true;
+    if (state != AppState.PLAY) return;
+    state = AppState.PAUSED;
     // renderer.setFocusable(false); i probably want it
     gameTimer.stop();
     pauseDialog.setVisible(true);
@@ -244,10 +245,27 @@ class App extends JFrame{
   }
 
   private void unpauseGame() {
-    if (!isPaused) return;
-    isPaused = false;
-    // renderer.setFocusable(true); i probably want it
-    // renderer.requestFocus();
+    if (state == AppState.PLAY) return;
+/**
+ * i can use swich here too
+ * but do it tomorrow my brain is dead.
+ * 
+  if (state == AppState.PLAY) return;
+  switch(state){
+    case AppState.PLAY -> return;
+    case AppState.PAUSED -> state = AppState.PLAY;
+    case AppState.NEWGAME -> loadNextLevel();
+    case AppState.GAMEOVER -> loadLevel("level" + currentLevel);
+    case AppState.VICTORY -> loadLevel("level" + 1);
+    case AppState.RECORDING -> state = AppState.PLAY;//???
+  }
+ */
+
+
+
+    state = AppState.PLAY;
+    renderer.setFocusable(true);
+    renderer.requestFocus();
     assert !gameTimer.isRunning(): "Game is already running";
     gameTimer.start();
     pauseDialog.setVisible(false);
@@ -371,7 +389,7 @@ class App extends JFrame{
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
 
-      if (!isPaused) { //isPaused may not be pretty solution..... should i use timer.running() instead??
+      if (state == AppState.PLAY) {
         new MockModel().ping();//p.model().ping();
 
         //model.ping() or update() or something
