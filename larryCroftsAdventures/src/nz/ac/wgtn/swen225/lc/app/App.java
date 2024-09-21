@@ -114,7 +114,7 @@ class App extends JFrame{
 
     //menuPanel.disableKeyStroke();
     //add(menuPanel, BorderLayout.WEST); // temporary
-    recorderPanel = new RecorderPanel();
+    recorderPanel = new RecorderPanel(e -> handleRecorderAction(e.getActionCommand()));
     //recorderPanel.setVisible(false); // initially hidden
 
 
@@ -154,6 +154,18 @@ class App extends JFrame{
       case "load" -> loadFile();
       case "help" -> showHelp();
       case "exit" -> System.exit(0);// need proper method later
+      case "toggle" -> toggleSidePanel();
+    }
+    assert false: "Unknown action command: " + actionCommand;
+  }
+
+
+  private void handleRecorderAction(String actionCommand){
+    switch(actionCommand){
+     /** case "step" -> step();
+      case "autoReplay" -> toggleAutoReplay();
+      case "loadRecording" -> loadRecording();
+      case "toggleRecording" -> toggleRecording();*/
       case "toggle" -> toggleSidePanel();
     }
     assert false: "Unknown action command: " + actionCommand;

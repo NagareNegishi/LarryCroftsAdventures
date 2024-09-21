@@ -1,6 +1,7 @@
 package nz.ac.wgtn.swen225.lc.app;
 
 import java.awt.GridLayout;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -16,13 +17,37 @@ public class RecorderPanel extends JPanel {
     private JButton startStopRecordingButton;
     private JButton toggleButton;
 
-    public RecorderPanel() {
+    public RecorderPanel(ActionListener listener) {
         setLayout(new GridLayout(0, 1));
-        initializeComponents();
+        initializeComponents(listener);
         addComponents();
     }
 
-    private void initializeComponents() {
+    private void initializeComponents(ActionListener listener) {
+        stepButton = createButton("Step", "step", listener);
+        autoReplayToggle = new JToggleButton("Auto-Replay");
+        autoReplayToggle.addActionListener(listener);
+        autoReplayToggle.setActionCommand("autoReplay");
+        autoReplayToggle.setFocusable(false);
+
+        speedControl = new JSlider(JSlider.HORIZONTAL, 1, 5, 3);
+        speedControl.setFocusable(false);
+        speedControl.addChangeListener(e -> adjustSpeed());
+
+        loadRecordingButton = createButton("Load Recording", "loadRecording", listener);
+        startStopRecordingButton = createButton("Start Recording", "toggleRecording", listener);
+        toggleButton = createButton("Show Menu", "toggle", listener);
+    }
+
+
+    private JButton createButton(String text, String actionCommand, ActionListener listener) {
+        JButton button = new JButton(text);
+        button.setActionCommand(actionCommand);
+        button.addActionListener(listener);
+        button.setFocusable(false); // remove focus from buttons
+        return button;
+    }
+   /**  private void initializeComponents() {
         stepButton = new JButton("Step");
         autoReplayToggle = new JToggleButton("Auto-Replay");
         speedControl = new JSlider(JSlider.HORIZONTAL, 1, 5, 3);
@@ -38,7 +63,7 @@ public class RecorderPanel extends JPanel {
         loadRecordingButton.addActionListener(e -> loadRecording());
         startStopRecordingButton.addActionListener(e -> toggleRecording());
         toggleButton.addActionListener(e -> System.out.println("Show Menu"));
-    }
+    }*/
 
     private void addComponents() {
         add(stepButton);
@@ -50,30 +75,11 @@ public class RecorderPanel extends JPanel {
         add(toggleButton);
     }
 
-    // Placeholder methods to be implemented later
-    private void step() {
-        System.out.println("Step");
-    }
 
-    private void toggleAutoReplay() {
-        System.out.println("Auto-Replay: " + autoReplayToggle.isSelected());
-    }
 
     private void adjustSpeed() {
         System.out.println("Speed: " + speedControl.getValue());
     }
 
-    private void loadRecording() {
-        System.out.println("Load Recording");
-    }
 
-    private void toggleRecording() {
-        if (startStopRecordingButton.getText().equals("Start Recording")) {
-            startStopRecordingButton.setText("Stop Recording");
-            System.out.println("Start Recording");
-        } else {
-            startStopRecordingButton.setText("Start Recording");
-            System.out.println("Stop Recording");
-        }
-    }
 }
