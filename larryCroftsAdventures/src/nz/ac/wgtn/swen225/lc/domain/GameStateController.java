@@ -2,13 +2,19 @@ package nz.ac.wgtn.swen225.lc.domain;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
 // Entry point for other modules to access 
 public class GameStateController implements GameStateControllerInterface {
 
+	@JsonProperty("maze")
 	private Maze maze;
+	@JsonProperty("gameState")
 	private GameState gameState;
+	@JsonProperty("chap")
 	private Chap chap;
 	
 	// most likely need to change mazeRows and mazeCols for the shape of the maze choose 
@@ -17,6 +23,20 @@ public class GameStateController implements GameStateControllerInterface {
         this.maze = Maze.createCustomMaze(mazeRows, mazeCols);
         this.chap = new Chap(startRow, startCol);
         this.gameState = new GameState(maze, chap, totalTreasures);
+	}
+	
+	
+	/**
+	 * Constructor for Jackson de-serialization
+	 * @param maze : Placement of tiles in game space
+	 * @param chap : player character 
+	 * @param gameState : contains all game information. Must also contain provided maze and chap
+	 */
+	@JsonCreator
+	public GameStateController(Maze maze, Chap chap, GameState gameState) {
+		this.maze = maze;
+		this.chap = chap;
+		this.gameState = gameState;
 	}
 	
 	

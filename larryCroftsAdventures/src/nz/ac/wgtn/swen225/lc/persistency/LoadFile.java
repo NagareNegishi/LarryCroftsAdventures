@@ -44,5 +44,24 @@ public class LoadFile implements Loader {
 		return Optional.empty();
 	}
 	
+	
+	/**
+	 * Used to test Maze de-serialisation
+	 * @param path
+	 * @return
+	 */
+	public static Optional<Maze> loadMaze(String path){
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			File file = new File(path);
+			Maze loadedMaze = mapper.readValue(file, Maze.class);
+			return Optional.of(loadedMaze);
+		}catch (IOException e) { e.printStackTrace();}
+		return Optional.empty();
+	}
+	
 }
+
+
+
 

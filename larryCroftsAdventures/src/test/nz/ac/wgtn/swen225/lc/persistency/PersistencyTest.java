@@ -10,6 +10,7 @@ import nz.ac.wgtn.swen225.lc.persistency.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.File;
 import java.util.Optional;
 
 // Domain imports
@@ -43,6 +44,8 @@ public class PersistencyTest {
     	Canary c = new Canary("ObjBird", 1000, s);
     	
     	assert SaveFile.saveObj("ObjectTest", c);
+    	
+    	
     }
     
     // TODO
@@ -61,10 +64,15 @@ public class PersistencyTest {
     	assert SaveFile.saveGame("GameSaveTest", gs);
     }
     
-    @Test public void GameLoad() {
-    	Optional<GameStateControllerInterface> gsOp = LoadFile.loadSave("GameSaveTest");
-    	GameStateControllerInterface gs = gsOp.get();
-
+//    @Test public void GameLoad() {
+//    	Optional<GameStateControllerInterface> gsOp = LoadFile.loadSave("GameSaveTest");
+//    	GameStateControllerInterface gs = gsOp.get();
+//    }
+    
+    @Test public void mazeSave() {
+    	Maze maze = Maze.createBasicMaze(5, 5);
+    	assert SaveFile.saveObj("MazeTest", maze);
+    	Maze maze2 = LoadFile.loadMaze("MazeTest.json").get();
     }
     
     

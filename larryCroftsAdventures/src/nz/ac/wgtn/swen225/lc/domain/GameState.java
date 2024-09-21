@@ -3,13 +3,19 @@ package nz.ac.wgtn.swen225.lc.domain;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
 public class GameState implements GameStateInterface {
 	
+	@JsonProperty
 	private Maze maze;
+	@JsonProperty
 	private Chap chap;
+	@JsonProperty
 	private int treasuresCollected;
+	@JsonProperty
 	private int totalTreasures;
 	
 	// field for collected keys: map from key to colour? 
