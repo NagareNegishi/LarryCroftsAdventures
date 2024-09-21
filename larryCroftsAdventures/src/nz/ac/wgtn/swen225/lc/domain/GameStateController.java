@@ -3,11 +3,13 @@ package nz.ac.wgtn.swen225.lc.domain;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
 // Entry point for other modules to access 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameStateController implements GameStateControllerInterface {
 
 	@JsonProperty

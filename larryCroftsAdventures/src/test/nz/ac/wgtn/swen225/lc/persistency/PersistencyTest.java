@@ -3,6 +3,7 @@ package test.nz.ac.wgtn.swen225.lc.persistency;
 import nz.ac.wgtn.swen225.lc.domain.*;
 import nz.ac.wgtn.swen225.lc.domain.GameStateControllerInterface;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+import nz.ac.wgtn.swen225.lc.domain.GameState;
 
 import nz.ac.wgtn.swen225.lc.persistency.*;
 
@@ -84,19 +85,24 @@ public class PersistencyTest {
     }
     
     
-    // TODO
     @Test public void gameStateLoad() {
-    	//GameState gs = new GameState();
-    	
+    	Maze maze = Maze.createBasicMaze(5, 5);
+    	Chap chap = new Chap(2, 2);
+    	GameState gs = new GameState(maze, chap, 2);
+    	assert SaveFile.saveObj("GameStateTest", gs);
+    	Optional<GameState> gsOption = LoadFile.loadObj("GameStateTest", GameState.class);
+    	assert gsOption.isPresent();
+    	GameState gsDeserial = gsOption.get();
+    	assert gsDeserial.totalTreasures() == gs.totalTreasures();
     }
     
     
      //TODO
-//    @Test public void GameLoad() {
-//    	Optional<GameStateControllerInterface> gsOp = LoadFile.loadSave("GameSaveTest");
-//    	GameStateControllerInterface gs = gsOp.get();
-//    }
-//    
+    @Test public void GameLoadTest() {
+    	Optional<GameStateControllerInterface> gsOp = LoadFile.loadSave("GameSaveTest");
+    	GameStateControllerInterface gs = gsOp.get();
+    }
+    
     
     
     
