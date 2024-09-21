@@ -114,7 +114,8 @@ class App extends JFrame{
 
     //menuPanel.disableKeyStroke();
     //add(menuPanel, BorderLayout.WEST); // temporary
-    recorderPanel = new RecorderPanel(e -> handleRecorderAction(e.getActionCommand()));
+    recorderPanel = new RecorderPanel(e -> handleRecorderAction(e.getActionCommand())
+    ,slider -> handleSliderChange(slider));//yes! slider value change -. then call handleSliderChange i hope it works
     //recorderPanel.setVisible(false); // initially hidden
 
 
@@ -169,6 +170,18 @@ class App extends JFrame{
       case "toggle" -> toggleSidePanel();
     }
     assert false: "Unknown action command: " + actionCommand;
+  }
+
+  /**
+   * for slider 
+   * so unlike i want to take the int value of the slider
+   * and i want to pass it to the recorder panel
+   * so what is this?
+   * runnables are not needed?.....oh, its consumer???
+   */
+  private void handleSliderChange(int value){
+    //do something with the value
+    System.out.println("speed is :" + value);
   }
 
 
