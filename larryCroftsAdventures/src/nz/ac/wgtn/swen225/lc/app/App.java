@@ -26,7 +26,9 @@ class App extends JFrame{
   private static final long serialVersionUID= 1L;
 
   private GameInfoPanel gameInfoPanel;
+  private JPanel sidePanel; // switch menu/ recorder panel
   private MenuPanel menuPanel;
+  private RecorderPanel recorderPanel; // placeholder for "recorder UI"
   private PauseDialog pauseDialog;
   private PauseDialog startDialog;
   private PauseDialog gameoverDialog;
@@ -39,7 +41,7 @@ class App extends JFrame{
 
 
   private JPanel renderer;
-  private JPanel recorderPanel; // placeholder for "recorder UI"
+  
   private JPanel DomainPanel; // placeholder for Jpanel i want to pass to the domain as interface keysLabel, treasuresLabel will be this
   //currently directly making the parameter from domain
 
@@ -101,9 +103,24 @@ class App extends JFrame{
  * action command is string discribe the action
  * so i can use switch case to handle the action
  */
+
+    sidePanel = new JPanel(new BorderLayout());
+    add(sidePanel, BorderLayout.WEST);
+
+
+ 
     menuPanel = new MenuPanel(e -> handleMenuAction(e.getActionCommand()));
+    sidePanel.add(menuPanel);
+
     //menuPanel.disableKeyStroke();
-    add(menuPanel, BorderLayout.WEST); // temporary
+    //add(menuPanel, BorderLayout.WEST); // temporary
+    recorderPanel = new RecorderPanel();
+    //recorderPanel.setVisible(false); // initially hidden
+
+
+
+
+
 
     // Center panel for game rendering (placeholder)
     renderer = new Renderer();
@@ -114,6 +131,9 @@ class App extends JFrame{
     startDialog = new PauseDialog(this, "Press Space to start", Color.GREEN, Color.YELLOW);
     gameoverDialog = new PauseDialog(this, "Game Over", Color.RED, Color.BLACK);
     startDialog.setVisible(true);
+
+
+
 }
 
 /**
@@ -134,9 +154,26 @@ class App extends JFrame{
       case "load" -> loadFile();
       case "help" -> showHelp();
       case "exit" -> System.exit(0);// need proper method later
+      case "toggle" -> toggleSidePanel();
     }
     assert false: "Unknown action command: " + actionCommand;
   }
+
+
+  private void toggleSidePanel() {
+    if (sidePanel.getComponent(0) == menuPanel) {
+      sidePanel.remove(menuPanel);
+      sidePanel.add(recorderPanel);
+    } else {
+      sidePanel.remove(recorderPanel);
+      sidePanel.add(menuPanel);
+    }
+    sidePanel.revalidate();
+    sidePanel.repaint();
+  }
+
+
+
 
   /**
    * Initialize the controller for the game

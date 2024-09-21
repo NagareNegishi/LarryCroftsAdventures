@@ -18,6 +18,9 @@ public class MenuPanel extends JPanel{
         add(createButton("Load", "load", listener));
         add(createButton("Help", "help", listener));
         add(createButton("Exit", "exit", listener));
+
+        JButton toggleRecorderButton = createButton("Show Recorder", "toggle", listener);
+        add(toggleRecorderButton);
     }
 
     /**
