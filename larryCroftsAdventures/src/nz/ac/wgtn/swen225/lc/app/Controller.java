@@ -11,14 +11,19 @@ import nz.ac.wgtn.swen225.lc.domain.Maze;
 /**
  * Controller class that extends Keys class
  */
+<<<<<<< HEAD
 public class Controller extends Keys{
     private final Chap chap;
     private final Maze maze;
 
+=======
+class Controller extends Keys{
+>>>>>>> origin/main
 /**
    * Constructor for the Controller class
    * @param c MockCamera object expecting "Chap" object
    */
+<<<<<<< HEAD
     public Controller(Chap chap, Maze maze, Map<String, Runnable> actionBindings){
         this.chap = chap;
         this.maze = maze;
@@ -26,15 +31,14 @@ public class Controller extends Keys{
         setAction(KeyEvent.VK_DOWN, 0, () -> chap.move(Chap.Direction.Down,maze), () -> {});
         setAction(KeyEvent.VK_LEFT, 0, () -> chap.move(Chap.Direction.Left,maze), () -> {});
         setAction(KeyEvent.VK_RIGHT, 0, () -> chap.move(Chap.Direction.Right,maze), () -> {});
+=======
+    Controller(Chap chap, Maze maze, Map<String, Runnable> actionBindings){
+        setAction(KeyEvent.VK_UP, 0,() -> chap.move(Chap.Direction.Up, maze), () -> {});
+        setAction(KeyEvent.VK_DOWN, 0,() -> chap.move(Chap.Direction.Down, maze), () -> {});
+        setAction(KeyEvent.VK_LEFT, 0,() -> chap.move(Chap.Direction.Left, maze), () -> {});
+        setAction(KeyEvent.VK_RIGHT, 0,() -> chap.move(Chap.Direction.Right, maze), () -> {});
+>>>>>>> origin/main
 
-/**
- * it should work after next domain merge
- *      setAction(KeyEvent.VK_UP, () -> chap.move(Chap.Direction.Up, maze), () -> {});
-        setAction(KeyEvent.VK_DOWN, () -> chap.move(Chap.Direction.Down, maze), () -> {});
-        setAction(KeyEvent.VK_LEFT, () -> chap.move(Chap.Direction.Left, maze), () -> {});
-        setAction(KeyEvent.VK_RIGHT, () -> chap.move(Chap.Direction.Right, maze), () -> {});
- */
-        
         // Ctrl key combinations
         // InputEvent since getKeyStroke() is expecting InputEvent
         

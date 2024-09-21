@@ -3,19 +3,30 @@ package nz.ac.wgtn.swen225.lc.domain;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
-public class GameState {
+public class GameState implements GameStateInterface {
 	
+	@JsonProperty
 	private Maze maze;
+	@JsonProperty
 	private Chap chap;
+	@JsonProperty
 	private int treasuresCollected;
+	@JsonProperty
 	private int totalTreasures;
 	
 	// field for collected keys: map from key to colour? 
 	//private Map<Key, String> keysCollected;
 	
-	public GameState(Maze maze, Chap chap, int totalTreasures) {
+	@JsonCreator
+	public GameState(@JsonProperty("maze") Maze maze,
+					@JsonProperty("chap") Chap chap,
+					@JsonProperty("totalTreasures") int totalTreasures) {
+		
 		if(maze.equals(null) || chap.equals(null)) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
 		this.maze = maze;

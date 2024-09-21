@@ -17,11 +17,12 @@ import javax.swing.JPanel;
  */
 public class PauseDialog extends JDialog {
     private static final long serialVersionUID = 1L;
-    private static final double WIDTH_PERCENTAGE = 0.8;
+    private final double WIDTH_PERCENTAGE;
     
 
-    public PauseDialog(JFrame parent, String text, Color backgroundColor, Color textColor) {
+    public PauseDialog(JFrame parent, String text, Color backgroundColor, Color textColor, double ratio) {
         super(parent, "Game Paused", false);
+        WIDTH_PERCENTAGE = ratio;
         initializeUI(text, backgroundColor, textColor);
         addParentResizeListener(parent);
     }
@@ -38,8 +39,6 @@ public class PauseDialog extends JDialog {
         panel.add(label);
         setContentPane(panel);// takeover the dialog
 
-        //setSize(580, 360); // get size later
-        //setLocationRelativeTo(getParent());
         setResizable(false);
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // do nothing on close
         setFocusableWindowState(false); // do not allow focus

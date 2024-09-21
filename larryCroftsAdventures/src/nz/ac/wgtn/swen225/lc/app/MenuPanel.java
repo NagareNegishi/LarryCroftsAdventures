@@ -12,29 +12,15 @@ public class MenuPanel extends JPanel{
     private static final long serialVersionUID= 1L;
     MenuPanel(ActionListener listener){
         setLayout(new GridLayout(0, 1));
-        pauseButton = createButton("Pause", "pause", listener);
+        pauseButton = ComponentFactory.createButton("Pause", "pause", listener);
         add(pauseButton);
-        add(createButton("Save", "save", listener));
-        add(createButton("Load", "load", listener));
-        add(createButton("Help", "help", listener));
-        add(createButton("Exit", "exit", listener));
+        add(ComponentFactory.createButton("Save", "save", listener));
+        add(ComponentFactory.createButton("Load", "load", listener));
+        add(ComponentFactory.createButton("Help", "help", listener));
+        add(ComponentFactory.createButton("Exit", "exit", listener));
+        add(ComponentFactory.createButton("Show Recorder", "toggle", listener));
     }
-
-    /**
-     * Create a button with the given text, action command, and listener.
-     * @param text
-     * @param actionCommand
-     * @param listener
-     * @return
-     */
-    private JButton createButton(String text, String actionCommand, ActionListener listener) {
-        JButton button = new JButton(text);
-        button.setActionCommand(actionCommand);
-        button.addActionListener(listener);
-        button.setFocusable(false); // remove focus from buttons
-        return button;
-    }
-
+    
     /**
      * Set the text of the pause button.
      * @param text
