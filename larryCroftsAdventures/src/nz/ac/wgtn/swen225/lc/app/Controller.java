@@ -12,16 +12,11 @@ import nz.ac.wgtn.swen225.lc.domain.Maze;
  * Controller class that extends Keys class
  */
 class Controller extends Keys{
-    private final Chap chap;
-    private final Maze maze;
-
 /**
    * Constructor for the Controller class
    * @param c MockCamera object expecting "Chap" object
    */
     Controller(Chap chap, Maze maze, Map<String, Runnable> actionBindings){
-        this.chap = chap;
-        this.maze = maze;
         setAction(KeyEvent.VK_UP, 0,() -> chap.move(Chap.Direction.Up, maze), () -> {});
         setAction(KeyEvent.VK_DOWN, 0,() -> chap.move(Chap.Direction.Down, maze), () -> {});
         setAction(KeyEvent.VK_LEFT, 0,() -> chap.move(Chap.Direction.Left, maze), () -> {});
