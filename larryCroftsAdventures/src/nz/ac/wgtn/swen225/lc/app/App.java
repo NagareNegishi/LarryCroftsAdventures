@@ -38,27 +38,23 @@ class App extends JFrame{
   private PauseDialog pauseDialog;
   private PauseDialog startDialog;
   private PauseDialog gameoverDialog;
+  private PauseDialog victoryDialog;
 
   private Timer gameTimer;
   private int timeLeft = 60; // 1 minute for level 1??
-  private int currentLevel = 1;
+  private int currentLevel = 0;
   private int keysCollected = 0; //or List<Key> keysCollected or items??? but in that case i shouldnt involeve the process
   private int treasuresLeft = 10; // Example value
 
 
   private JPanel renderer;
-  
-  private JPanel DomainPanel; // placeholder for Jpanel i want to pass to the domain as interface keysLabel, treasuresLabel will be this
-  //currently directly making the parameter from domain
 
-  //private int score = 0; // not requirement????
 
   Runnable closePhase= ()->{};
   //Phase currentPhase;
   private Controller controller;
 
-  /**private Game game;
-  private Renderer renderer;
+  /**
   private Recorder recorder;*/
   private boolean isPaused = false;
 
@@ -100,12 +96,12 @@ class App extends JFrame{
 
   private void initializeUI() {
 
-    // Top panel for game info
+    // game info
     gameInfoPanel = new GameInfoPanel(width/8, height);
     gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
     add(gameInfoPanel, BorderLayout.EAST);
 
-
+    // Side panel for menu/recorder UI
     sidePanel = new JPanel(new BorderLayout());
     sidePanel.setPreferredSize(new Dimension(width/8, height));
     add(sidePanel, BorderLayout.WEST);
@@ -124,21 +120,19 @@ class App extends JFrame{
     sidePanel.add(menuPanel);
 
     recorderPanel = new RecorderPanel(e -> handleRecorderAction(e.getActionCommand())
-    ,slider -> handleSliderChange(slider));//yes! slider value change -. then call handleSliderChange i hope it works
-    //recorderPanel.setVisible(false); // initially hidden
+    ,slider -> handleSliderChange(slider));
 
 
-    // Center panel for game rendering (placeholder)
+
+    // Center panel for game rendering
     renderer = new Renderer();
-    //renderer.setPreferredSize(new Dimension(800, 400)); everythingelse is for the renderer
     add(renderer, BorderLayout.CENTER);
 
     pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0), 0.75);
-    startDialog = new PauseDialog(this, "Press Space to start", Color.GREEN, Color.YELLOW, 0.75);
-    gameoverDialog = new PauseDialog(this, "Game Over", Color.RED, Color.BLACK, 0.75);
+    startDialog = new PauseDialog(this, "Press Space to start", Color.BLUE, Color.YELLOW, 0.75);
+    gameoverDialog = new PauseDialog(this, "Game Over\n Press Space to retry", Color.RED, Color.BLACK, 0.75);
+    victoryDialog = new PauseDialog(this, "Victory\nPress Space to play again", Color.GREEN, Color.ORANGE, 0.75);
     startDialog.setVisible(true);
-
-
 
 }
 
@@ -179,8 +173,8 @@ class App extends JFrame{
 
   /**
    * for slider 
-   * so unlike i want to take the int value of the slider
-   * and i want to pass it to the recorder panel
+   * i want to take the int value of the slider
+   * and i want to pass it to app
    * so what is this?
    * runnables are not needed?.....oh, its consumer???
    */
@@ -336,29 +330,6 @@ class App extends JFrame{
     System.exit(0);
   }
 
-/**
-    private void saveGame() {
-      GameSaver.saveGame();// i want to pass 2 runnable and int for level
-      JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
-  }
-
-  private void loadGame() {
-  // i think i need to pop up file chooser
-  // and get json file
-  // then pass it to persistency
-
-  JsonFile jsonFile = new JsonFile();?????
-//do i need to check it here? or in persistency??
-      Game loadedGame = GameLoader.loadGame(jsonFile);
-      if (loadedGame != null) {
-          game = loadedGame;
-          renderer.updateGame(game);
-          updateInfoLabels();
-          JOptionPane.showMessageDialog(this, "Game Loaded", "Load", JOptionPane.INFORMATION_MESSAGE);
-      }
-  }*/
-
-
 
 /**
  *  Still need to address Runnable next, Runnable first
@@ -395,7 +366,7 @@ class App extends JFrame{
 
 
     model = level;
-    renderer.addKeyListener(controller);//or just controller? can i reuse? i guess depend on others code
+    renderer.addKeyListener(controller);//likely i need to make new controller each level as controller contains maze
     renderer.setFocusable(true);
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
@@ -428,19 +399,22 @@ class App extends JFrame{
   }
 
 
-/** 
-  private void startGame() {
-    loadNextLevel();
+/**
+//for prototype, i can assume max level is 2 to simplify the process
+private void loadNextLevel() {
+
+int nextlevel = currentLevel++;
+String levelName = "level" + nextlevel;
+  Optional<GameStateControllerInterface> loadedGame = LoadFile.loadLevel(levelName);
+  if (loadedGame.isPresent()) {
+    model = (GameStateController)loadedGame.get();
+    setLevel(model);
+  } else {
+    JOptionPane.showMessageDialog(this, "Failed to load game", "Load Error", JOptionPane.ERROR_MESSAGE);
+    //or victory screen
+  }
 }
 
-private void loadNextLevel() {
-    Level level = persistency.load(this::onLevelComplete, this::onGameOver);
-    if (Level == null) {
-        showVictoryScreen();
-    } else {
-        setPhase(level);
-    }
-}
 
 private void onLevelComplete() {
     loadNextLevel();
@@ -464,82 +438,4 @@ private void restartCurrentLevel() {
   }
 }
 */
-
-
-  /**
-   * We dont need start menu for this project but I will keep it for future reference
-
-
-
-  private void phaseZero() {
-    var panel = new JPanel(new GridLayout(0, 2));
-    var welcome= new JLabel("     Welcome to Compact. A compact Java game!");
-    var start= new JButton("     Start!");
-    panel.add(new JLabel("     Customize your controller (press keys to assign):")); // taks 2
-    panel.add(new JLabel()); // task 2 adjust the grid layout
-    closePhase.run();
-    closePhase = ()->{ getContentPane().removeAll(); }; // task 2 remove all addtional components
-    add(BorderLayout.NORTH, welcome);
-    add(BorderLayout.SOUTH, start);
-
-    // task 2 add the key bindings to the panel
-    for (String action : actions) {
-        panel.add(new JLabel("       " + action + ":")); // trying to make it prettier but "compact"
-        JTextField keyField = new JTextField(KeyEvent.getKeyText(keyBindings.get(action)));
-        keyField.setEditable(false); // only accept key press, not text input
-        keyField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                int keyCode = e.getKeyCode();
-                if ((keyCode >= KeyEvent.VK_NUMPAD0 && keyCode <= KeyEvent.VK_NUMPAD9) ||
-                    (keyCode >= KeyEvent.VK_A && keyCode <= KeyEvent.VK_Z)) {
-                    keyBindings.put(action, keyCode);
-                    keyField.setText(KeyEvent.getKeyText(keyCode));
-                }
-            }
-        });
-        panel.add(keyField);
-    }
-
-    add(BorderLayout.CENTER, panel);
-    start.addActionListener(e -> phaseOne());
-    setPreferredSize(new Dimension(800, 400));
-    pack();
-  }*/
-
-
-
-  /**
-  I believe we dont need this for this project but I will keep it for future reference
-  
-  private void victory(){
-    closePhase.run();
-    closePhase = ()->{}; // could be removed but I think good practice to keep it
-    add(BorderLayout.CENTER, new JLabel("     Victory!!"));
-    pack();
-  }
-
-  private void phaseOne(){
-    setPhase(Phase.level1(()->phaseTwo(), ()->phaseZero(), keyBindings));
-  }
-
-  private void phaseTwo(){
-    setPhase(Phase.level2(()->victory(), ()->phaseZero(), keyBindings));
-  }*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
