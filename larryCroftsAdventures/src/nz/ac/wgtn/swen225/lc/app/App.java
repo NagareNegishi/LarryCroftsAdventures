@@ -8,6 +8,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -19,8 +20,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+import nz.ac.wgtn.swen225.lc.domain.GameStateControllerInterface;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
+import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
+import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
+
+
 
 class App extends JFrame{
   private static final long serialVersionUID= 1L;
@@ -207,9 +213,9 @@ class App extends JFrame{
     Map<String, Runnable> actionBindings =  new HashMap<>();
     actionBindings.put("exitWithoutSaving", this::exitGameWithoutSaving);
     actionBindings.put("exitAndSave", this::exitGameAndSave);
-    actionBindings.put("resumeSavedGame", this::resumeSavedGame);
-    actionBindings.put("startNewGame1", () -> startNewGame(1));
-    actionBindings.put("startNewGame2", () -> startNewGame(2));
+    actionBindings.put("resumeSavedGame", this::loadGame);
+    actionBindings.put("startNewGame1", () -> LoadFile.loadLevel("level1"));
+    actionBindings.put("startNewGame2", () -> LoadFile.loadLevel("level2"));
     actionBindings.put("pause", this::pauseGame);
     actionBindings.put("unpause", this::unpauseGame);
 
@@ -274,33 +280,49 @@ class App extends JFrame{
   }
 
   private void saveGame() {
-      //GameSaver.saveGame();
-      JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Save Game");
+    fileChooser.setFileFilter(new FileNameExtensionFilter("JSON files", "json"));
+
+    int userSelection = fileChooser.showSaveDialog(this); // show dialog and wait user input
+    if (userSelection == JFileChooser.APPROVE_OPTION) { // if user picked a file
+      File fileToSave = fileChooser.getSelectedFile();
+
+      String filename = fileToSave.getName(); // i should pass file
+      boolean success = SaveFile.saveGame(filename, model);
+      if (success) {
+        JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
+      } else {
+        JOptionPane.showMessageDialog(this, "Failed to save game", "Save Error", JOptionPane.ERROR_MESSAGE);
+      }
+    }
   }
 
-  private void loadFile() {
+  private Optional<GameStateControllerInterface> loadFile() {
     JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Load Game");
     FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON Game files", "json");//expecting json file
     fileChooser.setFileFilter(filter); // set filter
     int picked = fileChooser.showOpenDialog(this);
     if (picked == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File file = fileChooser.getSelectedFile();
-      //loadedGame = Persistency.loadGameFromFile(file);
+
+      String filename = file.getName(); // i should pass file
+      return LoadFile.loadSave(filename);
     }
+    return Optional.empty();
   }
 
-  /**
-   * I guess i need two kind of load method from persistency
-   * one app need to pass level, onWin, onLose
-   * one app need to pass saved file
-   */
 
-  private void loadGame(int level, Runnable onWin, Runnable onLose) {
-      //Game loadedGame = GameLoader.loadGame();
-      //if (loadedGame != null) {
-          //game = loadedGame;
-          JOptionPane.showMessageDialog(this, "Game Loaded", "Load", JOptionPane.INFORMATION_MESSAGE);
-      //}
+  private void loadGame(){//(int level, Runnable onWin, Runnable onLose) {
+    Optional<GameStateControllerInterface> loadedGame = loadFile();
+    if (loadedGame.isPresent()) {
+      model = (GameStateController)loadedGame.get();
+      setLevel(model);
+    } else {
+      JOptionPane.showMessageDialog(this, "Failed to load game", "Load Error", JOptionPane.ERROR_MESSAGE);
+    }
+
   }
   
   private void exitGameWithoutSaving() {
@@ -309,31 +331,10 @@ class App extends JFrame{
   }
 
   private void exitGameAndSave() {
-    //GameSaver.saveGame();
+    saveGame();
     gameTimer.stop();
     System.exit(0);
   }
-
-  private void resumeSavedGame() {
-    loadFile();
-      //Game loadedGame = GameLoader.loadGame();
-      //if (loadedGame != null) {
-          //game = loadedGame;
-          JOptionPane.showMessageDialog(this, "Game Loaded", "Load", JOptionPane.INFORMATION_MESSAGE);
-      //}
-  }
-
-  private void startNewGame(int level) {
-    //Persistency.loadGame(level, this::onWin, this::onLose);
-    //setPhase(null);
-  }
-
-
-
-
-
-
-
 
 /**
     private void saveGame() {
@@ -360,23 +361,10 @@ class App extends JFrame{
 
 
 /**
- * likely getting model from persistency
- * and model should already have Runnable next, Runnable first
- * so this method may not be needed
+ *  Still need to address Runnable next, Runnable first
  */
-  private void NewPhase(){
-    //setPhase(Phase.level1(()->phaseTwo(), ()->phaseZero(), keyBindings));
-	setPhase(new MockPhase());
-  }
 
-
-/**
- * likely getting model from persistency
- * ->i can use it to make viewport (or renderer)
- * viewport should extend JPanel, so i set it up in the viewport class
- *
- */
-  void setPhase(MockPhase p){ //MockPhase -> GameStateController? or 
+  void setLevel(GameStateController level){
 
 
     /**
@@ -406,6 +394,7 @@ class App extends JFrame{
 
 
 
+    model = level;
     renderer.addKeyListener(controller);//or just controller? can i reuse? i guess depend on others code
     renderer.setFocusable(true);
     Timer timer= new Timer(34, unused->{
@@ -421,7 +410,7 @@ class App extends JFrame{
          * but i can take keys/ treasure info from the model and update the gameInfoPanel here
          */
 
-         renderer.repaint();
+        renderer.repaint();
       }
     });
     closePhase.run();//close phase before adding any element of the new phase
