@@ -38,7 +38,10 @@ public class PersistencyTest {
      * Test for ObjectMaper
      */
     @Test public void objTest() {
-    	Canary c = new Canary("ObjBird", 1000);
+    	Seeds s = new Seeds(1000);
+
+    	Canary c = new Canary("ObjBird", 1000, s);
+    	
     	assert SaveFile.saveObj("ObjectTest", c);
     }
     
