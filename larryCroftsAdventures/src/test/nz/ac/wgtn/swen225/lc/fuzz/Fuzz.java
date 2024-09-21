@@ -16,6 +16,7 @@ import java.awt.event.KeyListener;
 
 public class Fuzz {
 	private static Random random;
+	//number of times to run the test
 	private static int iterations = 100;
 	public Fuzz() {
 		random = new Random();
@@ -26,13 +27,13 @@ public class Fuzz {
 		fuzz.Test1();
 	}
 	@Test public void Test1() {
+		//randomly moves chap in a direction.
 		MockController mockController = new MockController(new Chap(2,2), new Maze(5,5));
 		for (int i = 0; i < Fuzz.iterations; i++){
 			int next = random.nextInt(3);
 			if (next == 0) {
 				mockController.chap.move(Chap.Direction.Up, mockController.maze);
 				System.out.println("moved Chap up! Current Pos: " + mockController.chap.getPosition());
-				
 			}
 			if (next == 1) {
 				mockController.chap.move(Chap.Direction.Down, mockController.maze);
