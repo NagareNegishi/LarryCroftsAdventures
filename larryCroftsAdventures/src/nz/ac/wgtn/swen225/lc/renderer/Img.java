@@ -13,9 +13,9 @@ import java.util.stream.StreamSupport;
 import javax.imageio.ImageIO;
 
 /**
- * This is the class that is responsible for drawing the images and accessing them
- * The logic behind the image size should be all uniformly square
+ * This is the class that is responsible for LOADING the Images into Cache only
  * 
+ *  
  * @author Marwan Mohamed
  * @studentID 300653693
  * 
@@ -25,8 +25,7 @@ import javax.imageio.ImageIO;
 
 
 public enum Img {
-    CHAP,
-    TILE;
+    Kourie; //Kourie is a test object, don't mind him.
     public final BufferedImage image;
     
     Img() {
@@ -34,11 +33,14 @@ public enum Img {
     }
 
     private static Path startPath() {
-        return Paths.get(System.getProperty("user.dir"), "src", "imgs");
+        Path path=  Paths.get(System.getProperty("user.dir"), "src", "imgs");
+        System.out.println("Image path: " + path.toString());
+        return path;
     }
 
     private static BufferedImage loadImage(String name) {
         Path p = startPath().resolve(name + ".png");
+        System.out.println("Loading image from: " + p.toString()); // Add this line
         assert Files.exists(p) : "Image " + name + " not found. Visible files are:\n" 
                                 + DirectoryStructure.of(startPath());
         try {
