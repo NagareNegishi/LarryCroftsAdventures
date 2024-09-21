@@ -58,7 +58,7 @@ public class PersistencyTest {
     @Test public void mazeSave() {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	assert SaveFile.saveObj("MazeTest", maze);
-    	Maze maze2 = LoadFile.loadMaze("MazeTest").get();
+    	Maze maze2 = LoadFile.loadObj("MazeTest", Maze.class).get();
     }
     
     // Tests serialisation / deserialisation of Chap
@@ -89,12 +89,12 @@ public class PersistencyTest {
      * Test serialisation of GameStateController
      */
     @Test public void gameControlTest() {
-    	GameStateControllerInterface gsc = new GameStateController(5, 5, 2, 2, 1);
+    	GameStateController gsc = new GameStateController(5, 5, 2, 2, 1);
     	assert SaveFile.saveGame("GameSaveTest", gsc);
     	
-    	Optional<GameStateControllerInterface> gsOp = LoadFile.loadSave("GameSaveTest");
+    	Optional<GameStateController> gsOp = LoadFile.loadSave("GameSaveTest");
     	assert gsOp.isPresent();
-    	GameStateControllerInterface gscDeserial = gsOp.get();
+    	GameStateController gscDeserial = gsOp.get();
     }
     
      // Tests de-serialisation of GameStateController
