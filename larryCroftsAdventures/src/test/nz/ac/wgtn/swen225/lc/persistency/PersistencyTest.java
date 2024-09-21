@@ -49,21 +49,9 @@ public class PersistencyTest {
     	
     }
     
-    // TODO
-    @Test public void gameStateTest() {
-    	Maze maze = Maze.createBasicMaze(5, 5);
-		Chap chap = new Chap(2,2);
-		GameStateInterface test = new GameState(maze,chap,1);
-		//assert SaveFile.save
-    }
     
-    /**
-     * Test serialisation of GameState
-     */
-    @Test public void gameControlTest() {
-    	GameStateControllerInterface gs = new GameStateController(5, 5, 2, 2, 1);
-    	assert SaveFile.saveGame("GameSaveTest", gs);
-    }
+    
+    
     
     
     
@@ -97,13 +85,35 @@ public class PersistencyTest {
     }
     
     
-     //TODO
-    @Test public void GameLoadTest() {
+    /**
+     * Test serialisation of GameStateController
+     */
+    @Test public void gameControlTest() {
+    	GameStateControllerInterface gsc = new GameStateController(5, 5, 2, 2, 1);
+    	assert SaveFile.saveGame("GameSaveTest", gsc);
+    	
     	Optional<GameStateControllerInterface> gsOp = LoadFile.loadSave("GameSaveTest");
-    	GameStateControllerInterface gs = gsOp.get();
+    	assert gsOp.isPresent();
+    	GameStateControllerInterface gscDeserial = gsOp.get();
     }
     
-    
-    
+     // Tests de-serialisation of GameStateController
+    @Test public void GameSaveLoadTest() {
+    	Maze maze = Maze.createBasicMaze(5, 5);
+    	Chap chap = new Chap(2, 2);
+    	GameState gs = new GameState(maze, chap, 2);
+    	GameStateController gsc = new GameStateController(maze, chap, gs);
+    	
+    	assert SaveFile.saveObj("GameSaveLoadTest", gsc);
+    	
+    	Optional<GameStateController> gscOption = LoadFile.loadObj("GameSaveLoadTest", GameStateController.class);
+    	assert gscOption.isPresent();
+    	GameStateController gscDeserial = gscOption.get();
+    	
+    	assert gscDeserial.getChapPosition().equals(chap.getPosition());
+    	
+    	// checking if same type of tile as hashcode prevents .equals directly
+    	assert gscDeserial.getTileAtChapPosition().getClass().equals(maze.getTile(2, 2).getClass());    	
+    }
     
 }
