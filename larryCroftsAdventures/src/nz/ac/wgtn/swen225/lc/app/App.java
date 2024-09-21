@@ -20,7 +20,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 
-class App extends JFrame{
+public class App extends JFrame{
   private static final long serialVersionUID= 1L;
 
   private GameInfoPanel gameInfoPanel;
@@ -57,7 +57,7 @@ class App extends JFrame{
 
 
 
-  App(){
+  public App(){
     setTitle("Larry Croft's Adventures");//or something else
 
 
