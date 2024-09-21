@@ -40,7 +40,10 @@ import java.awt.Color;
 
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Point;
+
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -48,7 +51,14 @@ public class Renderer extends JPanel {
 
     private final int FPS = 60; // 60 frames per second
     private final int frameTime = 1000 / FPS; // time per frame in milliseconds
-
+    
+    private long lastTime = System.nanoTime();
+    private int frames = 0;
+    private int fps = 0;
+    
+    //these fields are for testing and recognizing the fps
+    final RenderImg renderKourie = new RenderImg(Img.Kourie);
+    
     public Renderer() {
         // Timer for updating the canvas every frame
         Timer timer = new Timer(frameTime, e -> updateCanvas());
@@ -64,14 +74,46 @@ public class Renderer extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); 
         
-        g.setColor(Color.RED);
+        
         
         // Clear the canvas
         
         //run the logic of working in "local space, of just rendering stuff around the player and outwards"
         //on saturday, Make the Icons needed for this whole thing to work, and to actually test the Img class
- 
         
-        g.fillRect(50, 50, 100, 100); // You can replace this with your custom rendering
+        fpsCheck();
+
+        // Display FPS on the screen
+        g.setColor(Color.BLACK);
+        g.setFont(new Font("Arial", Font.PLAIN, 18));
+        g.drawString("FPS: " + fps, 10, 20); // Draw FPS at top left
+        
+
+        
+        Dimension size = this.getSize();
+        
+        //Point center = new Point(1,1);
+        Point center = new Point(size.width/2,size.height/2);
+		// Use RenderImg to draw the image
+        renderKourie.draw(g, center, size);
+        
+        g.setColor(Color.BLACK);
+        //g.fillOval(size.height/2,size.width/2, 30, 30);
+        g.fillOval(size.width/2,(size.height/2)-20, 40, 40);
+        }
+    
+    private void fpsCheck() {
+    	
+    	long currentTime = System.nanoTime();
+        frames++;
+        if (currentTime - lastTime >= 1_000_000_000) {
+            fps = frames;
+            frames = 0;
+            lastTime = currentTime;
+        }
+    	
     }
+    
+    
+    
 }
