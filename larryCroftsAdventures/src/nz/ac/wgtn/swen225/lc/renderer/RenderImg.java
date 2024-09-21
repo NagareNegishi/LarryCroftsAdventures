@@ -35,7 +35,9 @@ public class RenderImg {
         // Draw the image
         
         g.drawImage(image, w1, h1, w2, h2, 0, 0, imageWidth, imageHeight, null);
-        g.setColor(Color.RED);
-        g.fillOval(imageWidth-20, imageHeight-20, 40, 40);
+        g.setColor(Color.ORANGE);
+        g.fillOval(size.width-20, size.height-20, 40, 40);
+        g.setColor(Color.BLUE);
+        g.fillOval(imageWidth-20, (imageHeight/2)-20, 40, 40);
     }
 }

@@ -93,12 +93,13 @@ public class Renderer extends JPanel {
         Dimension size = this.getSize();
         
         //Point center = new Point(1,1);
-        Point center = new Point(size.height/2,size.width/2);
+        Point center = new Point(size.width/2,size.height/2);
 		// Use RenderImg to draw the image
         renderKourie.draw(g, center, size);
         
-        g.setColor(Color.RED);
+        g.setColor(Color.BLACK);
         //g.fillOval(size.height/2,size.width/2, 30, 30);
+        g.fillOval(size.width/2,(size.height/2)-20, 40, 40);
         }
     
     private void fpsCheck() {
