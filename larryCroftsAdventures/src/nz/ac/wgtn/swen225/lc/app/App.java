@@ -280,12 +280,14 @@ class App extends JFrame{
   }
   
   private void exitGameWithoutSaving() {
-      System.exit(0);
+    gameTimer.stop();
+    System.exit(0);
   }
 
   private void exitGameAndSave() {
-      //GameSaver.saveGame();
-      System.exit(0);
+    //GameSaver.saveGame();
+    gameTimer.stop();
+    System.exit(0);
   }
 
   private void resumeSavedGame() {
