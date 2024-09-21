@@ -21,7 +21,7 @@ public class Maze {
 	
 	@JsonCreator
     public Maze(@JsonProperty("maze") Tile[][] maze, 
-                @JsonProperty("rows") int rows, 
+    			@JsonProperty("rows") int rows, 
                 @JsonProperty("cols") int cols) {
         this.maze = maze;
         this.rows = rows;

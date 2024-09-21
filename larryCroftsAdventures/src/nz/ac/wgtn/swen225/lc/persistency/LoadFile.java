@@ -31,7 +31,7 @@ public class LoadFile implements Loader {
 
 	/**
 	 * Loads file using ObjectMapper
-	 * @param String path : file path
+	 * @param path, String : file path
 	 * @return representation of game state
 	 */
 	private static Optional<GameStateControllerInterface> load(String path){
@@ -53,12 +53,31 @@ public class LoadFile implements Loader {
 	public static Optional<Maze> loadMaze(String path){
 		try {
 			ObjectMapper mapper = new ObjectMapper();
-			File file = new File(path);
+			File file = new File(path + ".json");
 			Maze loadedMaze = mapper.readValue(file, Maze.class);
 			return Optional.of(loadedMaze);
 		}catch (IOException e) { e.printStackTrace();}
 		return Optional.empty();
 	}
+	
+	/**
+     * Generic method to load a file using ObjectMapper
+     * @param path, String : file path
+     * @param valueType : the class type to deserialize to
+     * @return an Optional containing the deserialized object
+     */
+    public static <T> Optional<T> loadObj(String path, Class<T> valueType) {
+        try {
+            File file = new File(path + ".json");
+            ObjectMapper mapper = new ObjectMapper();
+            T loadedObject = mapper.readValue(file, valueType);
+            return Optional.of(loadedObject);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
+	
 	
 }
 

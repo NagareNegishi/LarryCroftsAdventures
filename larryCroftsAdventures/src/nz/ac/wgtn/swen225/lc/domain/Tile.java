@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+// Annotations for serialization
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = FreeTile.class, name = "FreeTile"),
@@ -12,8 +13,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = KeyTile.class, name = "KeyTile")
 })
 
-// super class of Tile that all tiles will extend
 @JsonIgnoreProperties(ignoreUnknown = true)
+//super class of Tile that all tiles will extend
 public abstract class Tile {
 	
 	

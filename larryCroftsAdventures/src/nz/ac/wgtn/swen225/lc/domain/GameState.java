@@ -21,6 +21,7 @@ public class GameState implements GameStateInterface {
 	// field for collected keys: map from key to colour? 
 	//private Map<Key, String> keysCollected;
 	
+	
 	public GameState(Maze maze, Chap chap, int totalTreasures) {
 		if(maze.equals(null) || chap.equals(null)) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}

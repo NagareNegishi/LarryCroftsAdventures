@@ -10,11 +10,11 @@ import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 // Entry point for other modules to access 
 public class GameStateController implements GameStateControllerInterface {
 
-	@JsonProperty("maze")
+	@JsonProperty
 	private Maze maze;
-	@JsonProperty("gameState")
+	@JsonProperty
 	private GameState gameState;
-	@JsonProperty("chap")
+	@JsonProperty
 	private Chap chap;
 	
 	// most likely need to change mazeRows and mazeCols for the shape of the maze choose 
@@ -33,7 +33,9 @@ public class GameStateController implements GameStateControllerInterface {
 	 * @param gameState : contains all game information. Must also contain provided maze and chap
 	 */
 	@JsonCreator
-	public GameStateController(Maze maze, Chap chap, GameState gameState) {
+	public GameStateController(@JsonProperty("maze") Maze maze,
+							@JsonProperty("chap") Chap chap,
+							@JsonProperty("gameState") GameState gameState) {
 		this.maze = maze;
 		this.chap = chap;
 		this.gameState = gameState;

@@ -49,7 +49,7 @@ public class PersistencyTest {
     }
     
     // TODO
-    @Test public void GameStateTest() {
+    @Test public void gameStateTest() {
     	Maze maze = Maze.createBasicMaze(5, 5);
 		Chap chap = new Chap(2,2);
 		GameStateInterface test = new GameState(maze,chap,1);
@@ -59,21 +59,45 @@ public class PersistencyTest {
     /**
      * Test serialisation of GameState
      */
-    @Test public void GameControlTest() {
+    @Test public void gameControlTest() {
     	GameStateControllerInterface gs = new GameStateController(5, 5, 2, 2, 1);
     	assert SaveFile.saveGame("GameSaveTest", gs);
     }
     
-//    @Test public void GameLoad() {
-//    	Optional<GameStateControllerInterface> gsOp = LoadFile.loadSave("GameSaveTest");
-//    	GameStateControllerInterface gs = gsOp.get();
-//    }
+    
     
     @Test public void mazeSave() {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	assert SaveFile.saveObj("MazeTest", maze);
-    	Maze maze2 = LoadFile.loadMaze("MazeTest.json").get();
+    	Maze maze2 = LoadFile.loadMaze("MazeTest").get();
     }
+    
+    // Tests serialisation / deserialisation of Chap
+    @Test public void ChapLoad() {
+    	Chap chap = new Chap(2, 2);
+    	assert chap.getPosition().equals("Chap is at row: 2, column: 2");
+    	assert SaveFile.saveObj("ChapText", chap);
+    	Optional<Chap> chapOption = LoadFile.loadObj("ChapText", Chap.class);
+    	assert chapOption.isPresent();
+    	Chap chapDeserial = chapOption.get();
+    	assert chap.getPosition().equals(chapDeserial.getPosition());
+    }
+    
+    
+    // TODO
+    @Test public void gameStateLoad() {
+    	//GameState gs = new GameState();
+    	
+    }
+    
+    
+     //TODO
+//    @Test public void GameLoad() {
+//    	Optional<GameStateControllerInterface> gsOp = LoadFile.loadSave("GameSaveTest");
+//    	GameStateControllerInterface gs = gsOp.get();
+//    }
+//    
+    
     
     
 }
