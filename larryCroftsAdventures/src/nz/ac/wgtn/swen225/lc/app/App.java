@@ -20,7 +20,6 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
-import nz.ac.wgtn.swen225.lc.domain.GameStateControllerInterface;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
@@ -56,12 +55,12 @@ class App extends JFrame{
 
   /**
   private Recorder recorder;*/
-  public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY, RECORDING}
+  public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY, BETWEEN, RECORDING}
   private AppState state = AppState.NEWGAME;
 
   private GameStateController model;
-  private int width = 800;
-  private int height = 400;
+  private static int width = 800;
+  private static int height = 400;
 
 
 
@@ -233,6 +232,29 @@ class App extends JFrame{
       gameTimer.start();
   }
 
+  private AppNotifier getAppNotifier(){
+    return new AppNotifier(){
+      public void onGameWin(){
+        state = AppState.BETWEEN;
+        gameTimer.stop();
+        loadNextLevel();
+      }
+      public void onGameLose(){
+        state = AppState.GAMEOVER;
+        gameTimer.stop();
+        gameoverDialog.setVisible(true);
+      }
+      public void onKeyPickup(int keyCount){
+        keysCollected = keyCount;
+        gameInfoPanel.setKeys(keysCollected);
+      }
+      public void onTreasurePickup(int treasureCount){
+        treasuresLeft = treasureCount;
+        gameInfoPanel.setTreasures(treasuresLeft);
+      }
+    };
+  }
+
 
 
   private void pauseGame() {
@@ -245,23 +267,16 @@ class App extends JFrame{
   }
 
   private void unpauseGame() {
-    if (state == AppState.PLAY) return;
-/**
- * i can use swich here too
- * but do it tomorrow my brain is dead.
- * 
-  if (state == AppState.PLAY) return;
-  switch(state){
-    case AppState.PLAY -> return;
-    case AppState.PAUSED -> state = AppState.PLAY;
-    case AppState.NEWGAME -> loadNextLevel();
-    case AppState.GAMEOVER -> loadLevel("level" + currentLevel);
-    case AppState.VICTORY -> loadLevel("level" + 1);
-    case AppState.RECORDING -> state = AppState.PLAY;//???
-  }
- */
+    boolean unpause = switch (state) {
+      case PLAY -> false; // Already playing
+      case PAUSED -> true;
+      case NEWGAME -> { loadNextLevel(); yield true; }
+      case GAMEOVER -> { LoadFile.loadLevel("level" + currentLevel); yield true; }
+      case VICTORY -> { LoadFile.loadLevel("level1"); yield true; }
+      case RECORDING, BETWEEN -> false; // need to think about this
+    };
 
-
+    if(!unpause) return;
 
     state = AppState.PLAY;
     renderer.setFocusable(true);
@@ -331,20 +346,39 @@ class App extends JFrame{
     if (loadedGame.isPresent()) {
       model = loadedGame.get();
       setLevel(model);
+      state = AppState.PLAY;
     } else {
-      JOptionPane.showMessageDialog(this, "Failed to load game", "Load Error", JOptionPane.ERROR_MESSAGE);
+      handleFileError("Failed to load game", "Load Error", 
+      new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
+      this::loadGame);
     }
+  }
 
+
+  private void handleFileError(String message, String title, String[] options, String defult, Runnable action){
+    int choice = JOptionPane.showOptionDialog(this, message, title,
+      JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null,
+      options, defult);
+      switch(choice){
+        case 0 -> action.run();
+        case 1 -> LoadFile.loadLevel("level1");
+        case 2 -> exitGameWithoutSaving();
+      }
   }
   
+
   private void exitGameWithoutSaving() {
+    closePhase.run();
     gameTimer.stop();
+    dispose();
     System.exit(0);
   }
 
   private void exitGameAndSave() {
     saveGame();
+    closePhase.run();
     gameTimer.stop();
+    dispose();
     System.exit(0);
   }
 
@@ -417,23 +451,24 @@ class App extends JFrame{
   }
 
 
-/**
+
 //for prototype, i can assume max level is 2 to simplify the process
 private void loadNextLevel() {
 
 int nextlevel = currentLevel++;
 String levelName = "level" + nextlevel;
-  Optional<GameStateControllerInterface> loadedGame = LoadFile.loadLevel(levelName);
+  Optional<GameStateController> loadedGame = LoadFile.loadLevel(levelName);
   if (loadedGame.isPresent()) {
-    model = (GameStateController)loadedGame.get();
+    model = loadedGame.get();
     setLevel(model);
   } else {
     JOptionPane.showMessageDialog(this, "Failed to load game", "Load Error", JOptionPane.ERROR_MESSAGE);
+
     //or victory screen
   }
 }
 
-
+/**
 private void onLevelComplete() {
     loadNextLevel();
 }
