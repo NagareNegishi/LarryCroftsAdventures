@@ -9,6 +9,7 @@ import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 
 
+@SuppressWarnings("unused")
 public class Fuzz {
 	private static Random random;
 	//number of times to run the test
