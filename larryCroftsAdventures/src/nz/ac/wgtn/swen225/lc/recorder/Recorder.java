@@ -3,6 +3,8 @@ package nz.ac.wgtn.swen225.lc.recorder;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Supplier;
+
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
@@ -11,6 +13,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 
 /**
  * Class used by the App module to generate a Recorder object. 
@@ -21,7 +24,7 @@ public class Recorder {
 	private ObjectMapper eventMapper = new ObjectMapper();
 	
 	// Entry to modify model of game for recording purposes.
-	private GameStateController recordingGame;
+	
 	
 	// Holds Chap's recorded movements and when they happened.
 	private List<DirectionEvent> events = new ArrayList<>();
@@ -32,6 +35,9 @@ public class Recorder {
 	// Rate events are shown per second during auto-replay.
 	private Double autoReplaySpeed = 1.0;
 
+	private Supplier<GameStateController> firstLevelSupplier;
+	
+	private GameStateController recordingGame;
 	/**
 	 * Wraps an actor's movement into an object to read at a later point.
 	 * @param direction The direction actor is moving.
@@ -45,13 +51,48 @@ public class Recorder {
 	}
 	
 	/**
+	 * Wraps an actor's movement into an object to read at a later point.
+	 * @param direction The direction actor is moving.
+	 * @param time Time when user inputed to move actor.
+	 */
+	public record RecordingChanges(GameStateController updatedGame, int updatedTime) {
+		public RecordingChanges {
+			assert updatedGame != null : "RecordingChanges can't have null GameStateController!";
+			assert updatedTime >= 0 : "DirectionEvent's time cannot be below 0";
+		}
+	}
+	
+	/**
 	 * Wrapper allowing file operations to be given as 
 	 * arguments without worrying about dealing with exception first. 
 	 */
 	interface FileOperation {
 	    void execute(RecordingFileChooser rfc) throws IOException;
 	}
-
+	
+	/**
+	 * Constructor intended to be used by App
+	 * for creating recorder object.
+	 */
+	public Recorder() {
+		firstLevelSupplier = ()->{
+			assert LoadFile.loadLevel("level1").isPresent() 
+			: "Exception occured when attempting to load first level for recorder!";
+			return LoadFile.loadLevel("level1").get();};
+		recordingGame = firstLevelSupplier.get();
+	}
+	
+	/**
+	 * Constructor allowing recorder to work  
+	 * When first level is not "level1".
+	 * Intended for testing
+	 * @param firstLevelSupplier Gives recorder modifiable game at first level.
+	 */
+	public Recorder(Supplier<GameStateController> firstLevelSupplier) {
+		this.firstLevelSupplier = firstLevelSupplier;
+		recordingGame = firstLevelSupplier.get();
+	}
+	
 	/**
 	 * Handles common logic for file operations such as load or save.
 	 * Shows a message to the user if the operation succeeds.
@@ -78,7 +119,7 @@ public class Recorder {
 	}
 	
 	/**
-	 * Writes JSON file, by serialising 
+	 * Writes JSON file, by serializing 
 	 * a list of DirectionEvent objects.
 	 */
 	public void saveRecording() {
@@ -106,50 +147,49 @@ public class Recorder {
 		autoReplaySpeed = eventsPerSecond;
 	}
 
-	/** OUTDATED WILL BE CHANGED TO PING PERSISTENCY
+	/**
 	 * Used by App module to manually
 	 * step the recording back by one event.
 	 * @param controllerOfLevelOnStart Controls newly loaded model of game.
-	 * @return The amount of time left when event originally occurred.
+	 * @return New Game controller and new time left to update to.
 	 */
-	public int previousStep(GameStateController controllerOfLevelOnStart) {
-		assert controllerOfLevelOnStart != null : "Cannot call previousStep on Recorder object with null GameStateController!";
+	public RecordingChanges previousStep() {
+		
 		assert !events.isEmpty() : "Recording is empty!";
-		recordingGame = controllerOfLevelOnStart;
-		if (currentEventIndex <= 0) return events.get(0).time();
+		recordingGame = firstLevelSupplier.get();
+		if (currentEventIndex <= 0) return new RecordingChanges(recordingGame, events.get(0).time());
 		currentEventIndex--;
 		
 		for (int i = 0; i <= currentEventIndex; i++) {
 			DirectionEvent curEvent = events.get(i);
 			recordingGame.moveChap(curEvent.direction());
 		}
-		return events.get(currentEventIndex).time();
+		return new RecordingChanges(recordingGame, events.get(currentEventIndex).time());
 	}
 
 	/**
 	 * Used by App module to manually
 	 * step the recording forward by one event.
-	 * @return The amount of time left when event originally occurred.
+	 * @return New Game controller and new time left to update to.
 	 */
-	public int nextStep() {
+	public RecordingChanges nextStep() {
+		assert recordingGame != null : "Recording doesn't have level to reference!";
 		assert !events.isEmpty() : "Recording is empty!";
 		if (currentEventIndex >= events.size() - 1) {
-			return events.get(events.size() - 1).time();
+			return new RecordingChanges(recordingGame, events.get(events.size() - 1).time());
 		}
 		currentEventIndex = Math.min(currentEventIndex + 1, events.size() - 1);
 		DirectionEvent curEvent = events.get(currentEventIndex);
 		recordingGame.moveChap(curEvent.direction());
-		return curEvent.time();
+		return new RecordingChanges(recordingGame, curEvent.time());
 	}
-
-	/** OUTDATED WILL BE CHANGED TO PING PERSISTENCY
-	 * Creates recorder object so long as 
-	 * gameController actually controls a game.
-	 * @param gameController Controls model of game with newly loaded level.
+	
+	
+	/**
+	 * TBD
 	 */
-	public Recorder(GameStateController gameController) {
-		assert gameController != null : "Cannot create Recorder object with null GameStateController!";
-		recordingGame = gameController;
+	public RecordingChanges autoReplay() {
+		return null;
 	}
 	
 	/**
