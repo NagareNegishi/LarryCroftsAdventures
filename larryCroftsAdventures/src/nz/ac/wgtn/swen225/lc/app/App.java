@@ -26,7 +26,6 @@ import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
 
-
 class App extends JFrame{
   private static final long serialVersionUID= 1L;
 
