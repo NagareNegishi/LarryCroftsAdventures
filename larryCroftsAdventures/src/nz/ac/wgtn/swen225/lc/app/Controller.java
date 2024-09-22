@@ -11,14 +11,12 @@ import nz.ac.wgtn.swen225.lc.domain.Maze;
 /**
  * Controller class that extends Keys class
  */
-//Anthony: added public keyword
-public class Controller extends Keys{
+class Controller extends Keys{
 /**
    * Constructor for the Controller class
    * @param c MockCamera object expecting "Chap" object
    */
-	//Anthony: added public keyword
-    public Controller(Chap chap, Maze maze, Map<String, Runnable> actionBindings){
+	Controller(Chap chap, Maze maze, Map<String, Runnable> actionBindings){
         setAction(KeyEvent.VK_UP, 0,() -> chap.move(Chap.Direction.Up, maze), () -> {});
         setAction(KeyEvent.VK_DOWN, 0,() -> chap.move(Chap.Direction.Down, maze), () -> {});
         setAction(KeyEvent.VK_LEFT, 0,() -> chap.move(Chap.Direction.Left, maze), () -> {});
@@ -26,7 +24,7 @@ public class Controller extends Keys{
 
         // Ctrl key combinations
         // InputEvent since getKeyStroke() is expecting InputEvent
-        
+        /* Anthony: commented to allow for actionBindings to be null
         setAction(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK, actionBindings.get("exitWithoutSaving"), () -> {});
         setAction(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, actionBindings.get("exitAndSave"), () -> {});
         setAction(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK, actionBindings.get("resumeSavedGame"), () -> {});
@@ -35,6 +33,6 @@ public class Controller extends Keys{
 
         // Other keys
         setAction(KeyEvent.VK_SPACE, 0, actionBindings.get("pause"), () -> {});
-        setAction(KeyEvent.VK_ESCAPE, 0, actionBindings.get("unpause"), () -> {});
+        setAction(KeyEvent.VK_ESCAPE, 0, actionBindings.get("unpause"), () -> {});*/
     }
 }

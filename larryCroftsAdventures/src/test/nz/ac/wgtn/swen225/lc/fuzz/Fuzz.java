@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 import org.junit.Test;
 
 import nz.ac.wgtn.swen225.lc.app.App;
+import nz.ac.wgtn.swen225.lc.app.MockController;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 
@@ -28,7 +29,7 @@ public class Fuzz {
 	}
 	@Test public void Test1() {
 		//randomly moves chap in a direction.
-		MockController mockController = new MockController(new Chap(2,2), new Maze(5,5));
+		MockController mockController = new MockController(new Chap(2,2), Maze.createBasicMaze(5,5));
 		for (int i = 0; i < Fuzz.iterations; i++){
 			int next = random.nextInt(3);
 			if (next == 0) {

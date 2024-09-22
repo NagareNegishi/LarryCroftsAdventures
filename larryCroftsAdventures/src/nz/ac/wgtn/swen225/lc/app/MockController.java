@@ -1,6 +1,5 @@
-package test.nz.ac.wgtn.swen225.lc.fuzz;
+package nz.ac.wgtn.swen225.lc.app;
 
-import nz.ac.wgtn.swen225.lc.app.Controller;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 
