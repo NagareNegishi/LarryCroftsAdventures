@@ -33,18 +33,22 @@ class Controller extends Keys{
         setAction(KeyEvent.VK_UP, 0,() -> {
             chap.move(Chap.Direction.Up, maze);
             recorder.ping(Chap.Direction.Up, time);
+            System.out.println("UP");
             }, () -> {});
         setAction(KeyEvent.VK_DOWN, 0,() -> {
             chap.move(Chap.Direction.Down, maze);
             recorder.ping(Chap.Direction.Down, time);
+            System.out.println("DOWN");
             }, () -> {});
         setAction(KeyEvent.VK_LEFT, 0,() -> {
             chap.move(Chap.Direction.Left, maze);
             recorder.ping(Chap.Direction.Left, time);
+            System.out.println("LEFT");
             }, () -> {});
         setAction(KeyEvent.VK_RIGHT, 0,() -> {
             chap.move(Chap.Direction.Right, maze);
             recorder.ping(Chap.Direction.Right, time);
+            System.out.println("RIGHT");
             }, () -> {});
 
         // Ctrl key combinations

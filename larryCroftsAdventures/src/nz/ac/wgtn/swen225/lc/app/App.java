@@ -521,7 +521,7 @@ class App extends JFrame{
       if (state == AppState.PLAY) {
         updateGameInfo(model); // this need to be gone
         renderer.repaint();
-        System.out.println("game is running");
+        //System.out.println("game is running");
       }
     });
     closePhase.run();//close phase before adding any element of the new phase
