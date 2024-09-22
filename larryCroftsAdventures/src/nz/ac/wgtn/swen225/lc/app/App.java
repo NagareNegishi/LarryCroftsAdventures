@@ -62,9 +62,9 @@ class App extends JFrame{
   private static int width = 800;
   private static int height = 400;
 
+  private static final int MAX_LEVEL = 2; //its not pretty... but i need to check loadNextLevel failure
 
 
-//////////////////////////////
 
 
   App(){
@@ -160,9 +160,12 @@ class App extends JFrame{
   }
 
 
+  /**
+   * connect to recorder method when recorder is implemented
+   */
   private void handleRecorderAction(String actionCommand){
     switch(actionCommand){
-     /** case "step" -> step();
+    /** case "step" -> step();
       case "autoReplay" -> toggleAutoReplay();
       case "loadRecording" -> loadRecording();
       case "toggleRecording" -> toggleRecording();*/
@@ -172,14 +175,14 @@ class App extends JFrame{
   }
 
   /**
-   * for slider 
+   * for slider
    * i want to take the int value of the slider
    * and i want to pass it to app
    * so what is this?
    * runnables are not needed?.....oh, its consumer???
    */
   private void handleSliderChange(int value){
-    //do something with the value
+    //do something with the value for recorder
     System.out.println("speed is :" + value);
   }
 
@@ -195,8 +198,6 @@ class App extends JFrame{
     sidePanel.revalidate();
     sidePanel.repaint();
   }
-
-
 
 
   /**
@@ -232,6 +233,13 @@ class App extends JFrame{
       gameTimer.start();
   }
 
+  /**
+   * I want to pass it to loader
+   * for final submission
+   * so loader can pluge those method to the model
+   * either file of runable or abstract method
+   * field may not work since 2 of method takes int....
+   */
   private AppNotifier getAppNotifier(){
     return new AppNotifier(){
       public void onGameWin(){
@@ -423,7 +431,9 @@ class App extends JFrame{
       assert SwingUtilities.isEventDispatchThread();
 
       if (state == AppState.PLAY) {
-        new MockModel().ping();//p.model().ping();
+
+        // should work without it for level 1
+        //new MockModel().ping();//p.model().ping();
 
         //model.ping() or update() or something
 
@@ -451,43 +461,23 @@ class App extends JFrame{
 
 
 
-//for prototype, i can assume max level is 2 to simplify the process
-private void loadNextLevel() {
-
-int nextlevel = currentLevel++;
-String levelName = "level" + nextlevel;
-  Optional<GameStateController> loadedGame = LoadFile.loadLevel(levelName);
-  if (loadedGame.isPresent()) {
-    model = loadedGame.get();
-    setLevel(model);
-  } else {
-    JOptionPane.showMessageDialog(this, "Failed to load game", "Load Error", JOptionPane.ERROR_MESSAGE);
-
-    //or victory screen
+  //for prototype, i can assume max level is 2 to simplify the process
+  private void loadNextLevel() {
+    int nextlevel = currentLevel++;
+    if (nextlevel > MAX_LEVEL) {
+      state = AppState.VICTORY;
+      victoryDialog.setVisible(true);
+      return;
+    }
+    String levelName = "level" + nextlevel;
+      Optional<GameStateController> loadedGame = LoadFile.loadLevel(levelName);
+      if (loadedGame.isPresent()) {
+        model = loadedGame.get();
+        setLevel(model);
+      } else {
+        handleFileError("Failed to load game", "Load Error", 
+        new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
+        this::loadGame);
+      }
   }
-}
-
-/**
-private void onLevelComplete() {
-    loadNextLevel();
-}
-
-private void onGameOver() {
-    showGameOverScreen();
-}
-//or????
-private void onGameOver() {
-  restartCurrentLevel();
-}
-
-private void restartCurrentLevel() {
-  Level level = persistency.restartCurrentLevel(this::onLevelComplete, this::onGameOver);
-  if (level == null) {
-      // This should not happen, but just in case
-      showGameOverScreen();
-  } else {
-      setPhase(level);
-  }
-}
-*/
 }
