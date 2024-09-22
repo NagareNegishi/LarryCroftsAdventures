@@ -14,7 +14,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 
-@SuppressWarnings("unused")
 public class Fuzz {
 	private static Random random;
 	//number of times to run the test
