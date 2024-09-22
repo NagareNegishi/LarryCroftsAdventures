@@ -1,6 +1,7 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
 import java.util.List;
+import java.util.Map;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
@@ -13,20 +14,27 @@ public class GameStateController {
 	
 	// most likely need to change mazeRows and mazeCols for the shape of the maze choose 
 	public GameStateController(int mazeRows, int mazeCols, int startRow, int startCol, int totalTreasures) {
+		if(mazeRows < 0 || mazeCols < 0 || startRow < 0 || startCol < 0 || totalTreasures < 0) {
+			throw new IllegalArgumentException("Maze must have parameters above 0 to create properly");}
+		if(startRow > mazeRows || startCol > mazeCols) {
+			throw new IllegalArgumentException("Chap must spawn within the bounds of the maze");}
+		
 		// basic maze initially but will be extended for the maze we choose
         this.maze = Maze.createCustomMaze(mazeRows, mazeCols);
         this.chap = new Chap(startRow, startCol);
         this.gameState = new GameState(maze, chap, totalTreasures);
-	}
-	
+        
+        assert mazeRows == maze.getRows() && mazeCols == maze.getCols();
+        assert startRow == chap.getRow() && startCol == chap.getCol();
+        }
 	
 	public void moveChap(Direction direction) {gameState.moveChap(direction);}
 	public String getChapPosition() {return chap.getPosition();}
 	 
-	//public List<Item> getChapInventory(){return chap.inventory();}
-	public void getChapInventory(){ chap.inventoryDescription();}
-	 
-	public int totalTreasures() {return gameState.totalTreasures();}
+	public List<Item> getChapInventory(){return chap.inventory();}
+	public void getChapInventoryDesc(){ chap.inventoryDescription();}
+	public Map<Key,String> getKeysCollected(){return gameState.keysCollected();}
+	public int getTotalTreasures() {return gameState.totalTreasures();}
 	public int getTreasuresCollected() {return gameState.getTreasuresCollected();}
 	public boolean isAllTreasureCollected() {return gameState.allTreasureCollected();}
 	 

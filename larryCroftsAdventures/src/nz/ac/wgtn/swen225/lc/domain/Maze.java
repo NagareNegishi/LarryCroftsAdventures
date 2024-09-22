@@ -2,12 +2,12 @@ package nz.ac.wgtn.swen225.lc.domain;
 
 public class Maze {
 
-	// could be renamed to grid or similar if confusing
 	private Tile[][] maze;
 	private int rows;
     private int cols;
 	
 	public Maze(int rows, int cols) {
+		if(rows < 0 || cols < 0) {throw new IllegalArgumentException("Maze must be created with more than 0 rows and cols");}
 		this.rows = rows;
 		this.cols = cols;
 		maze = new Tile[rows][cols];
@@ -24,16 +24,12 @@ public class Maze {
 		if (row < 0 || row >= maze.length || col < 0 || col >= maze[0].length) {
 	        throw new IllegalArgumentException("Row or column is outside the bounds of the maze.");
 	    }
-		
 		maze[row][col] = tile;
-		
 		// TODO: assert to check tile is correctly inserted
 		// assert tile instanceof ...
 	}
 	
-	public boolean validMove(int row, int col) {
-		return maze[row][col].canMoveTo();
-	}
+	public boolean validMove(int row, int col) {return maze[row][col].canMoveTo();}
 	
 	// helper method for creating a custom maze for testing different tiles
 	public static Maze createCustomMaze(int rows, int cols) {
@@ -43,10 +39,10 @@ public class Maze {
                 if (row == 0 || row == rows -1 || col == 0 || col == cols -1) {
                     maze.setTile(row, col, new WallTile());
                 } 
-                //creating a treasure tile for testing
+                //creating a Tile for testing
                 else if(row == 5 && col == 3) {
                 	maze.setTile(row, col, new LockedDoorTile("Blue"));}
-                // creating a KeyTile for testng
+                // creating a Tile for testng
                 else if(row == 4 && col == 3) {
                 	maze.setTile(row, col, new KeyTile(new Key("Blue")));
                 }else {
@@ -57,7 +53,7 @@ public class Maze {
 		return maze;
 	}
 	
-	// helper method for creating a maze with FreeTiles in the middle and WallTiles on the outside
+	// helper method for creating a square maze with FreeTiles in the middle and WallTiles on the outside
 	public static Maze createBasicMaze(int rows, int cols) {
 		Maze maze = new Maze(rows, cols);
 		for (int row = 0; row < rows; row++) {
