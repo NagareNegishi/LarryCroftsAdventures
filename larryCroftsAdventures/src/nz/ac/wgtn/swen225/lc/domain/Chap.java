@@ -3,17 +3,33 @@ package nz.ac.wgtn.swen225.lc.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Chap {
 	
+
 	private int row;
 	private int col;
 	private List<Item> inventory;
+	
 	
 	public Chap(int startRow, int startCol) {
 		this.row = startRow;
 		this.col = startCol;
 		this.inventory = new ArrayList<>();
 		}
+	
+	@JsonCreator
+	public Chap(@JsonProperty("startRow") int startRow,
+				@JsonProperty("startCol") int startCol,
+				@JsonProperty("inventory") ArrayList<Item> inventory) {
+		this.row = startRow;
+		this.col = startCol;
+		this.inventory = inventory;
+	}
 	
 	public int getRow() {return row;}
 	public int getCol() {return col;}
