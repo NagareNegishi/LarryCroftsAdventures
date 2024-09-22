@@ -320,7 +320,9 @@ class App extends JFrame{
       if (success) {
         JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
       } else {
-        JOptionPane.showMessageDialog(this, "Failed to save game", "Save Error", JOptionPane.ERROR_MESSAGE);
+        handleFileError("Failed to save game", "Save Error", 
+      new String[]{"Save Game", "start level 1", "quit"}, "Save Game",
+      this::saveGame);
       }
     }
   }
@@ -376,10 +378,7 @@ class App extends JFrame{
 
   private void exitGameAndSave() {
     saveGame();
-    closePhase.run();
-    gameTimer.stop();
-    dispose();
-    System.exit(0);
+    exitGameWithoutSaving();
   }
 
 
