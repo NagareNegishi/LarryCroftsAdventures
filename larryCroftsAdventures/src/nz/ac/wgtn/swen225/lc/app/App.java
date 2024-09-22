@@ -27,8 +27,7 @@ import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
 
-
-public class App extends JFrame{
+class App extends JFrame{
   private static final long serialVersionUID= 1L;
 
   private GameInfoPanel gameInfoPanel;
@@ -71,7 +70,7 @@ public class App extends JFrame{
 //////////////////////////////
 
 
-  public App(){
+  App(){
     setTitle("Larry Croft's Adventures");//or something else
 
 
