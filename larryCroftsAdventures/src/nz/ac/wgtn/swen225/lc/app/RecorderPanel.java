@@ -15,7 +15,7 @@ public class RecorderPanel extends JPanel {
     private JToggleButton autoReplayToggle;
     private JSlider speedControl;
     private JButton loadRecordingButton;
-    private JButton startStopRecordingButton;
+    private JButton saveRecordingButton;
     private JButton toggleButton;
 
     public RecorderPanel(ActionListener listener, Consumer<Integer> sliderConsumer) {
@@ -29,7 +29,7 @@ public class RecorderPanel extends JPanel {
         autoReplayToggle = ComponentFactory.createToggleButton("Auto Replay", "autoReplay", listener);
         speedControl = ComponentFactory.createSlider(1, 5, 3, sliderConsumer);
         loadRecordingButton = ComponentFactory.createButton("Load Recording", "loadRecording", listener);
-        startStopRecordingButton = ComponentFactory.createButton("Start Recording", "toggleRecording", listener);
+        saveRecordingButton = ComponentFactory.createButton("Save Recording", "saveRecording", listener);
         toggleButton = ComponentFactory.createButton("Show Menu", "toggle", listener);
     }
 
@@ -42,7 +42,7 @@ public class RecorderPanel extends JPanel {
         add(new JLabel("Speed:"));
         add(speedControl);
         add(loadRecordingButton);
-        add(startStopRecordingButton);
+        add(saveRecordingButton);
         add(toggleButton);
     }
 

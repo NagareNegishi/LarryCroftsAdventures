@@ -23,6 +23,7 @@ import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
+import nz.ac.wgtn.swen225.lc.recorder.Recorder;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
 
@@ -52,8 +53,8 @@ class App extends JFrame{
   //Phase currentPhase;
   private Controller controller;
 
-  /**
-  private Recorder recorder;*/
+  
+  private Recorder recorder;
   public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY, BETWEEN, RECORDING}
   private AppState state = AppState.NEWGAME;
 
@@ -76,7 +77,7 @@ class App extends JFrame{
 
     initializeUI();
     initializeController();
-    initializeGameTimer();
+    initializeGameTimer(); //must be after controller??
 
     setPreferredSize(new Dimension(width, height));
     pack();
@@ -127,6 +128,7 @@ class App extends JFrame{
     renderer = new Renderer();
     add(renderer, BorderLayout.CENTER);
 
+
     pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0), 0.75);
     startDialog = new PauseDialog(this, "Press Space to start", Color.BLUE, Color.YELLOW, 0.75);
     gameoverDialog = new PauseDialog(this, "Game Over\n Press Space to retry", Color.RED, Color.BLACK, 0.75);
@@ -164,10 +166,10 @@ class App extends JFrame{
    */
   private void handleRecorderAction(String actionCommand){
     switch(actionCommand){
-    /** case "step" -> step();
-      case "autoReplay" -> toggleAutoReplay();
-      case "loadRecording" -> loadRecording();
-      case "toggleRecording" -> toggleRecording();*/
+      case "step" -> recorder.nextStep();
+      //case "autoReplay" -> toggleAutoReplay();
+      case "loadRecording" -> recorder.loadRecording();
+      case "saveRecording" -> recorder.saveRecording();
       case "toggle" -> toggleSidePanel();
     }
     assert false: "Unknown action command: " + actionCommand;
@@ -181,8 +183,7 @@ class App extends JFrame{
    * runnables are not needed?.....oh, its consumer???
    */
   private void handleSliderChange(int value){
-    //do something with the value for recorder
-    System.out.println("speed is :" + value);
+    recorder.setPlaybackSpeed((double)value); //recorder want double
   }
 
 
@@ -223,6 +224,7 @@ class App extends JFrame{
   private void initializeGameTimer() {
       gameTimer = new Timer(1000, e -> {
           timeLeft--;
+          controller.updatetime(timeLeft);
           gameInfoPanel.setTime(timeLeft);
           if (timeLeft == 0) {
               gameTimer.stop();
@@ -424,6 +426,11 @@ class App extends JFrame{
 
 
     model = level;
+
+    recorder = new Recorder(model);
+    /**
+    * likely i need to make new controller or set it
+    */
     renderer.addKeyListener(controller);//likely i need to make new controller each level as controller contains maze
     renderer.setFocusable(true);
     Timer timer= new Timer(34, unused->{
@@ -441,6 +448,8 @@ class App extends JFrame{
          * but i can take keys/ treasure info from the model and update the gameInfoPanel here
          */
 
+        updateGameInfo(model); // this need to be gone
+        
         renderer.repaint();
       }
     });
@@ -457,8 +466,6 @@ class App extends JFrame{
     renderer.requestFocus();//need to be after pack
     timer.start();
   }
-
-
 
   //for prototype, i can assume max level is 2 to simplify the process
   private void loadNextLevel() {
@@ -479,4 +486,18 @@ class App extends JFrame{
         this::loadGame);
       }
   }
+
+
+  /**
+   * this is soooo unpretty solution
+   * definitely need to be changed
+   */
+  private void updateGameInfo(GameStateController level) {
+    keysCollected = level.getKeysCollected().size();
+    treasuresLeft = level.getTotalTreasures() - level.getTreasuresCollected();
+    gameInfoPanel.setKeys(keysCollected);
+    gameInfoPanel.setTreasures(treasuresLeft);
+  }
+
+
 }
