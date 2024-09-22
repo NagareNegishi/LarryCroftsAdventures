@@ -18,9 +18,7 @@ public class GameState implements GameStateInterface {
 	private int treasuresCollected;
 	@JsonProperty
 	private int totalTreasures;
-	
-	// field for collected keys: map from key to colour? 
-	//private Map<Key, String> keysCollected;
+	private Map<Key, String> keysCollected;
 	
 	@JsonCreator
 	public GameState(@JsonProperty("maze") Maze maze,
@@ -33,15 +31,14 @@ public class GameState implements GameStateInterface {
 		this.chap = chap;
 		this.treasuresCollected = 0;
 		this.totalTreasures = totalTreasures;
-		//this.keysCollected = new HashMap<>();
+		this.keysCollected = new HashMap<>();
 	}
 	
 	public int totalTreasures() {return totalTreasures;}
 	public int getTreasuresCollected() {return treasuresCollected;}
 	public void treasureCollected() {this.treasuresCollected++;}	
 	public boolean allTreasureCollected() {return treasuresCollected == totalTreasures ? true : false;}
-	
-	//public Map<Key,String> keysCollected(){return keysCollected;}
+	public Map<Key,String> keysCollected(){return keysCollected;}
 	
 	public String chapPosition(){return chap.getPosition();}
 	
@@ -66,9 +63,9 @@ public class GameState implements GameStateInterface {
 	    chap.move(direction, maze);
 	    
 	    // possibility of causing issues down the line, will test
-	    if (nextTile instanceof LockedDoorTile) {
-	        maze.setTile(newRow, newCol, new FreeTile());
-	    }
+	    if (nextTile instanceof LockedDoorTile) {maze.setTile(newRow, newCol, new FreeTile());}
+	    
+	    // checks for an item everytime Chap moves to a tile
 	    checkForItem();
 	}
 
@@ -79,6 +76,10 @@ public class GameState implements GameStateInterface {
             Item item = currentTile.getItem();
             chap.pickUpItem(item);
             if(item instanceof Treasure) {this.treasureCollected();}
+            if(item instanceof Key) {
+            	Key key = (Key) item;
+            	keysCollected.put(key, key.colour());
+            }
             currentTile.removeItem();
             maze.setTile(chap.getRow(), chap.getCol() , new FreeTile());
         }

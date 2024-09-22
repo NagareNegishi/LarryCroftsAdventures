@@ -96,7 +96,6 @@ public class Tests {
 		@Test
 		public void testChapCantMoveUpToWall() {
 			Maze maze = Maze.createBasicMaze(5, 5);
-			//System.out.println("Tile at 0,0 is: " + maze.getTile(0, 0).tileType());
 			Chap chap = new Chap(1,0);
 			assertThrows(IllegalArgumentException.class, () -> {
 				chap.move(Direction.Up,maze);
@@ -179,6 +178,7 @@ public class Tests {
 			Key key = (Key) chap.inventory().get(0);
 			assert key.colour().equals("Blue");
 			}
+		
 	// test Chap picks up a key AND a treasure and both are in inventory 
 		@Test
 		public void testChapCanPickUpKeyAndTreasure() {
@@ -224,6 +224,7 @@ public class Tests {
 			assert maze.getTile(3, 3) instanceof FreeTile;
 			
 		}
+		
 	// test Chap cannot move to a LockedDoorTile if he doesn't have a Key
 		@Test
 		public void testChapCantMoveToLockedDoorWithoutKey() {
@@ -239,6 +240,7 @@ public class Tests {
 
 			
 		}
+		
 	// test Chap cannot move to a LockedDoorTile if he has a key of a different colour
 		@Test
 		public void testChapCantMoveToLockedDoorWithWrongKey() {
