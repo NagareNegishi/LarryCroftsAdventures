@@ -2,14 +2,18 @@ package test.nz.ac.wgtn.swen225.lc.fuzz;
 
 import java.util.Random;
 
+import javax.swing.SwingUtilities;
+
 import org.junit.Test;
 
 import nz.ac.wgtn.swen225.lc.app.MockController;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-@SuppressWarnings("unused")
+
 public class Fuzz {
 	private static Random random;
 	//number of times to run the test
