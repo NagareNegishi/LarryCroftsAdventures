@@ -49,12 +49,7 @@ public class PersistencyTest {
     	
     }
     
-    
-    
-    
-    
-    
-    
+   
     @Test public void mazeSave() {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	assert SaveFile.saveObj("MazeTest", maze);
