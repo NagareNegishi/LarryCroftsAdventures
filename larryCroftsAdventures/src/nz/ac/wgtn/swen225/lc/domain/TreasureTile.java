@@ -3,6 +3,7 @@ package nz.ac.wgtn.swen225.lc.domain;
 public class TreasureTile extends Tile{
 
 	private Treasure treasure;
+	// might not need since all TreasureTilees have a treasure and turn into FreeTile on collection
 	private boolean hasTreasure;
 	
 	public TreasureTile() {

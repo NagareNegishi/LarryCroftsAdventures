@@ -87,18 +87,12 @@ public class Chap {
 			this.rowDir = row;
 			this.colDir = col;
 		}
-		
 		public int rowDirection() {return rowDir;}
 		public int colDirection() {return colDir;}
 	}
 	
-	// picks up an item and if it is a treasure marks it as collected
-	public void pickUpItem(Item item) {
-		inventory.add(item);
-		// may need to move this to another class dealing with game state
-		if(item instanceof Treasure) {((Treasure) item).collect();}	
-	}
-	
+
+	public void pickUpItem(Item item) {inventory.add(item);}	
 	public List<Item> inventory(){return inventory;}
 	
 	// helpful method for laying out chaps inventory
