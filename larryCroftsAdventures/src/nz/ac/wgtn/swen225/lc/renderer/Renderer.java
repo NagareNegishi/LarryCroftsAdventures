@@ -73,9 +73,7 @@ public class Renderer extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); 
-        
-        
-        
+
         // Clear the canvas
         
         //run the logic of working in "local space, of just rendering stuff around the player and outwards"
@@ -114,6 +112,19 @@ public class Renderer extends JPanel {
     	
     }
     
+    private void drawTiles() {
+    	//TODO make the logic here
+    	//we should look at where Chap is, and make a loop, in this loop, just go around chap
+    	//and draw stuff around him
+    	
+    	
+    }
+    
+    private void drawEntitys() {
+    	//TODO this should be the same exact thing as drawTiles, but reads the item present and draws it
+    	//input values yet to be made of course
+    	
+    }
     
     
 }

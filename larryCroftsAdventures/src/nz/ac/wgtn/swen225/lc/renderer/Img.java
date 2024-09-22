@@ -13,7 +13,11 @@ import java.util.stream.StreamSupport;
 import javax.imageio.ImageIO;
 
 /**
- * This is the class that is responsible for LOADING the Images into Cache only
+ * This is the class that is responsible for LOADING the Images into Cache only and finding them
+ * It's important to note that if the Enum's name as a file doesn't exist in the imgs folder
+ * it WILL break
+ * 
+ * eg. if we want a Kourie Img, we will NEED Kourie.png to be present, otherwise, the program won't run
  * 
  *  
  * @author Marwan Mohamed
