@@ -27,6 +27,10 @@ public class Recorder {
 	// Holds Chap's recorded movements and when they happened.
 	private List<DirectionEvent> events = new ArrayList<>();
 
+	// Limit to prevent memory issues 
+	// Probably not an issue unless trying to stress test game :/
+	private final int EventsLimit = 10000000;
+	
 	// Index of event in list that replay is up to.
 	private int currentEventIndex = -1;
 
@@ -75,7 +79,7 @@ public class Recorder {
 	 * Wrapper allowing file operations to be given as arguments without worrying
 	 * about dealing with exception first.
 	 */
-	interface FileOperation {
+	private interface FileOperation {
 		void execute(RecordingFileChooser rfc) throws IOException;
 	}
 
@@ -83,6 +87,7 @@ public class Recorder {
 	 * Constructor intended to be used by App for creating recorder object.
 	 */
 	public Recorder(Consumer<RecordingChanges> updateReciever) {
+		assert updateReciever != null : "Null update reciever given to record during construction!";
 		this.updateReciever = updateReciever;
 		firstLevelSupplier = () -> {
 			assert LoadFile.loadLevel("level1").isPresent()
@@ -99,6 +104,8 @@ public class Recorder {
 	 * @param firstLevelSupplier Gives recorder modifiable game at first level.
 	 */
 	public Recorder(Consumer<RecordingChanges> updateReciever, Supplier<GameStateController> firstLevelSupplier) {
+		assert updateReciever != null : "Null update reciever given to record during construction!";
+		assert firstLevelSupplier != null : "Null first level supplier given to record during construction!";
 		this.updateReciever = updateReciever;
 		this.firstLevelSupplier = firstLevelSupplier;
 		recordingGame = firstLevelSupplier.get();
@@ -146,6 +153,8 @@ public class Recorder {
 	 * @param currentTime Time when user inputed to move chap.
 	 */
 	public void ping(Direction direction, int currentTime) {
+		assert events != null : "Recorder events storage is null!";
+		if(events.size() == EventsLimit) return;
 		events.add(new DirectionEvent(direction, currentTime));
 	}
 
@@ -156,6 +165,7 @@ public class Recorder {
 	 * @return Rate that autoReplaySpeed was set to.
 	 */
 	public int setPlaybackSpeed(int eventsPerSecond) {
+		assert eventsPerSecond > 0 : "Auto replay speed must be above zero!";
 		return (autoReplaySpeed = eventsPerSecond);
 	}
 
