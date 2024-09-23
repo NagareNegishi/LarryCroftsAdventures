@@ -3,6 +3,7 @@ package nz.ac.wgtn.swen225.lc.recorder;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.swing.JFileChooser;
@@ -16,32 +17,39 @@ import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 
 /**
- * Class used by the App module to generate a Recorder object. 
+ * Class used by the App module to generate a Recorder object.
  */
-public class Recorder { 
-	
+public class Recorder {
+
 	// Serializes/de-serializes objects.
 	private ObjectMapper eventMapper = new ObjectMapper();
-	
-	// Entry to modify model of game for recording purposes.
-	
-	
+
 	// Holds Chap's recorded movements and when they happened.
 	private List<DirectionEvent> events = new ArrayList<>();
-	
-	// Index of event in list that replay is up to. 
-	private int currentEventIndex = -1;
-	
-	// Rate events are shown per second during auto-replay.
-	private Double autoReplaySpeed = 1.0;
 
+	// Index of event in list that replay is up to.
+	private int currentEventIndex = -1;
+
+	// Rate events are shown per second during auto-replay.
+	private int autoReplaySpeed = 1;
+
+	// Provides controllable model of game at start of first level
 	private Supplier<GameStateController> firstLevelSupplier;
-	
+
+	// Reference to the controllable game model
 	private GameStateController recordingGame;
+
+	// Thread used for auto replays
+	private Thread replayThread = null;
+
+	// An object to receive changes for App
+	private Consumer<RecordingChanges> updateReciever;
+
 	/**
 	 * Wraps an actor's movement into an object to read at a later point.
+	 * 
 	 * @param direction The direction actor is moving.
-	 * @param time Time when user inputed to move actor.
+	 * @param time      Time when user inputed to move actor.
 	 */
 	private record DirectionEvent(Direction direction, int time) {
 		public DirectionEvent {
@@ -49,11 +57,12 @@ public class Recorder {
 			assert time >= 0 : "DirectionEvent's time cannot be below 0";
 		}
 	}
-	
+
 	/**
 	 * Wraps an actor's movement into an object to read at a later point.
+	 * 
 	 * @param direction The direction actor is moving.
-	 * @param time Time when user inputed to move actor.
+	 * @param time      Time when user inputed to move actor.
 	 */
 	public record RecordingChanges(GameStateController updatedGame, int updatedTime) {
 		public RecordingChanges {
@@ -61,77 +70,79 @@ public class Recorder {
 			assert updatedTime >= 0 : "DirectionEvent's time cannot be below 0";
 		}
 	}
-	
+
 	/**
-	 * Wrapper allowing file operations to be given as 
-	 * arguments without worrying about dealing with exception first. 
+	 * Wrapper allowing file operations to be given as arguments without worrying
+	 * about dealing with exception first.
 	 */
 	interface FileOperation {
-	    void execute(RecordingFileChooser rfc) throws IOException;
-	}
-	
-	/**
-	 * Constructor intended to be used by App
-	 * for creating recorder object.
-	 */
-	public Recorder() {
-		firstLevelSupplier = ()->{
-			assert LoadFile.loadLevel("level1").isPresent() 
-			: "Exception occured when attempting to load first level for recorder!";
-			return LoadFile.loadLevel("level1").get();};
-		recordingGame = firstLevelSupplier.get();
-	}
-	
-	/**
-	 * Constructor allowing recorder to work  
-	 * When first level is not "level1".
-	 * Intended for testing
-	 * @param firstLevelSupplier Gives recorder modifiable game at first level.
-	 */
-	public Recorder(Supplier<GameStateController> firstLevelSupplier) {
-		this.firstLevelSupplier = firstLevelSupplier;
-		recordingGame = firstLevelSupplier.get();
-	}
-	
-	/**
-	 * Handles common logic for file operations such as load or save.
-	 * Shows a message to the user if the operation succeeds.
-	 */
-	private void handleRecording(String operationType, FileOperation fileOperation) {
-	    RecordingFileChooser rfc = new RecordingFileChooser(operationType);
-	    try {
-	        fileOperation.execute(rfc);
-	        JOptionPane.showMessageDialog(rfc.fileChooser, rfc.success);
-	    } catch (IOException ioe) {
-	        ioe.printStackTrace();
-	    }
-	}
-	
-	/**
-	 * Reads JSON file, interpreting data into
-	 * a list of DirectionEvent objects.
-	 */
-	public void loadRecording() {
-	    handleRecording("load", rfc -> {
-	        events = eventMapper.readValue(rfc.recordingLoc,
-	                eventMapper.getTypeFactory().constructCollectionType(List.class, DirectionEvent.class));
-	    });
-	}
-	
-	/**
-	 * Writes JSON file, by serializing 
-	 * a list of DirectionEvent objects.
-	 */
-	public void saveRecording() {
-	    handleRecording("save", rfc -> {
-	        eventMapper.writeValue(rfc.recordingLoc, events);
-	    });
+		void execute(RecordingFileChooser rfc) throws IOException;
 	}
 
 	/**
-	 * Used by App module to inform Recorder 
-	 * when chap is moving and what direction.
-	 * @param direction The direction chap is moving.
+	 * Constructor intended to be used by App for creating recorder object.
+	 */
+	public Recorder(Consumer<RecordingChanges> updateReciever) {
+		this.updateReciever = updateReciever;
+		firstLevelSupplier = () -> {
+			assert LoadFile.loadLevel("level1").isPresent()
+					: "Exception occured when attempting to load first level for recorder!";
+			return LoadFile.loadLevel("level1").get();
+		};
+		recordingGame = firstLevelSupplier.get();
+	}
+
+	/**
+	 * Constructor allowing recorder to work When first level is not "level1".
+	 * Intended for testing
+	 * 
+	 * @param firstLevelSupplier Gives recorder modifiable game at first level.
+	 */
+	public Recorder(Consumer<RecordingChanges> updateReciever, Supplier<GameStateController> firstLevelSupplier) {
+		this.updateReciever = updateReciever;
+		this.firstLevelSupplier = firstLevelSupplier;
+		recordingGame = firstLevelSupplier.get();
+	}
+
+	/**
+	 * Handles common logic for file operations such as load or save. Shows a
+	 * message to the user if the operation succeeds.
+	 */
+	private void handleRecording(String operationType, FileOperation fileOperation) {
+		RecordingFileChooser rfc = new RecordingFileChooser(operationType);
+		try {
+			fileOperation.execute(rfc);
+			JOptionPane.showMessageDialog(rfc.fileChooser, rfc.success);
+		} catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+	}
+
+	/**
+	 * Used by App module.
+	 * Reads JSON file, interpreting data into a list of DirectionEvent objects.
+	 */
+	public void loadRecording() {
+		handleRecording("load", rfc -> {
+			events = eventMapper.readValue(rfc.recordingLoc,
+					eventMapper.getTypeFactory().constructCollectionType(List.class, DirectionEvent.class));
+		});
+	}
+
+	/**
+	 * Used by App module.
+	 * Writes JSON file, by serializing a list of DirectionEvent objects.
+	 */
+	public void saveRecording() {
+		handleRecording("save", rfc -> {
+			eventMapper.writeValue(rfc.recordingLoc, events);
+		});
+	}
+
+	/**
+	 * Used by App module to inform Recorder when chap is moving and what direction.
+	 * 
+	 * @param direction   The direction chap is moving.
 	 * @param currentTime Time when user inputed to move chap.
 	 */
 	public void ping(Direction direction, int currentTime) {
@@ -139,61 +150,78 @@ public class Recorder {
 	}
 
 	/**
-	 * Used by App module to just set 
-	 * the automatic replay speed.
+	 * Used by App module to just set the automatic replay speed.
+	 * 
 	 * @param eventsPerSecond Rate events play for auto replay
+	 * @return Rate that autoReplaySpeed was set to.
 	 */
-	public void setPlaybackSpeed(Double eventsPerSecond) {
-		autoReplaySpeed = eventsPerSecond;
+	public int setPlaybackSpeed(int eventsPerSecond) {
+		return (autoReplaySpeed = eventsPerSecond);
 	}
 
 	/**
-	 * Used by App module to manually
-	 * step the recording back by one event.
-	 * @param controllerOfLevelOnStart Controls newly loaded model of game.
-	 * @return New Game controller and new time left to update to.
+	 * Used by App module to manually step the recording back by one event.
 	 */
-	public RecordingChanges previousStep() {
-		
+	public void previousStep() {
+
 		assert !events.isEmpty() : "Recording is empty!";
 		recordingGame = firstLevelSupplier.get();
-		if (currentEventIndex <= 0) return new RecordingChanges(recordingGame, events.get(0).time());
+		if (currentEventIndex <= 0) {
+			updateReciever.accept(new RecordingChanges(recordingGame, events.get(0).time()));
+			return;
+		}
+
 		currentEventIndex--;
-		
+
 		for (int i = 0; i <= currentEventIndex; i++) {
 			DirectionEvent curEvent = events.get(i);
 			recordingGame.moveChap(curEvent.direction());
 		}
-		return new RecordingChanges(recordingGame, events.get(currentEventIndex).time());
+		updateReciever.accept(new RecordingChanges(recordingGame, events.get(currentEventIndex).time()));
 	}
 
 	/**
-	 * Used by App module to manually
-	 * step the recording forward by one event.
-	 * @return New Game controller and new time left to update to.
+	 * Used by App module to manually step the recording forward by one event.
 	 */
-	public RecordingChanges nextStep() {
+	public void nextStep() {
 		assert recordingGame != null : "Recording doesn't have level to reference!";
 		assert !events.isEmpty() : "Recording is empty!";
 		if (currentEventIndex >= events.size() - 1) {
-			return new RecordingChanges(recordingGame, events.get(events.size() - 1).time());
+			updateReciever.accept(new RecordingChanges(recordingGame, events.get(events.size() - 1).time()));
+			return;
 		}
 		currentEventIndex = Math.min(currentEventIndex + 1, events.size() - 1);
 		DirectionEvent curEvent = events.get(currentEventIndex);
 		recordingGame.moveChap(curEvent.direction());
-		return new RecordingChanges(recordingGame, curEvent.time());
+		updateReciever.accept(new RecordingChanges(recordingGame, curEvent.time()));
 	}
-	
-	
+
 	/**
-	 * TBD
+	 * Used by App module to automatically step forward recording.
+	 * Can be toggled on and off.
 	 */
-	public RecordingChanges autoReplay() {
-		return null;
+	public void autoReplay() {
+		if (replayThread != null && replayThread.isAlive()) {
+			replayThread.interrupt();
+			return;
+		}
+		replayThread = new Thread(() -> {
+			try {
+				while (currentEventIndex < events.size()) {
+					Thread.sleep(1000 / autoReplaySpeed);
+					nextStep();
+				}
+			} catch (InterruptedException e) {
+				return;
+			}
+		});
+
+		replayThread.start();
 	}
-	
+
 	/**
 	 * Intended for making testing easier.
+	 * 
 	 * @return Chap's position in game model recording can view.
 	 */
 	public String getChapPosition() {
@@ -202,8 +230,8 @@ public class Recorder {
 }
 
 /**
- * Provides a custom file chooser UI for 
- * selecting and operating on JSON recording files.
+ * Provides a custom file chooser UI for selecting and operating on JSON
+ * recording files.
  */
 class RecordingFileChooser {
 
