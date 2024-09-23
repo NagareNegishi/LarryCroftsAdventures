@@ -184,7 +184,7 @@ class App extends JFrame{
    * runnables are not needed?.....oh, its consumer???
    */
   private void handleSliderChange(int value){
-    recorder.setPlaybackSpeed((double)value); //recorder want double
+    recorder.setPlaybackSpeed(value); //it will complite after recorder is updated
   }
 
 
@@ -426,6 +426,14 @@ class App extends JFrame{
 
 
     model = level;
+
+    /**
+     * after the merge it should be
+     * recorder = new Recorder((rc)-> {gameInfoPanel.setTime(rc.updateTime());
+     *                                model = re.updatedGame();
+     *                                });
+     */
+
 
     recorder = new Recorder(model);
     /**
