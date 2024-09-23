@@ -28,6 +28,9 @@ import nz.ac.wgtn.swen225.lc.recorder.Recorder;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
 
+/**
+ * Main class for the game application.
+ */
 class App extends JFrame{
   private static final long serialVersionUID= 1L;
 
