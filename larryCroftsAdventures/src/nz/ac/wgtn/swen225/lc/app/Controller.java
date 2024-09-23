@@ -11,10 +11,6 @@ import nz.ac.wgtn.swen225.lc.recorder.Recorder;
 
 /**
  * Controller class that extends Keys class
- * 
- * will be public after the merge, but need to be private before submission
- * both class and constructor
- * 
  */
 class Controller extends Keys{
 
