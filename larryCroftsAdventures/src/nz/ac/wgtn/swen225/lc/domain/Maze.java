@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Maze {
 
 	// could be renamed to grid or similar if confusing
+	@JsonProperty
 	private Tile[][] maze;
 	@JsonProperty
 	private int rows;
