@@ -6,6 +6,12 @@ import java.util.Map;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 
+/**
+ * Mock Controller for fuzz testing.
+ * Initially created by Fuzz developer, and I asked him to move it to App package.
+ * As App shouldn't allow other class to modify the controller,
+ * but Fuzz need to test the game logic.
+ */
 public class MockController extends Controller{
 	public Chap chap;
 	public Maze maze;
@@ -22,8 +28,10 @@ public class MockController extends Controller{
 	}
 
 	/**
-	 * mocking the action bindings
-	 * with Null Object Pattern
+	 * Mocking the action bindings
+	 * while showcasing the Null Object Pattern
+	 *
+	 * @return a map of action bindings
 	 */
 	private static Map<String, Runnable> createMockActionBindings() {
 		Map<String, Runnable> mockBindings = new HashMap<>();
@@ -36,5 +44,4 @@ public class MockController extends Controller{
         mockBindings.put("unpause", () -> {});
         return mockBindings;
 	}
-
 }

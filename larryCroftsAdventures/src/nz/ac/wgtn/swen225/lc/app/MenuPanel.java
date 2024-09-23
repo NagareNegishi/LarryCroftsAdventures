@@ -6,10 +6,17 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+/**
+ * A panel that displays the menu options, including pause, save, load, help, exit, and show recorder.
+ */
 public class MenuPanel extends JPanel{
     private JButton pauseButton;
-	
     private static final long serialVersionUID= 1L;
+
+    /**
+     * Create a new MenuPanel with the given ActionListener.
+     * @param listener
+     */
     MenuPanel(ActionListener listener){
         setLayout(new GridLayout(0, 1));
         pauseButton = ComponentFactory.createButton("Pause", "pause", listener);

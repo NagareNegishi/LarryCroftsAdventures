@@ -10,7 +10,11 @@ import nz.ac.wgtn.swen225.lc.recorder.Recorder;
 
 
 /**
- * Controller class that extends Keys class
+ * Controller class that extends Keys class.
+ * This class is responsible for handling key events,
+ * and performing actions based on the key events.
+ * this class has Chap, Maze, so Domain module can handle the key events.
+ * Recorder, so Recorder module can track the change of chap.
  */
 class Controller extends Keys{
 
@@ -21,8 +25,11 @@ class Controller extends Keys{
 
 
     /**
-    * Constructor for the Controller class
-    */
+     * Constructor for Controller class
+     * @param c Chap
+     * @param m Maze
+     * @param actionBindings contains the methods defined in App class
+     */
 	Controller(Chap c, Maze m, Map<String, Runnable> actionBindings){
         chap = c;
         maze = m;
