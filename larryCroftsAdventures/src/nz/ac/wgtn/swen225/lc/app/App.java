@@ -19,14 +19,18 @@ import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap;
+import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
+import nz.ac.wgtn.swen225.lc.recorder.Recorder;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
 
-
+/**
+ * Main class for the game application.
+ */
 class App extends JFrame{
   private static final long serialVersionUID= 1L;
 
@@ -53,8 +57,8 @@ class App extends JFrame{
   //Phase currentPhase;
   private Controller controller;
 
-  /**
-  private Recorder recorder;*/
+  
+  private Recorder recorder;
   public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY, BETWEEN, RECORDING}
   private AppState state = AppState.NEWGAME;
 
@@ -77,7 +81,7 @@ class App extends JFrame{
 
     initializeUI();
     initializeController();
-    initializeGameTimer();
+    initializeGameTimer(); //must be after controller??
 
     setPreferredSize(new Dimension(width, height));
     pack();
@@ -128,10 +132,11 @@ class App extends JFrame{
     renderer = new Renderer();
     add(renderer, BorderLayout.CENTER);
 
+
     pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0), 0.75);
-    startDialog = new PauseDialog(this, "Press Space to start", Color.BLUE, Color.YELLOW, 0.75);
-    gameoverDialog = new PauseDialog(this, "Game Over\n Press Space to retry", Color.RED, Color.BLACK, 0.75);
-    victoryDialog = new PauseDialog(this, "Victory\nPress Space to play again", Color.GREEN, Color.ORANGE, 0.75);
+    startDialog = new PauseDialog(this, "Press Escape to start", Color.BLUE, Color.YELLOW, 0.75);
+    gameoverDialog = new PauseDialog(this, "Game Over\n Press Escape to retry", Color.RED, Color.BLACK, 0.75);
+    victoryDialog = new PauseDialog(this, "Victory\nPress Escape to play again", Color.GREEN, Color.ORANGE, 0.75);
     startDialog.setVisible(true);
 
 }
@@ -165,10 +170,10 @@ class App extends JFrame{
    */
   private void handleRecorderAction(String actionCommand){
     switch(actionCommand){
-    /** case "step" -> step();
-      case "autoReplay" -> toggleAutoReplay();
-      case "loadRecording" -> loadRecording();
-      case "toggleRecording" -> toggleRecording();*/
+      case "step" -> recorder.nextStep();
+      //case "autoReplay" -> toggleAutoReplay();
+      case "loadRecording" -> recorder.loadRecording();
+      case "saveRecording" -> recorder.saveRecording();
       case "toggle" -> toggleSidePanel();
     }
     assert false: "Unknown action command: " + actionCommand;
@@ -182,8 +187,7 @@ class App extends JFrame{
    * runnables are not needed?.....oh, its consumer???
    */
   private void handleSliderChange(int value){
-    //do something with the value for recorder
-    System.out.println("speed is :" + value);
+    recorder.setPlaybackSpeed(value); //it will complite after recorder is updated
   }
 
 
@@ -224,13 +228,14 @@ class App extends JFrame{
   private void initializeGameTimer() {
       gameTimer = new Timer(1000, e -> {
           timeLeft--;
+          controller.updatetime(timeLeft);
           gameInfoPanel.setTime(timeLeft);
           if (timeLeft == 0) {
               gameTimer.stop();
               gameoverDialog.setVisible(true);
           }
       });
-      gameTimer.start();
+      gameTimer.stop();
   }
 
   /**
@@ -271,14 +276,13 @@ class App extends JFrame{
     // renderer.setFocusable(false); i probably want it
     gameTimer.stop();
     pauseDialog.setVisible(true);
-    startDialog.setVisible(false);// should optimize this
   }
 
   private void unpauseGame() {
     boolean unpause = switch (state) {
       case PLAY -> false; // Already playing
       case PAUSED -> true;
-      case NEWGAME -> { loadNextLevel(); yield true; }
+      case NEWGAME -> {setfakeLevel(); startDialog.setVisible(false);  yield true; }//{ loadNextLevel(); startDialog.setVisible(false); yield true; } !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       case GAMEOVER -> { LoadFile.loadLevel("level" + currentLevel); yield true; }
       case VICTORY -> { LoadFile.loadLevel("level1"); yield true; }
       case RECORDING, BETWEEN -> false; // need to think about this
@@ -290,9 +294,9 @@ class App extends JFrame{
     renderer.setFocusable(true);
     renderer.requestFocus();
     assert !gameTimer.isRunning(): "Game is already running";
-    gameTimer.start();
+    
     pauseDialog.setVisible(false);
-    gameoverDialog.setVisible(false);// should optimize this
+    gameTimer.start();
   }
 
 
@@ -425,6 +429,19 @@ class App extends JFrame{
 
 
     model = level;
+
+    /**
+     * after the merge it should be
+     * recorder = new Recorder((rc)-> {gameInfoPanel.setTime(rc.updateTime());
+     *                                model = re.updatedGame();
+     *                                });
+     */
+
+
+    recorder = new Recorder(model);
+    /**
+    * likely i need to make new controller or set it
+    */
     renderer.addKeyListener(controller);//likely i need to make new controller each level as controller contains maze
     renderer.setFocusable(true);
     Timer timer= new Timer(34, unused->{
@@ -442,6 +459,8 @@ class App extends JFrame{
          * but i can take keys/ treasure info from the model and update the gameInfoPanel here
          */
 
+        updateGameInfo(model); // this need to be gone
+        
         renderer.repaint();
       }
     });
@@ -458,8 +477,6 @@ class App extends JFrame{
     renderer.requestFocus();//need to be after pack
     timer.start();
   }
-
-
 
   //for prototype, i can assume max level is 2 to simplify the process
   private void loadNextLevel() {
@@ -480,4 +497,57 @@ class App extends JFrame{
         this::loadGame);
       }
   }
+
+
+  /**
+   * this is soooo unpretty solution
+   * definitely need to be changed
+   */
+  private void updateGameInfo(GameStateController level) {
+    keysCollected = level.getKeysCollected().size();
+    treasuresLeft = level.getTotalTreasures() - level.getTreasuresCollected();
+    gameInfoPanel.setKeys(keysCollected);
+    gameInfoPanel.setTreasures(treasuresLeft);
+  }
+
+
+
+  public void setfakeLevel(){
+    System.out.println("fake level");
+    Maze maze = Maze.createBasicMaze(10, 10);
+    Chap chap = new Chap(2,2);
+    GameState gameState = new GameState(maze, chap, 10);
+    model = new GameStateController(maze, chap, gameState);
+    recorder = new Recorder(model);
+    controller.setChap(chap);
+    controller.setMaze(maze);
+    controller.setRecorder(recorder);
+    /**
+    * likely i need to make new controller or set it
+    */
+    renderer.addKeyListener(controller);//likely i need to make new controller each level as controller contains maze
+    renderer.setFocusable(true);
+    Timer timer= new Timer(200, unused->{
+      assert SwingUtilities.isEventDispatchThread();
+      if (state == AppState.PLAY) {
+        updateGameInfo(model); // this need to be gone
+        renderer.repaint();
+        //System.out.println("game is running");
+      }
+    });
+    closePhase.run();//close phase before adding any element of the new phase
+    closePhase = ()->{ timer.stop();}; //remove(renderer); };
+
+    renderer.requestFocus();//need to be after pack
+    timer.start();
+  }
+
+
+
+
+
+
+
+
+
 }
