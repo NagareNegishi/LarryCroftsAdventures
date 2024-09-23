@@ -9,7 +9,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
-
+/**
+ * A panel that displays the recorder options, including step, auto replay, speed control, load recording, save recording, and show menu.
+ * I could make generic class for this and MenuPanel,
+ * but but the two classes are different enough that it would be more trouble than it's worth.
+ */
 public class RecorderPanel extends JPanel {
     private JButton stepButton;
     private JToggleButton autoReplayToggle;
@@ -18,6 +22,11 @@ public class RecorderPanel extends JPanel {
     private JButton saveRecordingButton;
     private JButton toggleButton;
 
+    /**
+     * Create a new RecorderPanel with the given ActionListener and Consumer.
+     * @param listener
+     * @param sliderConsumer
+     */
     public RecorderPanel(ActionListener listener, Consumer<Integer> sliderConsumer) {
         setLayout(new GridLayout(0, 1));
         initializeComponents(listener, sliderConsumer);
@@ -32,9 +41,6 @@ public class RecorderPanel extends JPanel {
         saveRecordingButton = ComponentFactory.createButton("Save Recording", "saveRecording", listener);
         toggleButton = ComponentFactory.createButton("Show Menu", "toggle", listener);
     }
-
-
-   
 
     private void addComponents() {
         add(stepButton);
