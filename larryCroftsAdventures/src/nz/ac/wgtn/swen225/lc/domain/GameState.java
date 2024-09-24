@@ -107,6 +107,16 @@ public class GameState implements GameStateInterface {
 				+ "To Chap's right is a " + maze.getTile(chap.getRow(), chap.getCol() + 1).tileType() + "\n"
 				+ "Below Chap is a " + maze.getTile(chap.getRow() + 1, chap.getCol()).tileType();
 	}
+
+
+
+	////////////////////nagi's code remove me later
+	public Chap getChap() {
+		return chap;
+	}
+	public Maze getMaze() {
+		return maze;
+	}
 }
 
 
