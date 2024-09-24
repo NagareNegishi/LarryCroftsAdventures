@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
-	@JsonSubTypes.Type(value = Key.class),
-	@JsonSubTypes.Type(value = Treasure.class)
+    @JsonSubTypes.Type(value = Treasure.class, name = "Treasure"),
+    @JsonSubTypes.Type(value = Key.class, name = "Key")
 })
 
 public interface Item {

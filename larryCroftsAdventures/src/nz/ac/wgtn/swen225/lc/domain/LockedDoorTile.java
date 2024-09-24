@@ -1,7 +1,10 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class LockedDoorTile extends Tile{
 	
+	@JsonProperty
 	private String colour;
 	private boolean locked;
 	

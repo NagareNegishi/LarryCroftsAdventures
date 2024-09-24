@@ -14,7 +14,7 @@ public class Level1 {
 		int rows = 20;
 		int cols = 20;
 		
-		Maze maze = Maze.createCustomMaze(rows, cols);
+		Maze maze = Maze.createCustomMaze();
 		
 		
 		Item item = maze.getTile(4, 3).getItem();
