@@ -129,7 +129,7 @@ class App extends JFrame{
 
 
     // Center panel for game rendering
-    renderer = new Renderer();
+    renderer = new JPanel();//new Renderer();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     add(renderer, BorderLayout.CENTER);
 
 
@@ -462,6 +462,10 @@ class App extends JFrame{
     /**
     * likely i need to make new controller or set it
     */
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+    renderer = new Renderer(model.getGameState());//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
     renderer.addKeyListener(controller);//likely i need to make new controller each level as controller contains maze
     renderer.setFocusable(true);
     Timer timer= new Timer(34, unused->{
