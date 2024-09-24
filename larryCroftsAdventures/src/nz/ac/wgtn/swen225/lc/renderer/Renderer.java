@@ -35,7 +35,11 @@ import java.awt.Point;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.GameState;
+import nz.ac.wgtn.swen225.lc.domain.Item;
+import nz.ac.wgtn.swen225.lc.domain.Key;
+import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
+import nz.ac.wgtn.swen225.lc.domain.Treasure;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -51,9 +55,14 @@ public class Renderer extends JPanel {
     private int y;
     private GameState game;
     
+    private int cX; //TODO remove this code
+    private int cY; //this is legacy code and should be removed
+    
     private long lastTime = System.nanoTime();
     private int frames = 0;
     private int fps = 0;
+    
+    private Graphics g;
     
     //these fields are for testing and recognizing the fps
     final RenderImg renderKourie = new RenderImg(Img.Kourie);
@@ -79,7 +88,7 @@ public class Renderer extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); 
-
+        this.g = g;
         
         fpsCheck();
 
@@ -106,7 +115,7 @@ public class Renderer extends JPanel {
         g.setColor(Color.WHITE);
         g.fillOval(size.width/2,(size.height/2)-20, 40, 40);
         
-        drawTiles(g);
+        drawTiles();
         
         
         }
@@ -123,7 +132,7 @@ public class Renderer extends JPanel {
     	
     }
     
-    private void drawTiles(Graphics g) {
+    private void drawTiles() {
 
     	int maxCol = game.getMaze().getCols();
     	int maxRow = game.getMaze().getRows();
@@ -140,21 +149,54 @@ public class Renderer extends JPanel {
                 g.setColor(Color.GREEN);
                 g.drawRect(currentX, currentY, currentY+32, currentX+32);
                 
-                if(t.hasItem()) {//run a helper method to find what's on here and draw it}
-                	}
+                //look if the tile has an item
+                if(t.hasItem()) {
+                	cX = currentX;
+                	cY = currentY;
+                	drawItem(t.getItem());}
                 
-                }
     		}
     	
     		
     	}
     	
-    	
-    	
-    	
-    	
-    	
     }
+    
+    private void drawItem(Item i) {
+    	
+    	//run a helper method to find what's on here and draw it}
+        	
+        	if(i instanceof Key) {
+        		//draw key
+        		g.setColor(Color.CYAN);
+        		g.drawRect(cX, cY, cX+32, cY+32);
+        		
+        	}
+        	
+        	if(i instanceof Treasure) {
+        		g.setColor(Color.ORANGE);
+        		g.drawRect(cX, cY, cX+32, cY+32);
+        		
+        	}
+        	
+        	if(i instanceof LockedDoorTile) {
+        		g.setColor(Color.BLUE);
+        		g.drawRect(cX, cY, cX+32, cY+32);
+        		
+        	}
+        	
+        }
+    
+    
+    
+}
+    	
+    	
+    	
+    	
+
+    	
+    
     
    
     
