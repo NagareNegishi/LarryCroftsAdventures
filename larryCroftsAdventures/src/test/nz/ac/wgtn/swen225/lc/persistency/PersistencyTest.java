@@ -1,10 +1,6 @@
 package test.nz.ac.wgtn.swen225.lc.persistency;
 
 import nz.ac.wgtn.swen225.lc.domain.*;
-import nz.ac.wgtn.swen225.lc.domain.GameStateControllerInterface;
-import nz.ac.wgtn.swen225.lc.domain.GameStateController;
-import nz.ac.wgtn.swen225.lc.domain.GameState;
-
 import nz.ac.wgtn.swen225.lc.persistency.*;
 
 
@@ -83,17 +79,17 @@ public class PersistencyTest {
     /**
      * Test serialisation of GameStateController
      */
-    @Test public void gameControlTest() {
-    	GameStateController gsc = new GameStateController(5, 5, 2, 2, 1);
-    	assert SaveFile.saveGame("GameSaveTest", gsc);
-    	
-    	Optional<GameStateController> gsOp = LoadFile.loadSave("GameSaveTest");
-    	assert gsOp.isPresent();
-    	GameStateController gscDeserial = gsOp.get();
-    }
+//    @Test public void gameControlTest() {
+//    	GameStateController gsc = new GameStateController(5, 5, 2, 2, 1);
+//    	assert SaveFile.saveGame("GameSaveTest", gsc);
+//    	
+//    	Optional<GameStateController> gsOp = LoadFile.loadSave("GameSaveTest");
+//    	assert gsOp.isPresent();
+//    	GameStateController gscDeserial = gsOp.get();
+//    }
     
      // Tests de-serialisation of GameStateController
-    @Test public void GameSaveLoadTest() {
+    @Test public void gameSaveLoadTest() {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	Chap chap = new Chap(2, 2);
     	GameState gs = new GameState(maze, chap, 2);
@@ -110,5 +106,36 @@ public class PersistencyTest {
     	// checking if same type of tile as hashcode prevents .equals directly
     	assert gscDeserial.getTileAtChapPosition().getClass().equals(maze.getTile(2, 2).getClass());    	
     }
+    
+    @Test 
+    public void integrationTestInit() {
+		
+		Maze maze = Maze.createCustomMaze();
+		Chap chap = new Chap(2, 2);
+		GameState gs = new GameState(maze, chap, 2);
+		
+		GameStateController gsc = new GameStateController(maze, chap, gs);
+		
+		Boolean saved = SaveFile.saveGame("NewTest", gsc);
+		assert saved;
+		
+		Optional<GameStateController> gscOption = LoadFile.loadSave("NewTest");
+		assert gscOption.isPresent();
+		GameStateController gscDeserial = gscOption.get();
+    }
+    
+    
+    @Test
+    public void newTest() {
+    	Maze maze = Maze.createCustomMaze();
+    	Chap chap = new Chap(2,2);
+    	GameState gs = new GameState(maze, chap, 2);
+    	GameStateController gsc = new GameStateController(maze, chap, gs);
+		
+		Boolean saved = SaveFile.saveGame("IntegrationEx", gsc);
+		assert saved;   
+		
+    }
+    
     
 }
