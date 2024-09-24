@@ -91,7 +91,6 @@ public class Chap {
 		public int colDirection() {return colDir;}
 	}
 	
-
 	public void pickUpItem(Item item) {inventory.add(item);}	
 	public List<Item> inventory(){return inventory;}
 	

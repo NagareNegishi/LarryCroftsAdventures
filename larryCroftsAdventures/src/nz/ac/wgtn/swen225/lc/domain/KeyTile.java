@@ -25,5 +25,8 @@ public class KeyTile extends Tile{
 		key = null;
 		keyCollected = true;
 		}
+
+	@Override
+	public String initial() {return "K ";}
 	
 }

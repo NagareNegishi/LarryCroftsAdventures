@@ -20,6 +20,8 @@ public class GameStateController implements GameStateControllerInterface {
 	@JsonProperty
 	private Chap chap;
 	
+	// change constructtor to avoid double use of maze
+	
 	// most likely need to change mazeRows and mazeCols for the shape of the maze choose 
 	public GameStateController(int mazeRows, int mazeCols, int startRow, int startCol, int totalTreasures) {
 		if(mazeRows < 0 || mazeCols < 0 || startRow < 0 || startCol < 0 || totalTreasures < 0) {
@@ -28,7 +30,7 @@ public class GameStateController implements GameStateControllerInterface {
 			throw new IllegalArgumentException("Chap must spawn within the bounds of the maze");}
 		
 		// basic maze initially but will be extended for the maze we choose
-        this.maze = Maze.createCustomMaze(mazeRows, mazeCols);
+        this.maze = Maze.createCustomMaze();
         this.chap = new Chap(startRow, startCol);
         this.gameState = new GameState(maze, chap, totalTreasures);
         

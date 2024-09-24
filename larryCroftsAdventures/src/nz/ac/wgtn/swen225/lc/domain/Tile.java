@@ -26,6 +26,10 @@ public abstract class Tile {
 	
 	// both these methods could be abstract, leaving as default methods for now as only treasure and key tiles need to use
 	public Item getItem() {return null;}
+	
 	public  void removeItem() {}
+	
+	// purely to help print maze
+	public abstract String initial();
 }
 

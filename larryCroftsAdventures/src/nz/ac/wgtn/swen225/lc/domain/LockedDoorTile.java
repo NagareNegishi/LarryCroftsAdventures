@@ -23,4 +23,6 @@ public class LockedDoorTile extends Tile{
 	public boolean hasItem() {return false;}
 	public String colour() {return colour;}
 
+	@Override
+	public String initial() {return "L ";}
 }
