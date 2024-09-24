@@ -58,15 +58,19 @@ public class Renderer extends JPanel {
     //these fields are for testing and recognizing the fps
     final RenderImg renderKourie = new RenderImg(Img.Kourie);
     
-    public Renderer(GameState game) { //presumambly have to take in the Gamestate here?
+    public Renderer() { //presumambly have to take in the Gamestate here?
         // Timer for updating the canvas every frame
         Timer timer = new Timer(frameTime, e -> updateCanvas());
         timer.start();
-        this.game = game;
+        
         System.out.println(this.getSize().getHeight());
         System.out.println(this.getSize().getWidth());
     }
-
+    
+    public void gameConsumer(GameState game) {
+    	this.game = game;
+    }
+    
     public void updateCanvas() {
        repaint();
        //this, will call paintComponent after it's done painting the last frame?
@@ -102,7 +106,7 @@ public class Renderer extends JPanel {
         g.setColor(Color.WHITE);
         g.fillOval(size.width/2,(size.height/2)-20, 40, 40);
         
-        
+        drawTiles(g);
         
         
         }
@@ -124,8 +128,8 @@ public class Renderer extends JPanel {
     	int maxCol = game.getMaze().getCols();
     	int maxRow = game.getMaze().getRows();
     	
-    	for (int rowOffset = -maxRow; rowOffset <= maxRow; rowOffset++) {
-    		for(int colOffset = -maxCol; colOffset <= maxCol; colOffset++) {
+    	for (int rowOffset = 0; rowOffset <= maxRow+1; rowOffset++) {
+    		for(int colOffset = 0; colOffset <= maxCol+1; colOffset++) {
     			
     			int currentY = x + colOffset;
                 int currentX = y + rowOffset;
@@ -133,6 +137,8 @@ public class Renderer extends JPanel {
                 
                 Tile t = game.getMaze().getTile(currentX, currentY);
                 //draw a free tile
+                g.setColor(Color.GREEN);
+                g.drawRect(currentX, currentY, currentY+32, currentX+32);
                 
                 if(t.hasItem()) {//run a helper method to find what's on here and draw it}
                 	}
