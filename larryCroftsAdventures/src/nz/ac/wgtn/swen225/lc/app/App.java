@@ -282,7 +282,30 @@ class App extends JFrame{
     boolean unpause = switch (state) {
       case PLAY -> false; // Already playing
       case PAUSED -> true;
-      case NEWGAME -> {setfakeLevel(); startDialog.setVisible(false);  yield true; }//{ loadNextLevel(); startDialog.setVisible(false); yield true; } !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      case NEWGAME -> {
+        Optional<GameStateController> loadedGame =loadFile();
+        if (loadedGame.isPresent()) {
+          model = loadedGame.get();
+          System.out.println("model loaded");
+          setLevel(model);
+          System.out.println("level set");
+        } else {
+          handleFileError("Failed to load game", "Load Error", 
+          new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
+          this::loadGame);
+        }
+        
+        
+        
+        
+        
+        yield true;}
+      
+      
+      
+      
+      
+      //{ loadNextLevel(); startDialog.setVisible(false); yield true; } //{setfakeLevel(); startDialog.setVisible(false);  yield true; }
       case GAMEOVER -> { LoadFile.loadLevel("level" + currentLevel); yield true; }
       case VICTORY -> { LoadFile.loadLevel("level1"); yield true; }
       case RECORDING, BETWEEN -> false; // need to think about this
@@ -348,8 +371,8 @@ class App extends JFrame{
     if (picked == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File file = fileChooser.getSelectedFile();
 
-      String filename = file.getName(); // i should pass file
-      return LoadFile.loadSave(filename);
+      //String filename = file.getName(); // i should pass file
+      return LoadFile.loadSave(file);
     }
     return Optional.empty();
   }
