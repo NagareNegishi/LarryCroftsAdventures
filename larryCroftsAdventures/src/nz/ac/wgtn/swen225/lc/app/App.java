@@ -515,10 +515,14 @@ class App extends JFrame{
     Chap chap = new Chap(2,2);
     GameState gameState = new GameState(maze, chap, 10);
     model = new GameStateController(maze, chap, gameState);
+
+    System.out.println("im here");
     recorder = new Recorder((rc)-> {
       gameInfoPanel.setTime(rc.updatedTime());
       model = rc.updatedGame();
       });
+
+    System.out.println("im here2");
     controller.setChap(chap);
     controller.setMaze(maze);
     controller.setRecorder(recorder);
