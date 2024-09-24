@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -56,7 +57,7 @@ public class GameStateController implements GameStateControllerInterface {
 	
 	public void moveChap(Direction direction) {gameState.moveChap(direction);}
 	public String getChapPosition() {return chap.getPosition();}
-	 
+	@JsonIgnore
 	public List<Item> getChapInventory(){return chap.inventory();}
 	public void getChapInventoryDesc(){ chap.inventoryDescription();}
 	public Map<Key,String> getKeysCollected(){return gameState.keysCollected();}

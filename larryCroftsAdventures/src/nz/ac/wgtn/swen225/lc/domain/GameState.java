@@ -18,6 +18,7 @@ public class GameState implements GameStateInterface {
 	private int treasuresCollected;
 	@JsonProperty
 	private int totalTreasures;
+	@JsonProperty
 	private Map<Key, String> keysCollected;
 	
 	@JsonCreator
