@@ -1,10 +1,6 @@
 package test.nz.ac.wgtn.swen225.lc.persistency;
 
 import nz.ac.wgtn.swen225.lc.domain.*;
-import nz.ac.wgtn.swen225.lc.domain.GameStateControllerInterface;
-import nz.ac.wgtn.swen225.lc.domain.GameStateController;
-import nz.ac.wgtn.swen225.lc.domain.GameState;
-
 import nz.ac.wgtn.swen225.lc.persistency.*;
 
 
@@ -93,7 +89,7 @@ public class PersistencyTest {
     }
     
      // Tests de-serialisation of GameStateController
-    @Test public void GameSaveLoadTest() {
+    @Test public void gameSaveLoadTest() {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	Chap chap = new Chap(2, 2);
     	GameState gs = new GameState(maze, chap, 2);
@@ -110,5 +106,27 @@ public class PersistencyTest {
     	// checking if same type of tile as hashcode prevents .equals directly
     	assert gscDeserial.getTileAtChapPosition().getClass().equals(maze.getTile(2, 2).getClass());    	
     }
+    
+    @Test 
+    public void integrationTestInit() {
+    	int rows = 5;
+		int cols = 10;
+		
+		Maze maze = Maze.createCustomMaze(rows, cols);
+		Chap chap = new Chap(2, 2);
+		GameState gs = new GameState(maze, chap, 2);
+		
+		GameStateController gsc = new GameStateController(maze, chap, gs);
+		
+		Boolean saved = SaveFile.saveGame("IntegrationEx", gsc);
+		assert saved;
+		
+		Optional<GameStateController> gscOption = LoadFile.loadSave("IntegrationEx");
+		assert gscOption.isPresent();
+		GameStateController gscDeserial = gscOption.get();
+		
+		
+    }
+    
     
 }
