@@ -21,6 +21,20 @@ public class PersistencyTest {
 //        GameController gm = new MockController(2, 2, 2, 1, 1);
 //        assert SaveFile.saveGame("Test1", gm);
 //    }
+	
+	@Test
+    public void level1Level() {
+    	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel("level1");
+    	assert gscOptionLevel.isPresent();
+    	GameStateController gscLevel = gscOptionLevel.get();
+    }
+	
+	@Test
+	public void level1Save() {
+		Optional<GameStateController> gscOption = LoadFile.loadSave("level1");
+		assert gscOption.isPresent();
+    	GameStateController gsc = gscOption.get();	
+	}
 
 	/**
 	 * Test for Juint
@@ -136,6 +150,8 @@ public class PersistencyTest {
 		assert saved;   
 		
     }
+    
+    
     
     
 }
