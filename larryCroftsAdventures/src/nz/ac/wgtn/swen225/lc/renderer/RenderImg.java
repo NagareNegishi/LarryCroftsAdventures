@@ -8,18 +8,23 @@ import java.awt.image.BufferedImage;
 
 public class RenderImg {
     private final Img img;
+    
+    private int w1;
+    private int h1;
+    private int w2;
+    private int h2;
 
     public RenderImg(Img img) {
         this.img = img;
     }
 
-    public void draw(Graphics g, Point center, Dimension size) {
-        BufferedImage image = img.image;
+    public void drawChap(Graphics g, Point center, Dimension size) {
+        BufferedImage image = img.image;//there's an optimization that can be done here to remove redundancies.
 
         // Get the actual width and height of the image
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
-
+        
         // Calculate the drawing coordinates
         int w1 = center.x - imageWidth / 2; // Center the image horizontally
         int h1 = center.y - imageHeight / 2; // Center the image vertically
@@ -27,10 +32,7 @@ public class RenderImg {
         int h2 = h1 + imageHeight;
 
         // Check if the image is outside the visible area
-        boolean isOut = h2 <= 0 || w2 <= 0 || h1 >= size.height || w1 >= size.width;
-        if (isOut) {
-            return;
-        }
+        testIfOut(size);
 
         // Draw the image
         
@@ -40,4 +42,20 @@ public class RenderImg {
         g.setColor(Color.BLUE);
         g.fillOval(imageWidth-20, (imageHeight/2)-20, 40, 40);
     }
+    
+    
+    public void testIfOut(Dimension size) {
+    	boolean isOut = h2 <= 0 || w2 <= 0 || h1 >= size.height || w1 >= size.width;
+        if (isOut) {
+            return;
+        }
+    }
+    
+    public void drawImg() {
+    	//this will draw the img where it needs to be
+    	
+    	
+    }
+    
+    
 }
