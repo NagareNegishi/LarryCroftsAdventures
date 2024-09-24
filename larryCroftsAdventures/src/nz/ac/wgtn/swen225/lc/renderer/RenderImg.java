@@ -51,9 +51,22 @@ public class RenderImg {
         }
     }
     
-    public void drawImg() {
+    public void drawImg(Graphics g , int x, int y) {
     	//this will draw the img where it needs to be
+    	BufferedImage image = img.image;
     	
+    	int imageWidth = image.getWidth();
+        int imageHeight = image.getHeight();
+        
+        int size = imageWidth;
+        
+    	int drawWidth = imageWidth * size;
+    	int drawHeight = imageHeight * size;
+    	
+    	w2 = drawWidth + size;
+    	h2 = drawHeight + size;
+    	
+    	g.drawImage(image, drawWidth, drawHeight, w2, h2, 0, 0, imageWidth, imageHeight, null);
     	
     }
     
