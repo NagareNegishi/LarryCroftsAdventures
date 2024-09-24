@@ -430,15 +430,12 @@ class App extends JFrame{
 
     model = level;
 
-    /**
-     * after the merge it should be
-     * recorder = new Recorder((rc)-> {gameInfoPanel.setTime(rc.updateTime());
-     *                                model = re.updatedGame();
-     *                                });
-     */
 
+    recorder = new Recorder((rc)-> {
+      gameInfoPanel.setTime(rc.updatedTime());
+      model = rc.updatedGame();
+      });
 
-    recorder = new Recorder(model);
     /**
     * likely i need to make new controller or set it
     */
@@ -518,7 +515,10 @@ class App extends JFrame{
     Chap chap = new Chap(2,2);
     GameState gameState = new GameState(maze, chap, 10);
     model = new GameStateController(maze, chap, gameState);
-    recorder = new Recorder(model);
+    recorder = new Recorder((rc)-> {
+      gameInfoPanel.setTime(rc.updatedTime());
+      model = rc.updatedGame();
+      });
     controller.setChap(chap);
     controller.setMaze(maze);
     controller.setRecorder(recorder);
