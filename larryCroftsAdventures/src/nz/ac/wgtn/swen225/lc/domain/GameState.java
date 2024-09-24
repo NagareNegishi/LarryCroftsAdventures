@@ -53,6 +53,9 @@ public class GameState implements GameStateInterface {
         case LockedDoorTile tile -> {
             if (checkForMatchingKey(tile.colour())) {
                 tile.unlock();
+				////////////////////////////
+				System.out.println("Chap has unlocked the door");
+				//////////////////////////
                 maze.setTile(newRow, newCol, new FreeTile()); // Replace the locked door with a free tile
             } else {
                 return; // Stop Chap from moving if he doesn't have the right key
@@ -61,14 +64,24 @@ public class GameState implements GameStateInterface {
         case ExitLockTile tile -> {
             if (allTreasureCollected()) {
                 tile.unlock();
+				////////////////////////////////
+				System.out.println("Chap has unlocked the exit");
+				//////////////////////////////
             } else {
                 return; // Stop Chap from moving if there's still treasure to collect
             }
         }
         case InfoFieldTile tile -> {
+			/////////////////////////////
+			System.out.println("Chap has entered an info field");
+			///////////////////////////
+
             tile.displayText(); // Display information on the tile
         }
         case Exit tile ->{
+			/////////////////////////////
+			System.out.println("Chap has reached the exit");
+			///////////////////////////
         	// Finish level an go to next level
         }
         default -> {

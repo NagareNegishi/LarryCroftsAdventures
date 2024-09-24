@@ -27,6 +27,16 @@ public class Maze {
         this.maze = maze;
         this.rows = rows;
         this.cols = cols;
+//////////////////////////////////////////
+/**	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			maze[i][j] = new FreeTile();
+		}
+	}*/
+///////////////////////////////////////////
+
+
+
     }
 	
 	public int getRows() { return rows; }
@@ -45,7 +55,17 @@ public class Maze {
 		// assert tile instanceof ...
 	}
 	
-	public boolean validMove(int row, int col) {return maze[row][col].canMoveTo();}
+	public boolean validMove(int row, int col) {
+		/////////////////////////////////////////
+		if (row < 0 || row >= rows || col < 0 || col >= cols) {
+			System.err.println("Invalid move: row or column is outside the bounds of the maze.");
+			return false;
+		}
+		return maze[row][col] != null && maze[row][col].canMoveTo();
+		/////////////////////////////////////////
+		
+		//return maze[row][col].canMoveTo();
+		}
 	
 	// helper method for creating a custom maze for testing different tiles
 	public static Maze createCustomMaze() {

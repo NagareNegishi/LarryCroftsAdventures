@@ -142,7 +142,7 @@ public class Renderer extends JPanel {
         }
     	
     }
-    
+    /** 
     private void drawTiles() {
 
     	int maxCol = game.getMaze().getCols();
@@ -196,19 +196,64 @@ public class Renderer extends JPanel {
         		
         	}
         	
+        }*/
+    
+    
+
+    private void drawTiles() {
+        int maxCol = game.getMaze().getCols();
+        int maxRow = game.getMaze().getRows();
+        
+        // Define the visible area around the player
+        int visibleRadius = 5;
+        int tileSize = 32;
+    
+        for (int rowOffset = -visibleRadius; rowOffset <= visibleRadius; rowOffset++) {
+            for (int colOffset = -visibleRadius; colOffset <= visibleRadius; colOffset++) {
+                
+                int currentX = x + rowOffset;
+                int currentY = y + colOffset;
+                
+                // Check if the current tile is within the maze bounds
+                if (currentX >= 0 && currentX < maxRow && currentY >= 0 && currentY < maxCol) {
+                    Tile t = game.getMaze().getTile(currentX, currentY);
+                    
+                    // Calculate screen position
+                    int screenX = (getWidth() / 2) + (rowOffset * tileSize);
+                    int screenY = (getHeight() / 2) + (colOffset * tileSize);
+                    
+                    // Draw a free tile
+                    g.setColor(Color.GREEN);
+                    g.drawRect(screenX, screenY, tileSize, tileSize);
+                    
+                    // Look if the tile has an item
+                    if (t.hasItem()) {
+                        drawItem(t.getItem(), screenX, screenY);
+                    }
+                }
+            }
         }
+    }
     
-    
+    private void drawItem(Item i, int screenX, int screenY) {
+        if (i instanceof Key) {
+            g.setColor(Color.CYAN);
+        } else if (i instanceof Treasure) {
+            g.setColor(Color.ORANGE);
+        } else if (i instanceof LockedDoorTile) {
+            g.setColor(Color.BLUE);
+        }
+        g.drawRect(screenX, screenY, 32, 32);
+    }
+
+
+
+
+
+
+
+
+
 
 }
-    	
-    	
-    	
-    	
-
-    	
-    
-    
-   
-    
 

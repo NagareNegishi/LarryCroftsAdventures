@@ -21,7 +21,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+import nz.ac.wgtn.swen225.lc.domain.Key;
+import nz.ac.wgtn.swen225.lc.domain.KeyTile;
+import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
+import nz.ac.wgtn.swen225.lc.domain.TreasureTile;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder;
@@ -190,8 +194,9 @@ class App extends JFrame{
    * Initialize the controller for the game
    * make map of key bindings and pass it to the controller
    */
-  private void initializeController(){
-    Map<String, Runnable> actionBindings =  new HashMap<>();
+  Map<String, Runnable> actionBindings =  new HashMap<>();
+  private void initializeController() {
+    //Map<String, Runnable> actionBindings =  new HashMap<>();
     actionBindings.put("exitWithoutSaving", this::exitGameWithoutSaving);
     actionBindings.put("exitAndSave", this::exitGameAndSave);
     actionBindings.put("resumeSavedGame", this::loadGame);
@@ -213,6 +218,7 @@ class App extends JFrame{
           if (timeLeft == 0) {
               gameTimer.stop();
               gameoverDialog.setVisible(true);
+              state = AppState.GAMEOVER;
           }
       });
       gameTimer.stop();
@@ -287,7 +293,22 @@ class App extends JFrame{
       
       
       //{ loadNextLevel(); startDialog.setVisible(false); yield true; } //{setfakeLevel(); startDialog.setVisible(false);  yield true; }
-      case GAMEOVER -> { LoadFile.loadLevel("level" + currentLevel); yield true; }
+      case GAMEOVER -> {
+      //  LoadFile.loadLevel("level" + currentLevel); yield true; 
+      timeLeft = 60;
+      Optional<GameStateController> model = LoadFile.loadLevel("level1");
+      model.ifPresent(this::setLevel);
+      System.out.println("model loaded");
+      gameoverDialog.setVisible(false);
+      
+      yield true;
+      }
+
+
+
+
+
+
       case VICTORY -> { LoadFile.loadLevel("level1"); yield true; }
       case RECORDING, BETWEEN -> false; // need to think about this
     };
@@ -467,18 +488,43 @@ class App extends JFrame{
 
 
     model = level;
+    GameState gamestate = model.getGameState();
 
+    controller = new Controller(gamestate, actionBindings);
+    Chap c = model.getChap();
+    Maze m = model.getMaze();
+    System.out.println("this is the maze I just loaded");
+    m.printMaze();
+    //not loading but showing domain works
+    m.setTile(2, 3, new TreasureTile());
+    m.setTile(3, 2, new KeyTile(new Key("Red")));
+    m.setTile(3, 3, new LockedDoorTile("Red"));
+    System.out.println("this is the maze after adding some tiles");
+    m.printMaze();
+
+    
+    /** 
+    m = Maze.createBasicMaze(10, 10);//!!!!!!!!!!!!!!!!!!!!!!!!!!
+    System.out.println("this is the Basic maze");
+    m.printMaze();
+    m = Maze.createCustomMaze();
+    System.out.println("this is the custom maze");
+    m.printMaze();
+    */
 
     recorder = new Recorder((rc)-> {
       gameInfoPanel.setTime(rc.updatedTime());
       model = rc.updatedGame();
       });
+    //controller.setChap(c);
+    //controller.setMaze(m);
+    controller.setRecorder(recorder);
 
     System.out.println("im here2");
     /**
     * likely i need to make new controller or set it
     */
-    renderer.gameConsumer( model.getGameState() );
+    renderer.gameConsumer(gamestate );
 
 
 
