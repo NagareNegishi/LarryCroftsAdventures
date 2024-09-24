@@ -11,4 +11,6 @@ public class WallTile extends Tile{
 	@Override
 	public boolean hasItem() {return false;}
 
+	@Override
+	public String initial() {return "W ";}
 }

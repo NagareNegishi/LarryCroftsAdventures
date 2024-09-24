@@ -48,13 +48,19 @@ public class Maze {
 	public boolean validMove(int row, int col) {return maze[row][col].canMoveTo();}
 	
 	// helper method for creating a custom maze for testing different tiles
-	public static Maze createCustomMaze(int rows, int cols) {
+	public static Maze createCustomMaze() {
+		int rows = 7;
+		int cols = 7;
 		Maze maze = new Maze(rows, cols);
 		for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 if (row == 0 || row == rows -1 || col == 0 || col == cols -1) {
                     maze.setTile(row, col, new WallTile());
                 } 
+                else if(row == 1 && col == 1) {
+                	maze.setTile(row,col, new TreasureTile());}
+                else if(row == 1 && col == 5) {
+                	maze.setTile(row,col, new TreasureTile());}
                 //creating a Tile for testing
                 else if(row == 5 && col == 3) {
                 	maze.setTile(row, col, new LockedDoorTile("Blue"));}
@@ -82,6 +88,21 @@ public class Maze {
             }
 		}
                 return maze;
+	}
+	
+	// helper method for drawing a room in the maze with a LockedDoorTile and a treasure
+	public static void createRoom() {
+		
+	}
+	
+	public void printMaze() {
+
+		for (int i = 0; i<rows; i++) {
+			for (int j = 0; j<cols; j++) {
+				System.out.print(maze[i][j].initial());
+			}
+			System.out.println();
+}
 	}
 	
 }

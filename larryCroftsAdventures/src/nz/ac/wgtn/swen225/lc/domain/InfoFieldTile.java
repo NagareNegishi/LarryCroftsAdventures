@@ -23,4 +23,6 @@ public class InfoFieldTile extends Tile{
 	
 	public String displayText() {return helpText;}
 
+	@Override
+	public String initial() {return "I";}
 }
