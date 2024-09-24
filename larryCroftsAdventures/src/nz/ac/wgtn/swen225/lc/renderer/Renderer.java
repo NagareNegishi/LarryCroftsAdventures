@@ -1,16 +1,5 @@
 package nz.ac.wgtn.swen225.lc.renderer;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-import javax.imageio.ImageIO;
 
 import java.awt.Color;
 
@@ -44,13 +33,23 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 
+import nz.ac.wgtn.swen225.lc.domain.Chap;
+import nz.ac.wgtn.swen225.lc.domain.GameState;
+import nz.ac.wgtn.swen225.lc.domain.Tile;
+
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class Renderer extends JPanel {
 
-    private final int FPS = 60; // 60 frames per second
+    
+	private static final long serialVersionUID = 1L;
+	private final int FPS = 60; // 60 frames per second
     private final int frameTime = 1000 / FPS; // time per frame in milliseconds
+    
+    private int x;
+    private int y;
+    private GameState game;
     
     private long lastTime = System.nanoTime();
     private int frames = 0;
@@ -59,10 +58,13 @@ public class Renderer extends JPanel {
     //these fields are for testing and recognizing the fps
     final RenderImg renderKourie = new RenderImg(Img.Kourie);
     
-    public Renderer() {
+    public Renderer(GameState game) { //presumambly have to take in the Gamestate here?
         // Timer for updating the canvas every frame
         Timer timer = new Timer(frameTime, e -> updateCanvas());
         timer.start();
+        this.game = game;
+        System.out.println(this.getSize().getHeight());
+        System.out.println(this.getSize().getWidth());
     }
 
     public void updateCanvas() {
@@ -73,13 +75,7 @@ public class Renderer extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); 
-        
-        
-        
-        // Clear the canvas
-        
-        //run the logic of working in "local space, of just rendering stuff around the player and outwards"
-        //on saturday, Make the Icons needed for this whole thing to work, and to actually test the Img class
+
         
         fpsCheck();
 
@@ -93,13 +89,22 @@ public class Renderer extends JPanel {
         Dimension size = this.getSize();
         
         //Point center = new Point(1,1);
-        Point center = new Point(size.width/2,size.height/2);
-		// Use RenderImg to draw the image
-        renderKourie.draw(g, center, size);
+        y = game.getChap().getCol();
+        x = game.getChap().getRow();
         
-        g.setColor(Color.BLACK);
-        //g.fillOval(size.height/2,size.width/2, 30, 30);
+        Point center = new Point(size.width/2,size.height/2);
+		
+        //There's a specific method for drawing Chap
+        renderKourie.drawChap(g, center, size);
+        
+        
+        
+        g.setColor(Color.WHITE);
         g.fillOval(size.width/2,(size.height/2)-20, 40, 40);
+        
+        
+        
+        
         }
     
     private void fpsCheck() {
@@ -114,6 +119,37 @@ public class Renderer extends JPanel {
     	
     }
     
+    private void drawTiles(Graphics g) {
+
+    	int maxCol = game.getMaze().getCols();
+    	int maxRow = game.getMaze().getRows();
+    	
+    	for (int rowOffset = -maxRow; rowOffset <= maxRow; rowOffset++) {
+    		for(int colOffset = -maxCol; colOffset <= maxCol; colOffset++) {
+    			
+    			int currentY = x + colOffset;
+                int currentX = y + rowOffset;
+    			
+                
+                Tile t = game.getMaze().getTile(currentX, currentY);
+                //draw a free tile
+                
+                if(t.hasItem()) {//run a helper method to find what's on here and draw it}
+                	}
+                
+                }
+    		}
+    	
+    		
+    	}
+    	
+    	
+    	
+    	
+    	
+    	
+    }
     
+   
     
-}
+
