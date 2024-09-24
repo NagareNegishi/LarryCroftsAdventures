@@ -19,4 +19,6 @@ public class ExitLockTile extends Tile{
 	@Override
 	public boolean hasItem() {return false;}
 
+	@Override
+	public String initial() {return "EL";}
 }

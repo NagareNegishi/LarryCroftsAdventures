@@ -173,6 +173,7 @@ public class Tests {
 			Chap chap = new Chap(2,2);
 			GameState test = new GameState(maze,chap,1);
 			maze.setTile(2, 3, new KeyTile(new Key("Blue")));
+			assert maze.getTile(2,3) instanceof KeyTile;
 			test.moveChap(Direction.Right);
 			assert chap.inventory().get(0) instanceof Key;
 			Key key = (Key) chap.inventory().get(0);
@@ -259,5 +260,12 @@ public class Tests {
 			assertEquals(2,chap.getRow());
 			assertEquals(3,chap.getCol());
 			
+		}
+		@Test
+		public void test01() {
+			Maze maze = Maze.createCustomMaze();
+			Chap chap = new Chap(4,3);
+			GameState test = new GameState(maze,chap,0);
+			maze.printMaze();
 		}
 }

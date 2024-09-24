@@ -12,4 +12,7 @@ public class FreeTile extends Tile{
 	@Override
 	public boolean hasItem() {return false;}
 
+	@Override
+	public String initial() {return "F ";}
+
 }

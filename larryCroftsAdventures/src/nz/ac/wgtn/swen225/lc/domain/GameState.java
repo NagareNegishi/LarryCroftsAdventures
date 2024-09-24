@@ -101,6 +101,12 @@ public class GameState implements GameStateInterface {
 							   .map(item -> (Key) item)
 							   .anyMatch(key -> key.colour().equals(doorColour));
 	}
+	public String chapSurroundings() {
+		return "To Chap's left is a: " + maze.getTile(chap.getRow(), chap.getCol() - 1).tileType() + "\n"
+				+ "Above Chap is a " + maze.getTile(chap.getRow() -1, chap.getCol()).tileType() + "\n"
+				+ "To Chap's right is a " + maze.getTile(chap.getRow(), chap.getCol() + 1).tileType() + "\n"
+				+ "Below Chap is a " + maze.getTile(chap.getRow() + 1, chap.getCol()).tileType();
+	}
 }
 
 
