@@ -1,5 +1,6 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -8,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = Treasure.class, name = "Treasure"),
     @JsonSubTypes.Type(value = Key.class, name = "Key")
 })
+@JsonIgnoreProperties(ignoreUnknown = true)
+
 
 public interface Item {
 	

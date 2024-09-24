@@ -116,10 +116,10 @@ public class PersistencyTest {
 		
 		GameStateController gsc = new GameStateController(maze, chap, gs);
 		
-		Boolean saved = SaveFile.saveGame("IntegrationEx", gsc);
+		Boolean saved = SaveFile.saveGame("NewTest", gsc);
 		assert saved;
 		
-		Optional<GameStateController> gscOption = LoadFile.loadSave("IntegrationEx");
+		Optional<GameStateController> gscOption = LoadFile.loadSave("NewTest");
 		assert gscOption.isPresent();
 		GameStateController gscDeserial = gscOption.get();
     }
