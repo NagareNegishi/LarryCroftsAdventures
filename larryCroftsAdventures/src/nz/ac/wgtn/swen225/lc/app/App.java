@@ -50,7 +50,7 @@ class App extends JFrame{
   private int treasuresLeft = 10; // Example value
 
 
-  private JPanel renderer;
+  private Renderer renderer;
 
 
   Runnable closePhase= ()->{};
@@ -129,7 +129,7 @@ class App extends JFrame{
 
 
     // Center panel for game rendering
-    renderer = new JPanel();//new Renderer();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    renderer = new Renderer();
     add(renderer, BorderLayout.CENTER);
 
 
@@ -468,9 +468,10 @@ class App extends JFrame{
     /**
     * likely i need to make new controller or set it
     */
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-    renderer = new Renderer(model.getGameState());//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    renderer.gameConsumer( model.getGameState() );
+
+
+
 
     System.out.println("im here3");
 
