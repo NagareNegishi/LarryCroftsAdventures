@@ -6,6 +6,7 @@ public class LockedDoorTile extends Tile{
 	
 	@JsonProperty
 	private String colour;
+	@JsonProperty
 	private boolean locked;
 	
 	public LockedDoorTile(String colour) {
