@@ -34,7 +34,6 @@ import java.awt.Graphics;
 import java.awt.Point;
 
 import javax.swing.JPanel;
-import javax.swing.Timer;
 
 import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.Item;
@@ -68,8 +67,11 @@ public class Renderer extends JPanel {
     
     public Renderer() { //presumambly have to take in the Gamestate here?
         // Timer for updating the canvas every frame
-        Timer timer = new Timer(frameTime, e -> updateCanvas());
-        timer.start();
+
+        //////////////////////////////////////////////
+        //Timer timer = new Timer(frameTime, e -> updateCanvas());
+        //timer.start();
+        ////////////////////////////////////////////////
         
         System.out.println(this.getSize().getHeight());
         System.out.println(this.getSize().getWidth());
@@ -81,6 +83,9 @@ public class Renderer extends JPanel {
     
     public void updateCanvas() {
         if (game == null) {
+/////////////////////////////////////////
+        System.err.println("Game is null");
+        ////////////////////////////////////////
             return;
             
         }
@@ -195,7 +200,7 @@ public class Renderer extends JPanel {
         }
     
     
-    
+
 }
     	
     	

@@ -49,15 +49,10 @@ class App extends JFrame{
   private int keysCollected = 0; //or List<Key> keysCollected or items??? but in that case i shouldnt involeve the process
   private int treasuresLeft = 10; // Example value
 
-
-  private Renderer renderer;
-
-
   Runnable closePhase= ()->{};
   //Phase currentPhase;
   private Controller controller;
-
-  
+  private Renderer renderer;
   private Recorder recorder;
   public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY, BETWEEN, RECORDING}
   private AppState state = AppState.NEWGAME;
@@ -68,16 +63,11 @@ class App extends JFrame{
 
   private static final int MAX_LEVEL = 2; //its not pretty... but i need to check loadNextLevel failure
 
-
-
-
   App(){
     setTitle("Larry Croft's Adventures");//or something else
 
-
     assert SwingUtilities.isEventDispatchThread();
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
 
     initializeUI();
     initializeController();
@@ -96,15 +86,11 @@ class App extends JFrame{
 
   
 
-
-
   private void initializeUI() {
-
     // game info
     gameInfoPanel = new GameInfoPanel(width/8, height);
     gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
     add(gameInfoPanel, BorderLayout.EAST);
-
     // Side panel for menu/recorder UI
     sidePanel = new JPanel(new BorderLayout());
     sidePanel.setPreferredSize(new Dimension(width/8, height));
@@ -126,19 +112,15 @@ class App extends JFrame{
     recorderPanel = new RecorderPanel(e -> handleRecorderAction(e.getActionCommand())
     ,slider -> handleSliderChange(slider));
 
-
-
     // Center panel for game rendering
     renderer = new Renderer();
     add(renderer, BorderLayout.CENTER);
-
 
     pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0), 0.75);
     startDialog = new PauseDialog(this, "Press Escape to start", Color.BLUE, Color.YELLOW, 0.75);
     gameoverDialog = new PauseDialog(this, "Game Over\n Press Escape to retry", Color.RED, Color.BLACK, 0.75);
     victoryDialog = new PauseDialog(this, "Victory\nPress Escape to play again", Color.GREEN, Color.ORANGE, 0.75);
     startDialog.setVisible(true);
-
 }
 
 /**
@@ -217,8 +199,6 @@ class App extends JFrame{
     actionBindings.put("startNewGame2", () -> LoadFile.loadLevel("level2"));
     actionBindings.put("pause", this::pauseGame);
     actionBindings.put("unpause", this::unpauseGame);
-
-
     controller = new Controller(new Chap(2,2), new Maze(5,5), actionBindings);//temp maze and chap
     addKeyListener(controller);
     setFocusable(true);//could be remove??
@@ -363,11 +343,34 @@ class App extends JFrame{
     }
   }
 
+
+
+
+
+  /**
+   * String-based methods expect filenames without the ".json" extension, as they automatically append it.
+   * File-based methods expect complete filenames including the ".json" extension, as they use the File object as-is.
+   */
   private Optional<GameStateController> loadFile() {
-    JFileChooser fileChooser = new JFileChooser();
+
+    File projectRoot = new File(System.getProperty("user.dir"));
+    System.out.println("project is here: " + projectRoot.getAbsolutePath());
+
+    File saveDirectory = new File(projectRoot, "levels");
+    System.out.println("saves is here: " + saveDirectory.getAbsolutePath());
+    if (!saveDirectory.exists()) {
+      System.out.println("saves directory does not exist");
+    }
+
+
+
+    JFileChooser fileChooser = new JFileChooser(saveDirectory);
     fileChooser.setDialogTitle("Load Game");
     FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON Game files", "json");//expecting json file
     fileChooser.setFileFilter(filter); // set filter
+    fileChooser.setAcceptAllFileFilterUsed(false); // disable "All files" option
+
+
     int picked = fileChooser.showOpenDialog(this);
     if (picked == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File file = fileChooser.getSelectedFile();
@@ -376,9 +379,11 @@ class App extends JFrame{
 
       System.out.println("file name: " + filename);
 
-      return LoadFile.loadSave("level1");
+      //return LoadFile.loadSave("level1");
       //return LoadFile.loadSave(filename);
+      return LoadFile.loadSave(file);
     }
+    System.err.println("this is Optional.empty() from load file");
     return Optional.empty();
   }
 
@@ -403,7 +408,12 @@ class App extends JFrame{
       options, defult);
       switch(choice){
         case 0 -> action.run();
-        case 1 -> LoadFile.loadLevel("level1");
+        case 1 -> {
+          Optional<GameStateController> model = LoadFile.loadLevel("level1");
+          model.ifPresent(this::setLevel);
+          System.out.println("model loaded");
+          startDialog.setVisible(false);
+        }
         case 2 -> exitGameWithoutSaving();
       }
   }
@@ -495,8 +505,8 @@ class App extends JFrame{
          */
 
         updateGameInfo(model); // this need to be gone
-        
-        renderer.repaint();
+        renderer.updateCanvas();
+        //renderer.repaint();
       }
     });
     closePhase.run();//close phase before adding any element of the new phase

@@ -92,11 +92,11 @@ public class Recorder {
 		assert updateReciever != null : "Null update reciever given to record during construction!";
 		this.updateReciever = updateReciever;
 		firstLevelSupplier = () -> {
-			assert LoadFile.loadSave("level1").isPresent()
-			//assert LoadFile.loadLevel("level1").isPresent()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			//assert LoadFile.loadSave("level1").isPresent()
+			assert LoadFile.loadLevel("level1").isPresent()
 					: "Exception occured when attempting to load first level for recorder!";
-			//return LoadFile.loadLevel("level1").get();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			return LoadFile.loadSave("level1").get();
+			return LoadFile.loadLevel("level1").get();
+			//return LoadFile.loadSave("level1").get();
 		};
 		recordingGame = firstLevelSupplier.get();
 	}
