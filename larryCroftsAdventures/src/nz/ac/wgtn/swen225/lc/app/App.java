@@ -289,6 +289,7 @@ class App extends JFrame{
           System.out.println("model loaded");
           setLevel(model);
           System.out.println("level set");
+          startDialog.setVisible(false);
         } else {
           handleFileError("Failed to load game", "Load Error", 
           new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
@@ -371,8 +372,12 @@ class App extends JFrame{
     if (picked == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File file = fileChooser.getSelectedFile();
 
-      //String filename = file.getName(); // i should pass file
-      return LoadFile.loadSave(file);
+      String filename = file.getName(); // i should pass file
+
+      System.out.println("file name: " + filename);
+
+      return LoadFile.loadSave("level1");
+      //return LoadFile.loadSave(filename);
     }
     return Optional.empty();
   }
@@ -448,7 +453,7 @@ class App extends JFrame{
      * i can just pass the model to the renderer
      * so i dont need to risk breaking the jframe
      */
-
+    System.out.println("setting level");
 
 
     model = level;
@@ -459,6 +464,7 @@ class App extends JFrame{
       model = rc.updatedGame();
       });
 
+    System.out.println("im here2");
     /**
     * likely i need to make new controller or set it
     */
@@ -466,8 +472,12 @@ class App extends JFrame{
     renderer = new Renderer(model.getGameState());//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+    System.out.println("im here3");
+
     renderer.addKeyListener(controller);//likely i need to make new controller each level as controller contains maze
     renderer.setFocusable(true);
+
+    System.out.println("im here4");
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
 

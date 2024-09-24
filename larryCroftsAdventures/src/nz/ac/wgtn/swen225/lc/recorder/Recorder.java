@@ -2,7 +2,8 @@ package nz.ac.wgtn.swen225.lc.recorder;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -12,6 +13,7 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
@@ -90,9 +92,11 @@ public class Recorder {
 		assert updateReciever != null : "Null update reciever given to record during construction!";
 		this.updateReciever = updateReciever;
 		firstLevelSupplier = () -> {
-			assert LoadFile.loadLevel("level1").isPresent()
+			assert LoadFile.loadSave("level1").isPresent()
+			//assert LoadFile.loadLevel("level1").isPresent()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 					: "Exception occured when attempting to load first level for recorder!";
-			return LoadFile.loadLevel("level1").get();
+			//return LoadFile.loadLevel("level1").get();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			return LoadFile.loadSave("level1").get();
 		};
 		recordingGame = firstLevelSupplier.get();
 	}
