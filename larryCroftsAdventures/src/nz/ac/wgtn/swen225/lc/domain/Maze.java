@@ -1,9 +1,15 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Maze {
 
+
 	private Tile[][] maze;
+	@JsonProperty
 	private int rows;
+	@JsonProperty
     private int cols;
 	
 	public Maze(int rows, int cols) {
@@ -12,6 +18,15 @@ public class Maze {
 		this.cols = cols;
 		maze = new Tile[rows][cols];
 		}
+	
+	@JsonCreator
+    public Maze(@JsonProperty("maze") Tile[][] maze, 
+    			@JsonProperty("rows") int rows, 
+                @JsonProperty("cols") int cols) {
+        this.maze = maze;
+        this.rows = rows;
+        this.cols = cols;
+    }
 	
 	public int getRows() { return rows; }
     public int getCols() { return cols; }
