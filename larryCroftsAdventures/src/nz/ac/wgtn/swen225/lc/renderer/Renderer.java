@@ -88,6 +88,9 @@ public class Renderer extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); 
+        
+        if(game == null) {return;}
+        
         this.g = g;
         
         fpsCheck();
@@ -137,8 +140,8 @@ public class Renderer extends JPanel {
     	int maxCol = game.getMaze().getCols();
     	int maxRow = game.getMaze().getRows();
     	
-    	for (int rowOffset = 0; rowOffset <= maxRow+1; rowOffset++) {
-    		for(int colOffset = 0; colOffset <= maxCol+1; colOffset++) {
+    	for (int rowOffset = 0; rowOffset < maxRow; rowOffset++) {
+    		for(int colOffset = 0; colOffset < maxCol; colOffset++) {
     			
     			int currentY = x + colOffset;
                 int currentX = y + rowOffset;
