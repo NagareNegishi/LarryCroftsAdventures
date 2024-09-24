@@ -1,11 +1,10 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
-//*** TODO ***//
-public class zInfoFieldTileTODO extends Tile{
+public class InfoFieldTile extends Tile{
 	
 	private String helpText;
 
-	//public InfoFieldTile(String helpText) {this.helpText = helpText;}
+	public InfoFieldTile(String helpText) {this.helpText = helpText;}
 
 	@Override
 	public boolean canMoveTo() {
@@ -21,5 +20,7 @@ public class zInfoFieldTileTODO extends Tile{
 
 	@Override
 	public boolean hasItem() {return false;}
+	
+	public String displayText() {return helpText;}
 
 }
