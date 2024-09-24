@@ -1,10 +1,16 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class KeyTile extends Tile{
 	
+	@JsonProperty
 	private Key key;
 	private boolean keyCollected = false;
 	
+	@JsonCreator
 	public KeyTile(Key key) {this.key = key;}
 
 	@Override
@@ -18,6 +24,7 @@ public class KeyTile extends Tile{
 	@Override
 	public boolean hasItem() {return true;}
 
+	@JsonIgnore
 	@Override
 	public Item getItem() {return key;}
 	@Override
@@ -25,5 +32,4 @@ public class KeyTile extends Tile{
 		key = null;
 		keyCollected = true;
 		}
-	
 }
