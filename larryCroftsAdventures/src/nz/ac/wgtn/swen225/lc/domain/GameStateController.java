@@ -62,6 +62,9 @@ public class GameStateController implements GameStateControllerInterface {
 	public int getTreasuresCollected() {return gameState.getTreasuresCollected();}
 	public boolean isAllTreasureCollected() {return gameState.allTreasureCollected();}
 	 
+	public Maze getMaze() {return maze;}
+	public Chap getChap() {return chap;}
+	 
 	// can change to return a tile instead of string if needed for comparison later
 	//public String getTileAtChapPosition() { return maze.getTile(chap.getRow(), chap.getCol()).tileType();}
 	public Tile getTileAtChapPosition() { return maze.getTile(chap.getRow(), chap.getCol());}

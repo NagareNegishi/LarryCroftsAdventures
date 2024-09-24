@@ -48,23 +48,33 @@ public class GameState implements GameStateInterface {
 		int newCol = chap.getCol() + direction.colDirection();
 		Tile nextTile = maze.getTile(newRow, newCol);
 		
-		// using ifs to get logic down can edit later to avoid ifs
-		if(nextTile instanceof LockedDoorTile) {
-			 LockedDoorTile tile = (LockedDoorTile) nextTile;
-			 // stop Chap from moving if he doesn't have the right key
-			 if(!checkForMatchingKey(tile.colour())) {
-				 return;
-			 // otherwise unlock the door and move him onto it
-			 } else {
-				 tile.unlock();
-			 }
-		}
-		
+		switch (nextTile) {
+        case LockedDoorTile tile -> {
+            if (checkForMatchingKey(tile.colour())) {
+                tile.unlock();
+                maze.setTile(newRow, newCol, new FreeTile()); // Replace the locked door with a free tile
+            } else {
+                return; // Stop Chap from moving if he doesn't have the right key
+            }
+        }
+        case ExitLockTile tile -> {
+            if (allTreasureCollected()) {
+                tile.unlock();
+            } else {
+                return; // Stop Chap from moving if there's still treasure to collect
+            }
+        }
+        case InfoFieldTile tile -> {
+            tile.displayText(); // Display information on the tile
+        }
+        case Exit tile ->{
+        	// Finish level an go to next level
+        }
+        default -> {
+            
+        }
+    }
 	    chap.move(direction, maze);
-	    
-	    // possibility of causing issues down the line, will test
-	    if (nextTile instanceof LockedDoorTile) {maze.setTile(newRow, newCol, new FreeTile());}
-	    
 	    // checks for an item everytime Chap moves to a tile
 	    checkForItem();
 	}
@@ -75,11 +85,11 @@ public class GameState implements GameStateInterface {
         if (currentTile.hasItem()) {
             Item item = currentTile.getItem();
             chap.pickUpItem(item);
-            if(item instanceof Treasure) {this.treasureCollected();}
-            if(item instanceof Key) {
-            	Key key = (Key) item;
-            	keysCollected.put(key, key.colour());
-            }
+            switch (item) {
+            case Treasure treasure -> treasureCollected();
+            case Key key -> keysCollected.put(key, key.colour());
+            default -> {}
+        }
             currentTile.removeItem();
             maze.setTile(chap.getRow(), chap.getCol() , new FreeTile());
         }
@@ -91,7 +101,6 @@ public class GameState implements GameStateInterface {
 							   .map(item -> (Key) item)
 							   .anyMatch(key -> key.colour().equals(doorColour));
 	}
-	// TODO: method to change game state when treasureCollected == totalTreasures so exit lock opens
 }
 
 
