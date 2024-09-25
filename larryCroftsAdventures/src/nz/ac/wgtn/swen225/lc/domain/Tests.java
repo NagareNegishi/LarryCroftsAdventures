@@ -263,9 +263,9 @@ public class Tests {
 		}
 		@Test
 		public void test01() {
-			Maze maze = Maze.createCustomMaze();
-			Chap chap = new Chap(4,3);
-			GameState test = new GameState(maze,chap,0);
+			Maze maze = Maze.createLevel1();
+			//Chap chap = new Chap(4,3);
+			//GameState test = new GameState(maze,chap,0);
 			maze.printMaze();
 		}
 }
