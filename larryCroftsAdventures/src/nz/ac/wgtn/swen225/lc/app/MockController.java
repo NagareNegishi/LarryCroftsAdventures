@@ -11,7 +11,7 @@ public class MockController extends Controller{
 	public Maze maze;
 	public Map<String, Runnable> actionBindings;
 	public MockController(Chap chap, Maze maze, Map<String, Runnable> actionBindings) {
-		super(chap,maze,null);
+		super(chap,maze,actionBindings);
 		this.chap = chap;
 		this.maze = maze;
 	}
