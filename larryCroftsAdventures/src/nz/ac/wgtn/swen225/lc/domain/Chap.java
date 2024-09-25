@@ -46,6 +46,23 @@ public class Chap {
 	}
 	
 	public void move(Direction direction, Maze maze) {
+///////////////////////////////////////////////
+	int newRow = this.row + direction.rowDirection();
+	int newCol = this.col + direction.colDirection();
+
+	if (maze.validMove(newRow, newCol)) {
+		System.out.println("I am moving to row: " + newRow + ", column: " + newCol
+				+ " from " + getPosition());
+		this.row = newRow;
+		this.col = newCol;
+	} else {
+		System.out.println("I Cannot move to " + direction.name() + ".\n"
+				+ getPosition()
+				+ " \nand I am trying to move to row: " + newRow + ", column: " + newCol);
+	}
+///////////////////////////////////////////////
+
+		/** 
 	    int newRow = this.row;
 	    int newCol = this.col;
 	    
@@ -71,6 +88,7 @@ public class Chap {
 	    this.row = newRow;
 	    this.col = newCol;
 	    assert this.row == newRow && this.col == newCol : "Move failed";
+		*/
 	}
 
 	// enum to store the directions Chap can move as well as functionality to see what direction Chap will move next
@@ -91,7 +109,12 @@ public class Chap {
 		public int colDirection() {return colDir;}
 	}
 	
-	public void pickUpItem(Item item) {inventory.add(item);}	
+	public void pickUpItem(Item item) {
+		//////////////////////////////////
+		System.out.println("I picked up: " + item.description() + ";)");
+
+		////////////////////////////////////
+		inventory.add(item);}	
 	public List<Item> inventory(){return inventory;}
 	
 	// helpful method for laying out chaps inventory

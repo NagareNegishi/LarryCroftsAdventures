@@ -6,7 +6,6 @@ import javax.swing.SwingUtilities;
 
 import org.junit.Test;
 
-import nz.ac.wgtn.swen225.lc.app.App;
 import nz.ac.wgtn.swen225.lc.app.MockController;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Maze;

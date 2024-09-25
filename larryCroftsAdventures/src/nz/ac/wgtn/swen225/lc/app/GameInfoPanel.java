@@ -9,6 +9,9 @@ import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+ * A panel that displays the game information, including the time, level, keys, and treasures.
+ */
 public class GameInfoPanel extends JPanel {
     private JLabel timeTextLabel;
     private JLabel timeLabel;
@@ -16,6 +19,11 @@ public class GameInfoPanel extends JPanel {
     private JLabel keysLabel;
     private JLabel treasuresLabel;
     
+    /**
+     * Create a new GameInfoPanel with the given width and height.
+     * @param width
+     * @param height
+     */
     public GameInfoPanel(int width, int height) {
         setLayout(new BorderLayout(0,10));
         setPreferredSize(new Dimension(width, height)); //repetitive?? app will call it later too
@@ -43,34 +51,56 @@ public class GameInfoPanel extends JPanel {
 
     }
 
-    // I could have just one method, but its more readable to have separate methods
+    /*
+     * I am fully aware that the following setters can be one method that takes a string and an int
+     * However, those methods are called by other modules,
+     * and readability is more important when you collaborate with others.
+     */
+
+    /**
+     * set the time on the timer label, and update the color of the timer
+     * @param time
+     */
     public void setTime(int time) {
         timeLabel.setText(String.valueOf(time));
         updateTimerColor(time);
     }
+
+    /**
+     * set the level on the level label
+     * @param level
+     */
     public void setLevel(int level) {
         levelLabel.setText("Level: " + level);
     }
+
+    /**
+     * set the keys on the keys label
+     * @param keys
+     */
     public void setKeys(int keys) {
         keysLabel.setText("Keys: " + keys);
     }
+
+    /**
+     * set the treasures on the treasures label
+     * @param treasures
+     */
     public void setTreasures(int treasures) {
         treasuresLabel.setText("Treasures left: " + treasures);
     }
 
     /**
-     * change it to switch later
+     * update the color of the timer label based on the time
      * @param time
      */
     public void updateTimerColor(int time) {
-        if (time < 10) {
-            timeLabel.setForeground(Color.RED);
-        } else if (time < 20) {
-            timeLabel.setForeground(Color.ORANGE);
-        }
-        else {
-            timeLabel.setForeground(Color.BLACK);
-        }
+        Color color = switch(time/10) {// I can't believe new switch can't limit the scope of the variable
+            case 0  -> Color.RED;
+            case 1 ->Color.ORANGE;
+            default -> Color.BLACK;
+        };
+        timeLabel.setForeground(color);
     }
 
 
