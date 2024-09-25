@@ -269,7 +269,8 @@ class App extends JFrame{
       case PLAY -> false; // Already playing
       case PAUSED -> true;
       case NEWGAME -> {
-        Optional<GameStateController> loadedGame =loadFile();
+        //Optional<GameStateController> loadedGame =loadFile();
+        Optional<GameStateController> loadedGame = LoadFile.loadLevel("level1");
         if (loadedGame.isPresent()) {
           model = loadedGame.get();
           System.out.println("model loaded");
