@@ -1,13 +1,15 @@
 package test.nz.ac.wgtn.swen225.lc.fuzz;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import javax.swing.SwingUtilities;
 
 import org.junit.Test;
 
-import nz.ac.wgtn.swen225.lc.app.App;
 import nz.ac.wgtn.swen225.lc.app.MockController;
+import nz.ac.wgtn.swen225.lc.app.MockRunnable;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 
@@ -29,7 +31,17 @@ public class Fuzz {
 	}
 	@Test public void Test1() {
 		//randomly moves chap in a direction.
-		MockController mockController = new MockController(new Chap(2,2), Maze.createBasicMaze(5,5));
+		Map<String, Runnable> actionBindings = new HashMap<String, Runnable>();
+		actionBindings.put("exitWithoutSaving", new MockRunnable());
+		actionBindings.put("exitAndSave", new MockRunnable());
+		actionBindings.put("resumeSavedGame", new MockRunnable());
+		actionBindings.put("startNewGame1", new MockRunnable());
+		actionBindings.put("startNewGame2", new MockRunnable());
+		actionBindings.put("pause", new MockRunnable());
+		actionBindings.put("unpause", new MockRunnable());
+		System.out.println(actionBindings);
+		
+		MockController mockController = new MockController(new Chap(2,2), Maze.createBasicMaze(5,5), actionBindings);
 		for (int i = 0; i < Fuzz.iterations; i++){
 			int next = random.nextInt(3);
 			if (next == 0) {

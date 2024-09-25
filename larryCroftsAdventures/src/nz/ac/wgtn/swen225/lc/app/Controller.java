@@ -24,7 +24,6 @@ class Controller extends Keys{
 
         // Ctrl key combinations
         // InputEvent since getKeyStroke() is expecting InputEvent
-        /* Anthony: commented to allow for actionBindings to be null
         setAction(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK, actionBindings.get("exitWithoutSaving"), () -> {});
         setAction(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK, actionBindings.get("exitAndSave"), () -> {});
         setAction(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK, actionBindings.get("resumeSavedGame"), () -> {});
@@ -33,6 +32,6 @@ class Controller extends Keys{
 
         // Other keys
         setAction(KeyEvent.VK_SPACE, 0, actionBindings.get("pause"), () -> {});
-        setAction(KeyEvent.VK_ESCAPE, 0, actionBindings.get("unpause"), () -> {});*/
+        setAction(KeyEvent.VK_ESCAPE, 0, actionBindings.get("unpause"), () -> {});
     }
 }
