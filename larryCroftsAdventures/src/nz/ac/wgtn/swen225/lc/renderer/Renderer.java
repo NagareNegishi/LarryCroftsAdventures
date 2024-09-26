@@ -33,15 +33,16 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 
-import javax.swing.JPanel;
-import javax.swing.Timer;
-
+import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.Item;
 import nz.ac.wgtn.swen225.lc.domain.Key;
 import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
 import nz.ac.wgtn.swen225.lc.domain.Treasure;
+
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 public class Renderer extends JPanel {
 
