@@ -18,14 +18,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
-import nz.ac.wgtn.swen225.lc.domain.Key;
-import nz.ac.wgtn.swen225.lc.domain.KeyTile;
-import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
-import nz.ac.wgtn.swen225.lc.domain.TreasureTile;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder;
@@ -41,7 +36,7 @@ class App extends JFrame{
   private GameInfoPanel gameInfoPanel;
   private JPanel sidePanel; // switch menu/ recorder panel
   private MenuPanel menuPanel;
-  private RecorderPanel recorderPanel; // placeholder for "recorder UI"
+  private RecorderPanel recorderPanel;
   private PauseDialog pauseDialog;
   private PauseDialog startDialog;
   private PauseDialog gameoverDialog;
@@ -54,14 +49,15 @@ class App extends JFrame{
   private int treasuresLeft = 10; // Example value
 
   Runnable closePhase= ()->{};
-  //Phase currentPhase;
+  private Map<String, Runnable> actionBindings =  new HashMap<>(); // need to be passed to controller
+  private GameStateController model;
   private Controller controller;
   private Renderer renderer;
   private Recorder recorder;
   public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY, BETWEEN, RECORDING}
   private AppState state = AppState.NEWGAME;
 
-  private GameStateController model;
+
   private static int width = 800;
   private static int height = 400;
 
@@ -73,7 +69,9 @@ class App extends JFrame{
     assert SwingUtilities.isEventDispatchThread();
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+    initializeModel();
     initializeUI();
+    initializeActionBindings();
     initializeController();
     initializeGameTimer(); //must be after controller??
 
@@ -88,6 +86,19 @@ class App extends JFrame{
     });
   }
 
+  /**
+   * Initialize the model for the game by loading the first level.
+   */
+  private void initializeModel(){
+    Optional<GameStateController> loadedGame = LoadFile.loadLevel("level1");
+    if (loadedGame.isPresent()) {
+      model = loadedGame.get();
+    } else {
+      handleFileError("Failed to load game", "Load Error", 
+      new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
+      this::loadGame);
+    }
+  }
   
 
   private void initializeUI() {
@@ -99,17 +110,16 @@ class App extends JFrame{
     sidePanel = new JPanel(new BorderLayout());
     sidePanel.setPreferredSize(new Dimension(width/8, height));
     add(sidePanel, BorderLayout.WEST);
-
-/**
- * note:
- * Jbutton need action listener
- * action listener is functional interface
- * Im implementing public void actionPerformed(ActionEvent e) here
- * in MenuPanel, i set action command for each button/ action event
- * so i can use getActionCommand() to get the action command
- * action command is string discribe the action
- * so i can use switch case to handle the action
- */
+    /*
+    * note:
+    * Jbutton need action listener
+    * action listener is functional interface
+    * Im implementing public void actionPerformed(ActionEvent e) here
+    * in MenuPanel, i set action command for each button/ action event
+    * so i can use getActionCommand() to get the action command
+    * action command is string discribe the action
+    * so i can use switch case to handle the action
+    */
     menuPanel = new MenuPanel(e -> handleMenuAction(e.getActionCommand()));
     sidePanel.add(menuPanel);
 
@@ -117,14 +127,26 @@ class App extends JFrame{
     ,slider -> handleSliderChange(slider));
 
     // Center panel for game rendering
+    /*
+     * after the refactoring the code, I can instantiate the renderer with gamestate,
+     * however this is group decision, if we want to display game behind of the dialog.
+     * if not instantiating with gamestate may not safe.
+     * We have set method for gamestate in renderer already, so we can use it here.
+     */
     renderer = new Renderer();
     add(renderer, BorderLayout.CENTER);
+    InitializeDialogs();
+}
 
-    pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0), 0.75);
-    startDialog = new PauseDialog(this, "Press Escape to start", Color.BLUE, Color.YELLOW, 0.75);
-    gameoverDialog = new PauseDialog(this, "Game Over\n Press Escape to retry", Color.RED, Color.BLACK, 0.75);
-    victoryDialog = new PauseDialog(this, "Victory\nPress Escape to play again", Color.GREEN, Color.ORANGE, 0.75);
-    startDialog.setVisible(true);
+/**
+ * Initialize the dialogs for the game
+ */
+private void InitializeDialogs(){
+  pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0), 0.75);
+  startDialog = new PauseDialog(this, "Press Escape to start", Color.BLUE, Color.YELLOW, 0.75);
+  gameoverDialog = new PauseDialog(this, "Game Over\n Press Escape to retry", Color.RED, Color.BLACK, 0.75);
+  victoryDialog = new PauseDialog(this, "Victory\nPress Escape to play again", Color.GREEN, Color.ORANGE, 0.75);
+  startDialog.setVisible(true);
 }
 
 /**
@@ -150,7 +172,6 @@ class App extends JFrame{
     assert false: "Unknown action command: " + actionCommand;
   }
 
-
   /**
    * connect to recorder method when recorder is implemented
    */
@@ -166,17 +187,16 @@ class App extends JFrame{
   }
 
   /**
-   * for slider
-   * i want to take the int value of the slider
-   * and i want to pass it to app
-   * so what is this?
-   * runnables are not needed?.....oh, its consumer???
+   * Method to handle the change in the slider value in the recorder panel
+   * @param value the value of the slider
    */
   private void handleSliderChange(int value){
-    recorder.setPlaybackSpeed(value); //it will complite after recorder is updated
+    recorder.setPlaybackSpeed(value);
   }
 
-
+  /**
+   * Method to toggle the side panel between the menu and the recorder panel
+   */
   private void toggleSidePanel() {
     if (sidePanel.getComponent(0) == menuPanel) {
       sidePanel.remove(menuPanel);
@@ -189,14 +209,10 @@ class App extends JFrame{
     sidePanel.repaint();
   }
 
-
   /**
-   * Initialize the controller for the game
-   * make map of key bindings and pass it to the controller
+   * Initialize the action bindings (Map of actions to Runnable) for the controller
    */
-  Map<String, Runnable> actionBindings =  new HashMap<>();
-  private void initializeController() {
-    //Map<String, Runnable> actionBindings =  new HashMap<>();
+  private void initializeActionBindings() {
     actionBindings.put("exitWithoutSaving", this::exitGameWithoutSaving);
     actionBindings.put("exitAndSave", this::exitGameAndSave);
     actionBindings.put("resumeSavedGame", this::loadGame);
@@ -204,7 +220,13 @@ class App extends JFrame{
     actionBindings.put("startNewGame2", () -> LoadFile.loadLevel("level2"));
     actionBindings.put("pause", this::pauseGame);
     actionBindings.put("unpause", this::unpauseGame);
-    controller = new Controller(new Chap(2,2), new Maze(5,5), actionBindings);//temp maze and chap
+  }
+
+  /**
+   * Initialize the controller for the game
+   */
+  private void initializeController() {
+    controller = new Controller(model, actionBindings); //initialize with level 1
     addKeyListener(controller);
     setFocusable(true);//could be remove??
   }
@@ -459,8 +481,6 @@ class App extends JFrame{
  */
 
   void setLevel(GameStateController level){
-
-
     /**
      * Phase was model + controller and model need rannable to be complete
      * app has controller, so if i can reuse it, just do so,
@@ -472,38 +492,20 @@ class App extends JFrame{
      * to final submission, the model should be able to handle it
      */
 
-
-
-
-
-    //set up the viewport and the timer
-    //MockView v= new MockView();   // pass model to it (p.model());
-
-    /**
-     * i dont need to make new renderer each time
-     * if renderer has setmethod to update the model(gamestatecontroller)
-     * i can just pass the model to the renderer
-     * so i dont need to risk breaking the jframe
-     */
-    System.out.println("setting level");
-
+/////////////////////////////////delete this part
+    System.out.println("setLevel is called");
+////////////////////////////////////////////
 
     model = level;
     GameState gamestate = model.getGameState();
+    controller = new Controller(level, actionBindings);
 
-    controller = new Controller(gamestate, actionBindings);
-    Chap c = model.getChap();
+/////////////////////////////////delete this part
     Maze m = model.getMaze();
     System.out.println("this is the maze I just loaded");
     m.printMaze();
-    //not loading but showing domain works
-    m.setTile(2, 3, new TreasureTile());
-    m.setTile(3, 2, new KeyTile(new Key("Red")));
-    m.setTile(3, 3, new LockedDoorTile("Red"));
-    System.out.println("this is the maze after adding some tiles");
-    m.printMaze();
+////////////////////////////////////////////
 
-    
     /** 
     m = Maze.createBasicMaze(10, 10);//!!!!!!!!!!!!!!!!!!!!!!!!!!
     System.out.println("this is the Basic maze");
@@ -517,25 +519,15 @@ class App extends JFrame{
       gameInfoPanel.setTime(rc.updatedTime());
       model = rc.updatedGame();
       });
-    //controller.setChap(c);
-    //controller.setMaze(m);
     controller.setRecorder(recorder);
 
-    System.out.println("im here2");
-    /**
-    * likely i need to make new controller or set it
-    */
-    renderer.gameConsumer(gamestate );
+/////////////////////////delete this part
+    System.out.println("recorder is set in setLevel");
+/////////////////////////////////
 
-
-
-
-    System.out.println("im here3");
-
-    renderer.addKeyListener(controller);//likely i need to make new controller each level as controller contains maze
+    renderer.gameConsumer(gamestate);// just set new gamestate, don't instantiate new renderer
+    renderer.addKeyListener(controller);
     renderer.setFocusable(true);
-
-    System.out.println("im here4");
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
 
@@ -550,22 +542,12 @@ class App extends JFrame{
          * its not pretty solution
          * but i can take keys/ treasure info from the model and update the gameInfoPanel here
          */
-
         updateGameInfo(model); // this need to be gone
         renderer.updateCanvas();
-        //renderer.repaint();
       }
     });
     closePhase.run();//close phase before adding any element of the new phase
     closePhase = ()->{ timer.stop();}; //remove(renderer); };
-/**
- * I should be able to remove this part
- *  
-    add(BorderLayout.CENTER, renderer);//add the new phase viewport
-    setPreferredSize(getSize());//to keep the current size
-    pack();                     //after pack
-*/
-
     renderer.requestFocus();//need to be after pack
     timer.start();
   }
@@ -601,52 +583,5 @@ class App extends JFrame{
     gameInfoPanel.setKeys(keysCollected);
     gameInfoPanel.setTreasures(treasuresLeft);
   }
-
-
-
-  public void setfakeLevel(){
-    System.out.println("fake level");
-    Maze maze = Maze.createBasicMaze(10, 10);
-    Chap chap = new Chap(2,2);
-    GameState gameState = new GameState(maze, chap, 10);
-    model = new GameStateController(maze, chap, gameState);
-
-    System.out.println("im here");
-    recorder = new Recorder((rc)-> {
-      gameInfoPanel.setTime(rc.updatedTime());
-      model = rc.updatedGame();
-      });
-
-    System.out.println("im here2");
-    controller.setChap(chap);
-    controller.setMaze(maze);
-    controller.setRecorder(recorder);
-    /**
-    * likely i need to make new controller or set it
-    */
-    renderer.addKeyListener(controller);//likely i need to make new controller each level as controller contains maze
-    renderer.setFocusable(true);
-    Timer timer= new Timer(200, unused->{
-      assert SwingUtilities.isEventDispatchThread();
-      if (state == AppState.PLAY) {
-        updateGameInfo(model); // this need to be gone
-        renderer.repaint();
-        //System.out.println("game is running");
-      }
-    });
-    closePhase.run();//close phase before adding any element of the new phase
-    closePhase = ()->{ timer.stop();}; //remove(renderer); };
-
-    renderer.requestFocus();//need to be after pack
-    timer.start();
-  }
-
-
-
-
-
-
-
-
 
 }
