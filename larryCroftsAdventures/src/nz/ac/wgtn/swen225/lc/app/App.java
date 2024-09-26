@@ -26,7 +26,6 @@ import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
-
 /**
  * Main class for the game application.
  */
@@ -44,7 +43,7 @@ class App extends JFrame{
 
   private Timer gameTimer;
   private int timeLeft = 60; // 1 minute for level 1??
-  private int currentLevel = 0;
+  private int currentLevel = 1; // we initialize with level 1
   private int keysCollected = 0; //or List<Key> keysCollected or items??? but in that case i shouldnt involeve the process
   private int treasuresLeft = 10; // Example value
 
@@ -57,11 +56,22 @@ class App extends JFrame{
   public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY, BETWEEN, RECORDING}
   private AppState state = AppState.NEWGAME;
 
-
   private static int width = 800;
   private static int height = 400;
 
   private static final int MAX_LEVEL = 2; //its not pretty... but i need to check loadNextLevel failure
+  private static final String HELP = "Help:\n" +
+  "Use the arrow keys to move the hero.\n" +
+  "Collect all treasures to complete the level.\n" +
+  "Collect keys to unlock doors.\n" +
+  "Avoid enemies.\n" +
+  "Press Ctrl + X to exit without saving.\n" +
+  "Press Ctrl + S to save the game.\n" +
+  "Press Ctrl + R to resume a saved game.\n" +
+  "Press Ctrl + 1 to start a new game at level 1.\n" +
+  "Press Ctrl + 2 to start a new game at level 2.\n" +
+  "Press Space to pause the game.\n" +
+  "Press Esc to resume the game.\n";
 
   App(){
     setTitle("Larry Croft's Adventures");//or something else
@@ -150,6 +160,17 @@ private void InitializeDialogs(){
 }
 
 /**
+ * It's not pretty solution, but
+ * The player of the game can call new levels at any time
+ * so we need to hide all dialogs before starting a new level
+ */
+private void hideDialogs(){
+  pauseDialog.setVisible(false);
+  startDialog.setVisible(false);
+  gameoverDialog.setVisible(false);
+  victoryDialog.setVisible(false);
+}
+/**
  * Handle menu actions
  * @param actionCommand
  */
@@ -165,7 +186,7 @@ private void InitializeDialogs(){
       }
       case "save" -> saveGame();
       case "load" -> loadFile();
-      case "help" -> showHelp();
+      case "help" -> showHelp(HELP);
       case "exit" -> System.exit(0);// need proper method later
       case "toggle" -> toggleSidePanel();
     }
@@ -216,8 +237,18 @@ private void InitializeDialogs(){
     actionBindings.put("exitWithoutSaving", this::exitGameWithoutSaving);
     actionBindings.put("exitAndSave", this::exitGameAndSave);
     actionBindings.put("resumeSavedGame", this::loadGame);
-    actionBindings.put("startNewGame1", () -> LoadFile.loadLevel("level1"));
-    actionBindings.put("startNewGame2", () -> LoadFile.loadLevel("level2"));
+    actionBindings.put("startNewGame1", () -> {
+      currentLevel = 1;
+      checkModel(LoadFile.loadLevel("level1"));
+      hideDialogs();
+      gameRun();
+    });
+    actionBindings.put("startNewGame2", () -> {
+      currentLevel = 2;
+      checkModel(LoadFile.loadLevel("level2"));
+      hideDialogs();
+      gameRun();
+    });
     actionBindings.put("pause", this::pauseGame);
     actionBindings.put("unpause", this::unpauseGame);
   }
@@ -289,81 +320,54 @@ private void InitializeDialogs(){
   private void unpauseGame() {
     boolean unpause = switch (state) {
       case PLAY -> false; // Already playing
-      case PAUSED -> true;
-      case NEWGAME -> {
-        //Optional<GameStateController> loadedGame =loadFile();
-        Optional<GameStateController> loadedGame = LoadFile.loadLevel("level1");
-        if (loadedGame.isPresent()) {
-          model = loadedGame.get();
-          System.out.println("model loaded");
-          setLevel(model);
-          System.out.println("level set");
-          startDialog.setVisible(false);
-        } else {
-          handleFileError("Failed to load game", "Load Error", 
-          new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
-          this::loadGame);
+      case PAUSED -> {
+        pauseDialog.setVisible(false);
+        yield true;
         }
-        
-        
-        
-        
-        
+      case NEWGAME -> {
+        setLevel(model);
+        startDialog.setVisible(false);
         yield true;}
-      
-      
-      
-      
-      
-      //{ loadNextLevel(); startDialog.setVisible(false); yield true; } //{setfakeLevel(); startDialog.setVisible(false);  yield true; }
       case GAMEOVER -> {
-      //  LoadFile.loadLevel("level" + currentLevel); yield true; 
-      timeLeft = 60;
-      Optional<GameStateController> model = LoadFile.loadLevel("level1");
-      model.ifPresent(this::setLevel);
-      System.out.println("model loaded");
+      /////////////////////////////////  
+      timeLeft = 60; // if we want to have different time for each level, we need to change this
+      // in that case, we need set time in setLevel
+      //////////////////////////////////////
+      checkModel(LoadFile.loadLevel("level" + currentLevel));
       gameoverDialog.setVisible(false);
-      
       yield true;
       }
-
-
-
-
-
-
-      case VICTORY -> { LoadFile.loadLevel("level1"); yield true; }
+      case VICTORY -> {
+        currentLevel = 1; // reset level to 1
+        checkModel(LoadFile.loadLevel("level1"));
+        victoryDialog.setVisible(false);
+        yield true; }
       case RECORDING, BETWEEN -> false; // need to think about this
     };
-
     if(!unpause) return;
+    gameRun();
+  }
 
+  private void gameRun(){
     state = AppState.PLAY;
     renderer.setFocusable(true);
     renderer.requestFocus();
     assert !gameTimer.isRunning(): "Game is already running";
-    
-    pauseDialog.setVisible(false);
     gameTimer.start();
   }
 
 
+  private void checkModel(Optional<GameStateController> opm) { // may need variant for save
+    opm.ifPresentOrElse(this::setLevel, ()->{
+      handleFileError("Failed to load game", "Load Error", 
+      new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
+      this::loadGame);
+    });
+  }
   
 
-
-  private void showHelp() {
-      JOptionPane.showMessageDialog(this, "Help:\n" +
-              "Use the arrow keys to move the hero.\n" +
-              "Collect all treasures to complete the level.\n" +
-              "Collect keys to unlock doors.\n" +
-              "Avoid enemies.\n" +
-              "Press Ctrl + X to exit without saving.\n" +
-              "Press Ctrl + S to save the game.\n" +
-              "Press Ctrl + R to resume a saved game.\n" +
-              "Press Ctrl + 1 to start a new game at level 1.\n" +
-              "Press Ctrl + 2 to start a new game at level 2.\n" +
-              "Press Space to pause the game.\n" +
-              "Press Esc to resume the game.\n", "Help", JOptionPane.INFORMATION_MESSAGE);
+  private void showHelp(String text) {
+      JOptionPane.showMessageDialog(this, text, "Help", JOptionPane.INFORMATION_MESSAGE);
   }
 
   private void saveGame() {
@@ -388,9 +392,6 @@ private void InitializeDialogs(){
   }
 
 
-
-
-
   /**
    * String-based methods expect filenames without the ".json" extension, as they automatically append it.
    * File-based methods expect complete filenames including the ".json" extension, as they use the File object as-is.
@@ -398,13 +399,15 @@ private void InitializeDialogs(){
   private Optional<GameStateController> loadFile() {
 
     File projectRoot = new File(System.getProperty("user.dir"));
-    System.out.println("project is here: " + projectRoot.getAbsolutePath());
+    System.out.println("project root is here: " + projectRoot.getAbsolutePath());////////////
 
     File saveDirectory = new File(projectRoot, "levels");
-    System.out.println("saves is here: " + saveDirectory.getAbsolutePath());
+    ///////////////////////////////////
+    System.out.println("saves directly is here: " + saveDirectory.getAbsolutePath());
     if (!saveDirectory.exists()) {
       System.out.println("saves directory does not exist");
     }
+    ///////////////////////////////////
     JFileChooser fileChooser = new JFileChooser(saveDirectory);
     fileChooser.setDialogTitle("Load Game");
     FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON Game files", "json");//expecting json file
@@ -420,8 +423,7 @@ private void InitializeDialogs(){
 
       System.out.println("file name: " + filename);
 
-      //return LoadFile.loadSave("level1");
-      //return LoadFile.loadSave(filename);
+      //return LoadFile.loadSave(filename); //string based
       return LoadFile.loadSave(file);
     }
     System.err.println("this is Optional.empty() from load file");
@@ -430,16 +432,7 @@ private void InitializeDialogs(){
 
 
   private void loadGame(){//(int level, Runnable onWin, Runnable onLose) {
-    Optional<GameStateController> loadedGame = loadFile();
-    if (loadedGame.isPresent()) {
-      model = loadedGame.get();
-      setLevel(model);
-      state = AppState.PLAY;
-    } else {
-      handleFileError("Failed to load game", "Load Error", 
-      new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
-      this::loadGame);
-    }
+    checkModel(loadFile());
   }
 
 
