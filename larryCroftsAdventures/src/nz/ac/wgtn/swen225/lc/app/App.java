@@ -405,9 +405,6 @@ private void InitializeDialogs(){
     if (!saveDirectory.exists()) {
       System.out.println("saves directory does not exist");
     }
-
-
-
     JFileChooser fileChooser = new JFileChooser(saveDirectory);
     fileChooser.setDialogTitle("Load Game");
     FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON Game files", "json");//expecting json file
