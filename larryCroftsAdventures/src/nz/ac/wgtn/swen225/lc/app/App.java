@@ -283,17 +283,33 @@ class App extends JFrame{
     gameTimer.start();
   }
 
-  private void checkModel(Optional<GameStateController> opm) { // may need variant for save
-    opm.ifPresentOrElse(this::setLevel, ()->{
-      handleFileError("Failed to load game", "Load Error", 
-      new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
-      this::loadGame);
-    });
-  }
-
   private void showHelp(String text) {
       JOptionPane.showMessageDialog(this, text, "Help", JOptionPane.INFORMATION_MESSAGE);
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////Save and Load related methods here /////////////////////////////////////////////////
+///////////////// saveGame() and loadFile() are useing JFileChooser to get file from user/////////////////////
+///////////////// So probably Persistency want to modify that File to something it requires/////////////////
+
+////other methods related to save and load are also in this section, but they are not directly related to JFileChooser
+
+
 
   private void saveGame() {
     JFileChooser fileChooser = new JFileChooser();
@@ -351,10 +367,49 @@ class App extends JFrame{
     return Optional.empty();
   }
 
+
+
+
+
+  /**
+   * currently simply Calling LoadFile()
+   */
   private void loadGame(){//(int level, Runnable onWin, Runnable onLose) {
     checkModel(loadFile());
   }
 
+  /**
+   * Optional check here
+   */
+  private void checkModel(Optional<GameStateController> opm) { // may need variant for save
+    opm.ifPresentOrElse(this::setLevel, ()->{
+      handleFileError("Failed to load game", "Load Error", 
+      new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
+      this::loadGame);
+    });
+  }
+
+  //for prototype, i can assume max level is 2 to simplify the process
+  /**
+   * this should work fine, as LoadFile.loadLevel(String) is currently working
+   */
+  private void loadNextLevel() {
+    int nextlevel = currentLevel++;
+    if (nextlevel > MAX_LEVEL) {
+      state = AppState.VICTORY;
+      GameDialogs.VICTORY.show();
+      return;
+    }
+    checkModel(LoadFile.loadLevel("level" + nextlevel));
+  }
+
+  /**
+   * Handling load error
+   * choice is:
+   * 0: try again loadFile or saveGame
+   * 1: start level 1
+   * 2: quit game
+   */
   private void handleFileError(String message, String title, String[] options, String defult, Runnable action){
     int choice = JOptionPane.showOptionDialog(this, message, title,
       JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, defult);
@@ -367,6 +422,25 @@ class App extends JFrame{
         case 2 -> exitGameWithoutSaving();
       }
   }
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   private void exitGameWithoutSaving() {
     closePhase.run();
@@ -428,16 +502,6 @@ class App extends JFrame{
     timer.start();
   }
 
-  //for prototype, i can assume max level is 2 to simplify the process
-  private void loadNextLevel() {
-    int nextlevel = currentLevel++;
-    if (nextlevel > MAX_LEVEL) {
-      state = AppState.VICTORY;
-      GameDialogs.VICTORY.show();
-      return;
-    }
-    checkModel(LoadFile.loadLevel("level" + nextlevel));
-  }
 
   /**
    * this is soooo unpretty solution definitely need to be changed
