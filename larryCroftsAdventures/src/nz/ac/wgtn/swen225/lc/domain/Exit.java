@@ -2,6 +2,9 @@ package nz.ac.wgtn.swen225.lc.domain;
 
 public class Exit extends Tile {
 
+	//public static final String CYAN = "\u001B[36m";
+	//public static final String RESET = "\u001B[0m";
+	
 	@Override
 	public boolean canMoveTo() {return true;}
 
@@ -12,5 +15,5 @@ public class Exit extends Tile {
 	public boolean hasItem() {return false;}
 
 	@Override
-	public String initial() {return "E";}
+	public String initial() {return "P ";}
 }

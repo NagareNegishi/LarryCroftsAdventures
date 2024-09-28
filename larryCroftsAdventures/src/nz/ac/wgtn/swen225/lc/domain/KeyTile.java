@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class KeyTile extends Tile{
 	
+	 //public static final String RESET = "\u001B[0m"; 
+	 //public static final String PURPLE = "\u001B[35m";
+	
 	@JsonProperty
 	private Key key;
 	private boolean keyCollected = false;
@@ -33,7 +36,6 @@ public class KeyTile extends Tile{
 		keyCollected = true;
 		}
 
-	@Override
-	public String initial() {return "K ";}
+	@Override	public String initial() {return "K " ;}
 	
 }
