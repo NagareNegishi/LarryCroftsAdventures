@@ -33,14 +33,16 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 
-import javax.swing.JPanel;
-
+import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.Item;
 import nz.ac.wgtn.swen225.lc.domain.Key;
 import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
 import nz.ac.wgtn.swen225.lc.domain.Treasure;
+
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 public class Renderer extends JPanel {
 
@@ -67,29 +69,19 @@ public class Renderer extends JPanel {
     
     public Renderer() { //presumambly have to take in the Gamestate here?
         // Timer for updating the canvas every frame
-
-        //////////////////////////////////////////////
-        //Timer timer = new Timer(frameTime, e -> updateCanvas());
-        //timer.start();
-        ////////////////////////////////////////////////
+        Timer timer = new Timer(frameTime, e -> updateCanvas());
+        timer.start();
         
         System.out.println(this.getSize().getHeight());
         System.out.println(this.getSize().getWidth());
     }
     
     public void gameConsumer(GameState game) {
-        this.game = game;
+    	this.game = game;
     }
     
     public void updateCanvas() {
-        if (game == null) {
-/////////////////////////////////////////
-        System.err.println("Game is null");
-        ////////////////////////////////////////
-            return;
-            
-        }
-        repaint();
+       repaint();
        //this, will call paintComponent after it's done painting the last frame?
     }
 
@@ -142,7 +134,7 @@ public class Renderer extends JPanel {
         }
     	
     }
-    /** 
+    
     private void drawTiles() {
 
     	int maxCol = game.getMaze().getCols();
@@ -196,64 +188,18 @@ public class Renderer extends JPanel {
         		
         	}
         	
-        }*/
-    
-    
-
-    private void drawTiles() {
-        int maxCol = game.getMaze().getCols();
-        int maxRow = game.getMaze().getRows();
-        
-        // Define the visible area around the player
-        int visibleRadius = 5;
-        int tileSize = 32;
-    
-        for (int rowOffset = -visibleRadius; rowOffset <= visibleRadius; rowOffset++) {
-            for (int colOffset = -visibleRadius; colOffset <= visibleRadius; colOffset++) {
-                
-                int currentX = x + rowOffset;
-                int currentY = y + colOffset;
-                
-                // Check if the current tile is within the maze bounds
-                if (currentX >= 0 && currentX < maxRow && currentY >= 0 && currentY < maxCol) {
-                    Tile t = game.getMaze().getTile(currentX, currentY);
-                    
-                    // Calculate screen position
-                    int screenX = (getWidth() / 2) + (rowOffset * tileSize);
-                    int screenY = (getHeight() / 2) + (colOffset * tileSize);
-                    
-                    // Draw a free tile
-                    g.setColor(Color.GREEN);
-                    g.drawRect(screenX, screenY, tileSize, tileSize);
-                    
-                    // Look if the tile has an item
-                    if (t.hasItem()) {
-                        drawItem(t.getItem(), screenX, screenY);
-                    }
-                }
-            }
         }
-    }
     
-    private void drawItem(Item i, int screenX, int screenY) {
-        if (i instanceof Key) {
-            g.setColor(Color.CYAN);
-        } else if (i instanceof Treasure) {
-            g.setColor(Color.ORANGE);
-        } else if (i instanceof LockedDoorTile) {
-            g.setColor(Color.BLUE);
-        }
-        g.drawRect(screenX, screenY, 32, 32);
-    }
-
-
-
-
-
-
-
-
-
-
+    
+    
 }
+    	
+    	
+    	
+    	
 
+    	
+    
+    
+   
+    
