@@ -75,6 +75,7 @@ public class GameState implements GameStateInterface {
 	public String chapPosition(){return chap.getPosition();}
 	// Added by Adam
 	public int getTime() {return timeLeft;}
+	public void setTime(int time) {this.timeLeft = time;}
 	
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
