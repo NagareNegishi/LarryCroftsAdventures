@@ -67,6 +67,8 @@ public class GameStateController implements GameStateControllerInterface {
 	 
 	public Maze getMaze() {return maze;}
 	public Chap getChap() {return chap;}
+	// Added by Adam
+	public int getTime() {return gameState.getTime();}
 	 
 	// can change to return a tile instead of string if needed for comparison later
 	//public String getTileAtChapPosition() { return maze.getTile(chap.getRow(), chap.getCol()).tileType();}

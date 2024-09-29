@@ -22,6 +22,10 @@ public class GameState implements GameStateInterface {
 	private int totalTreasures;
 	@JsonProperty
 	private Map<Key, String> keysCollected;
+	// Added by Adam
+	// seconds left for level
+	@JsonProperty
+	private int timeLeft;
 	
 	
 	public GameState(Maze maze, Chap chap, int totalTreasures) {
@@ -42,12 +46,14 @@ public class GameState implements GameStateInterface {
 	 * @param chap
 	 * @param totalTreasures
 	 * @param keysCollected
+	 * @param time
 	 */
 	@JsonCreator
 	public GameState(@JsonProperty("maze") Maze maze,
 					@JsonProperty("chap") Chap chap,
 					@JsonProperty("totalTreasures") int totalTreasures,
-					@JsonProperty("keysCollected") Map<Key, String> keysCollected){
+					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
+					@JsonProperty("timeLeft") int timeLeft){
 		
 		if(maze.equals(null) || chap.equals(null)) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
@@ -56,6 +62,7 @@ public class GameState implements GameStateInterface {
 		this.treasuresCollected = 0;
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = keysCollected;
+		this.timeLeft =timeLeft;
 	}
 	
 	
@@ -66,6 +73,8 @@ public class GameState implements GameStateInterface {
 	public Map<Key,String> keysCollected(){return keysCollected;}
 	
 	public String chapPosition(){return chap.getPosition();}
+	// Added by Adam
+	public int getTime() {return timeLeft;}
 	
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
