@@ -1,10 +1,7 @@
 package test.nz.ac.wgtn.swen225.lc.fuzz;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
-import javax.swing.SwingUtilities;
 
 import org.junit.Test;
 
@@ -13,16 +10,13 @@ import nz.ac.wgtn.swen225.lc.app.MockRunnable;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
 
 public class Fuzz {
 	private static Random random;
 	//number of times to run the test
 	private static int iterations = 100;
 	public Fuzz() {
-		random = new Random();
+		random = new Random(); 
 	}
 	
 	public static void main(String[] args) {
@@ -31,16 +25,9 @@ public class Fuzz {
 	}
 	@Test public void Test1() {
 		//randomly moves chap in a direction.
-		Map<String, Runnable> actionBindings = new HashMap<String, Runnable>();
-		actionBindings.put("exitWithoutSaving", new MockRunnable());
-		actionBindings.put("exitAndSave", new MockRunnable());
-		actionBindings.put("resumeSavedGame", new MockRunnable());
-		actionBindings.put("startNewGame1", new MockRunnable());
-		actionBindings.put("startNewGame2", new MockRunnable());
-		actionBindings.put("pause", new MockRunnable());
-		actionBindings.put("unpause", new MockRunnable());
-		System.out.println(actionBindings);
-		
+		MockRunnable mr = new MockRunnable();
+		Map<String, Runnable> actionBindings = Map.of("exitWithoutSaving",mr,"exitAndSave",mr, "resumeSavedGame",mr, 
+													  "startNewGame1",mr, "startNewGame2",mr,"pause",mr,"unpause",mr);
 		MockController mockController = new MockController(new Chap(2,2), Maze.createBasicMaze(5,5), actionBindings);
 		for (int i = 0; i < Fuzz.iterations; i++){
 			int next = random.nextInt(3);
