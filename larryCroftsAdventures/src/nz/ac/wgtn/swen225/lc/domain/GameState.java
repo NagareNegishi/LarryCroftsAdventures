@@ -37,6 +37,7 @@ public class GameState implements GameStateInterface {
 		this.treasuresCollected = 0;
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = new HashMap<>();
+		this.timeLeft = 60; // 60 seconds by default
 	}
 	
 	
