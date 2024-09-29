@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameState implements GameStateInterface {
 	
 	@JsonProperty
@@ -21,10 +23,8 @@ public class GameState implements GameStateInterface {
 	@JsonProperty
 	private Map<Key, String> keysCollected;
 	
-	@JsonCreator
-	public GameState(@JsonProperty("maze") Maze maze,
-					@JsonProperty("chap") Chap chap,
-					@JsonProperty("totalTreasures") int totalTreasures) {
+	
+	public GameState(Maze maze, Chap chap, int totalTreasures) {
 		
 		if(maze.equals(null) || chap.equals(null)) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
@@ -34,6 +34,30 @@ public class GameState implements GameStateInterface {
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = new HashMap<>();
 	}
+	
+	
+	/**
+	 * New constructor specifically for Jackson reconstruction
+	 * @param maze
+	 * @param chap
+	 * @param totalTreasures
+	 * @param keysCollected
+	 */
+	@JsonCreator
+	public GameState(@JsonProperty("maze") Maze maze,
+					@JsonProperty("chap") Chap chap,
+					@JsonProperty("totalTreasures") int totalTreasures,
+					@JsonProperty("keysCollected") Map<Key, String> keysCollected){
+		
+		if(maze.equals(null) || chap.equals(null)) {throw new IllegalArgumentException("Chap or Maze is null");}
+		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
+		this.maze = maze;
+		this.chap = chap;
+		this.treasuresCollected = 0;
+		this.totalTreasures = totalTreasures;
+		this.keysCollected = keysCollected;
+	}
+	
 	
 	public int totalTreasures() {return totalTreasures;}
 	public int getTreasuresCollected() {return treasuresCollected;}

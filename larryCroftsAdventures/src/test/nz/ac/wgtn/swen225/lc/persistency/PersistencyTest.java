@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 // Domain imports
@@ -75,6 +76,31 @@ public class PersistencyTest {
     	assert chapOption.isPresent();
     	Chap chapDeserial = chapOption.get();
     	assert chap.getPosition().equals(chapDeserial.getPosition());
+    	
+    	
+    	
+    }
+    
+    @Test public void chapInventory() {
+    	Maze maze = Maze.createBasicMaze(5, 5);
+    	Chap chap = new Chap(2, 2);
+    	
+    	Item redKey = new Key("red");
+    	chap.pickUpItem(redKey);
+    	GameState gs = new GameState(maze, chap, 2);
+    	GameStateController gsc = new GameStateController(maze, chap, gs);
+
+    	
+    	
+    	assert SaveFile.saveObj("inventoryTest", gsc);
+    	Optional<GameStateController> gsOption = LoadFile.loadObj("inventoryTest", GameStateController.class);
+    	assert gsOption.isPresent();
+    	GameStateController gsDeserial = gsOption.get();
+    	
+    	List<Item> inventory = gsDeserial.getChapInventory();
+    	assert inventory != null;
+    	
+    	for(Item item : inventory) {  System.out.println(item.description());}
     }
     
     
@@ -150,6 +176,7 @@ public class PersistencyTest {
 		assert saved;   
 		
     }
+    
     
     
     
