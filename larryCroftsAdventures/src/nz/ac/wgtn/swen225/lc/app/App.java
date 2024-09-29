@@ -23,6 +23,7 @@ import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder;
+import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
 /**
  * Main class for the game application.
@@ -43,8 +44,8 @@ class App extends JFrame{
   private Map<String, Runnable> actionBindings =  new HashMap<>(); // need to be passed to controller
   private GameStateController model;
   private Controller controller;
-  private JPanel renderer;
-  //private Renderer renderer;
+  //private JPanel renderer;
+  private Renderer renderer;
   private Recorder recorder;
   public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY, BETWEEN, RECORDING}
   private AppState state = AppState.NEWGAME;
@@ -108,7 +109,7 @@ class App extends JFrame{
      * if not instantiating with gamestate may not safe.
      * We have set method for gamestate in renderer already, so we can use it here.
      */
-    renderer = new JPanel();//new Renderer();
+    renderer = new Renderer();//new Renderer();
     add(renderer, BorderLayout.CENTER);
     GameDialogs.InitializeDialogs(this);
     GameDialogs.START.show();
@@ -474,7 +475,7 @@ class App extends JFrame{
     System.out.println("recorder is set in setLevel");
 /////////////////////////////////
 
-    //renderer.gameConsumer(gamestate);// just set new gamestate, don't instantiate new renderer
+    renderer.gameConsumer(gamestate);// just set new gamestate, don't instantiate new renderer
     renderer.addKeyListener(controller);
     renderer.setFocusable(true);
     Timer timer= new Timer(34, unused->{

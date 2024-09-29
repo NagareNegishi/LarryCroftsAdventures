@@ -44,6 +44,20 @@ import nz.ac.wgtn.swen225.lc.domain.Treasure;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+
+/**
+ * This is the Renderer that handles the logic for rendering. 
+ * 
+ * if you want to update the current panel, use updateCanvas()
+ * 
+ * It Extends JPanel to apply it's own rendering
+ * Renderer requires a Gamestate to draw anything, if a Gamestate isn't present, it won't draw anything. 
+ * be sure to update the Gamestate accordingly
+ * 
+ * 
+ * @author Marwan Mohamed
+ */
+
 public class Renderer extends JPanel {
 
     
@@ -56,7 +70,7 @@ public class Renderer extends JPanel {
     private GameState game;
     
     private int cX; //TODO remove this code
-    private int cY; //this is legacy code and should be removed
+    private int cY; //should be removed after the old rendering engine is removed
     
     private long lastTime = System.nanoTime();
     private int frames = 0;
@@ -64,11 +78,16 @@ public class Renderer extends JPanel {
     
     private Graphics g;
     
-    //these fields are for testing and recognizing the fps
+    //Fields for the images
     final RenderImg renderKourie = new RenderImg(Img.Kourie);
     
-    public Renderer() { //presumambly have to take in the Gamestate here?
-        // Timer for updating the canvas every frame
+    
+    /**
+     * Renderer constuctor inilizes a Timer to update every frame.
+     * This timer can be removed in favour for more optimized calls by App or domain, 
+     * for whenever the player moves and on a seperate thread for when the enemies move
+     */
+    public Renderer() { 
         Timer timer = new Timer(frameTime, e -> updateCanvas());
         timer.start();
         
@@ -76,13 +95,20 @@ public class Renderer extends JPanel {
         System.out.println(this.getSize().getWidth());
     }
     
+    /*
+     * Sets the game that's currently being used. 
+     */
     public void gameConsumer(GameState game) {
-    	this.game = game;
+    	this.game = game;//should honestly be called setGame. Marco's been whispering in my head for too long
     }
     
+    
+    /*
+     * updates the frame after waiting for the previous frame to finish, do NOT call paintComponent directly
+     * it will cause problems
+     */
     public void updateCanvas() {
        repaint();
-       //this, will call paintComponent after it's done painting the last frame?
     }
 
     @Override
@@ -105,18 +131,18 @@ public class Renderer extends JPanel {
         Dimension size = this.getSize();
         
         //Point center = new Point(1,1);
-        y = game.getChap().getCol();
-        x = game.getChap().getRow();
+        y = game.getChap().getRow();
+        x = game.getChap().getCol();
         
-        Point center = new Point(size.width/2,size.height/2);
+        Point center = new Point(x*32,y*32);
 		
         //There's a specific method for drawing Chap
         renderKourie.drawChap(g, center, size);
         
-        
+      
         
         g.setColor(Color.WHITE);
-        g.fillOval(size.width/2,(size.height/2)-20, 40, 40);
+        //g.fillOval(size.width/2,(size.height/2), 40, 40);
         
         drawTiles();
         
@@ -135,28 +161,38 @@ public class Renderer extends JPanel {
     	
     }
     
+    
+    /*
+     * Draws the maze itself, centered on chap
+     */
     private void drawTiles() {
 
     	int maxCol = game.getMaze().getCols();
     	int maxRow = game.getMaze().getRows();
     	
+    	
+    	//the current code doesn't offset properly, it will be reviewed at a later date
     	for (int rowOffset = 0; rowOffset < maxRow; rowOffset++) {
     		for(int colOffset = 0; colOffset < maxCol; colOffset++) {
     			
-    			int currentY = x + colOffset;
-                int currentX = y + rowOffset;
+    			int currentX = colOffset;
+    			int currentY = rowOffset;
     			
-                
-                Tile t = game.getMaze().getTile(currentX, currentY);
-                //draw a free tile
-                g.setColor(Color.GREEN);
-                g.drawRect(currentX, currentY, currentY+32, currentX+32);
-                
-                //look if the tile has an item
-                if(t.hasItem()) {
-                	cX = currentX;
-                	cY = currentY;
-                	drawItem(t.getItem());}
+                if(currentX < 0 || currentX >= maxCol || currentY < 0 || currentY >= maxRow) {
+                	g.setColor(Color.BLACK);
+                    g.drawRect( (currentX *32), currentY*32, 32,32);
+                }else {
+                	
+                Tile t = game.getMaze().getTile(currentY, currentX);
+	                //draw a free tile
+	                g.setColor(Color.GREEN);
+	                g.drawRect((currentX *32), currentY*32, 32, 32);
+	                //look if the tile has an item
+	                if(t.hasItem()) {
+	                	cX = currentX *32;
+	                	cY = currentY*32;
+	                	drawItem(t.getItem());}
+                }
                 
     		}
     	
@@ -165,26 +201,31 @@ public class Renderer extends JPanel {
     	
     }
     
+    /**
+     * draws the item set on the current Tile
+     * 
+     * @param Item in the current tile
+     */
     private void drawItem(Item i) {
     	
     	//run a helper method to find what's on here and draw it}
-        	
+    
         	if(i instanceof Key) {
         		//draw key
         		g.setColor(Color.CYAN);
-        		g.drawRect(cX, cY, cX+32, cY+32);
+        		g.drawRect(cX, cY, 32, 32);
         		
         	}
         	
         	if(i instanceof Treasure) {
         		g.setColor(Color.ORANGE);
-        		g.drawRect(cX, cY, cX+32, cY+32);
+        		g.drawRect(cX, cY, 32, 32);
         		
         	}
         	
         	if(i instanceof LockedDoorTile) {
         		g.setColor(Color.BLUE);
-        		g.drawRect(cX, cY, cX+32, cY+32);
+        		g.drawRect(cX, cY, 32, 32);
         		
         	}
         	
