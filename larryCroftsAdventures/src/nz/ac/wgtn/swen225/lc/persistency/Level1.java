@@ -28,8 +28,6 @@ public class Level1 {
 		
 		GameStateController gsc = new GameStateController(maze, chap, gs);
 		
-		
-		
 		Boolean saved = SaveFile.saveGame("IntegrationEx", gsc);
 		assert saved;
 	}
