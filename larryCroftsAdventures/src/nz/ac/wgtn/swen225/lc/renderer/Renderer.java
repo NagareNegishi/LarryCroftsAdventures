@@ -189,10 +189,9 @@ public class Renderer extends JPanel {
     			
     			Tile t = game.getMaze().getTile(row, col);
                 
-                	
+                drawTile(t, currentX, currentY);
                 //draw a free tile
-                g.setColor(Color.GREEN);
-                g.drawRect((currentX), currentY, imgSize, imgSize);
+                
                 //look if the tile has an item
                 if(t.hasItem()) {
           
@@ -206,8 +205,16 @@ public class Renderer extends JPanel {
     	
     }
     
-    private void drawTile() {
-    	
+    private void drawTile(Tile i, int x, int y) {
+    	if (i instanceof LockedDoorTile) {
+    		g.setColor(Color.BLUE);
+    		g.drawRect(x, y, imgSize, imgSize);
+    		
+    	}else {
+    		g.setColor(Color.GREEN);
+            g.drawRect(x, y, imgSize, imgSize);
+    		
+    	}
     	
     	
     }
@@ -234,11 +241,7 @@ public class Renderer extends JPanel {
         		
         	}
         	
-        	if(i instanceof LockedDoorTile) {
-        		g.setColor(Color.BLUE);
-        		g.drawRect(x, y, 32, 32);
-        		
-        	}
+
         	
         }
     
