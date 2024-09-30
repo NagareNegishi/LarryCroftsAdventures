@@ -29,6 +29,11 @@ import javax.imageio.ImageIO;
 
 
 public enum Img {
+	FreeTile,
+	LockedDoor_blue,
+    Wall_Tile,
+    Treasure,
+    Blue_key,
     Kourie; //Kourie is a test object, don't mind him.
     public final BufferedImage image;
     

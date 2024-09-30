@@ -33,12 +33,16 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 
+import nz.ac.wgtn.swen225.lc.domain.ExitLockTile;
+import nz.ac.wgtn.swen225.lc.domain.FreeTile;
 import nz.ac.wgtn.swen225.lc.domain.GameState;
+import nz.ac.wgtn.swen225.lc.domain.InfoFieldTile;
 import nz.ac.wgtn.swen225.lc.domain.Item;
 import nz.ac.wgtn.swen225.lc.domain.Key;
 import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
 import nz.ac.wgtn.swen225.lc.domain.Treasure;
+import nz.ac.wgtn.swen225.lc.domain.WallTile;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -77,6 +81,11 @@ public class Renderer extends JPanel {
     
     //Fields for the images
     final RenderImg renderKourie = new RenderImg(Img.Kourie);
+    final RenderImg LockedDoor = new RenderImg(Img.LockedDoor_blue);
+    final RenderImg Wall = new RenderImg(Img.Wall_Tile);
+    final RenderImg FreeTile = new RenderImg(Img.FreeTile);
+    final RenderImg Treasure = new RenderImg(Img.Treasure);
+    final RenderImg Blue_key = new RenderImg(Img.Blue_key);
     
     final int imgSize;
     
@@ -125,7 +134,6 @@ public class Renderer extends JPanel {
         g.setFont(new Font("Arial", Font.PLAIN, 18));
         g.drawString("FPS: " + fps, 10, 20); // Draw FPS at top left
         
-
         
         Dimension size = this.getSize();
         
@@ -136,9 +144,9 @@ public class Renderer extends JPanel {
         Point center = new Point(getWidth() / 2, getHeight()/2);
 		
         //There's a specific method for drawing Chap
-        renderKourie.drawChap(g, center, size);
         
         drawTiles();
+        renderKourie.drawChap(g, center, size);
         
         
         }
@@ -168,7 +176,7 @@ public class Renderer extends JPanel {
     	//Extra Offset
     	
     	
-    	int offset = imgSize/2;
+    	int offset = 0;
     	
     	int screenCenterX = getWidth() / 2; // Center of the screen horizontally
         int screenCenterY = getHeight() / 2; // Center of the screen vertically
@@ -206,15 +214,30 @@ public class Renderer extends JPanel {
     }
     
     private void drawTile(Tile i, int x, int y) {
-    	if (i instanceof LockedDoorTile) {
-    		g.setColor(Color.BLUE);
-    		g.drawRect(x, y, imgSize, imgSize);
-    		
-    	}else {
-    		g.setColor(Color.GREEN);
-            g.drawRect(x, y, imgSize, imgSize);
-    		
+    	
+    	if (i instanceof FreeTile) {
+    		FreeTile.drawImg(g,x,y);
     	}
+
+    	else if (i instanceof LockedDoorTile) {
+    		LockedDoor.drawImg(g,x,y);
+    	}
+    	
+    	else if (i instanceof WallTile){
+    		Wall.drawImg(g,x,y);
+    	}
+    	
+    	else if (i instanceof ExitLockTile) {//I'm not sure what this one is
+    		g.setColor(Color.BLACK);
+    		g.fillRect(x, y, imgSize, imgSize);
+    	}
+    	
+    	else if (i instanceof InfoFieldTile) {//I'm not sure what this one is either
+    		g.setColor(Color.MAGENTA);
+    		g.drawRect(x, y, imgSize, imgSize);
+    	}
+    	
+    	
     	
     	
     }
@@ -230,14 +253,12 @@ public class Renderer extends JPanel {
     
         	if(i instanceof Key) {
         		//draw key
-        		g.setColor(Color.CYAN);
-        		g.drawRect(x, y, 32, 32);
+        		Blue_key.drawImg(g, x, y);
         		
         	}
         	
         	if(i instanceof Treasure) {
-        		g.setColor(Color.ORANGE);
-        		g.drawRect(x, y, 32, 32);
+	        	Treasure.drawImg(g, x, y);
         		
         	}
         	
