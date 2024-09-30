@@ -36,6 +36,7 @@ public enum Img {
         this.image = loadImage(this.name());
     }
 
+
     private static Path startPath() {
         Path path=  Paths.get(System.getProperty("user.dir"), "src", "imgs");
         System.out.println("Image path: " + path.toString());
