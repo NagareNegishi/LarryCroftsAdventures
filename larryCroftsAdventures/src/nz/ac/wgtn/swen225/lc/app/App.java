@@ -83,7 +83,7 @@ class App extends JFrame{
    * Initialize the model for the game by loading the first level.
    */
   private void initializeModel(){
-    Optional<GameStateController> loadedGame = LoadFile.loadLevel("level1");
+    Optional<GameStateController> loadedGame = LoadFile.loadLevel(Paths.level1);
     if (loadedGame.isPresent()) {
       model = loadedGame.get();
     } else {
@@ -175,7 +175,7 @@ class App extends JFrame{
     actionBindings.put("resumeSavedGame", this::loadGame);
     actionBindings.put("startNewGame1", () -> {
       currentLevel = 1;
-      checkModel(LoadFile.loadLevel("level1"));
+      checkModel(LoadFile.loadLevel(Paths.level1));
       GameDialogs.hideAll();
       gameRun();
     });
@@ -273,7 +273,7 @@ class App extends JFrame{
       }
       case VICTORY -> {
         currentLevel = 1; // reset level to 1
-        checkModel(LoadFile.loadLevel("level1"));
+        checkModel(LoadFile.loadLevel(Paths.level1));
         GameDialogs.VICTORY.hide(); 
         yield true; }
       case RECORDING, BETWEEN -> false; // need to think about this
@@ -407,6 +407,7 @@ class App extends JFrame{
       GameDialogs.VICTORY.show();
       return;
     }
+    // This still works. I've converted everything else to Files, but not sure how to convert this atm -AdamT
     checkModel(LoadFile.loadLevel("level" + nextlevel));
   }
 
@@ -423,7 +424,7 @@ class App extends JFrame{
       switch(choice){
         case 0 -> action.run();
         case 1 -> {
-          checkModel(LoadFile.loadLevel("level1")); // it should loop unless model is set
+          checkModel(LoadFile.loadLevel(Paths.level1)); // it should loop unless model is set
           GameDialogs.START.hide();
         }
         case 2 -> exitGameWithoutSaving();

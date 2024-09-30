@@ -51,9 +51,9 @@ public class LoadFile implements Loader {
      * @param file : .json file containing serialised GameStateControllerInterface
      * @return de-serialsed GameStateControllerInterface
      */
-    public static Optional<GameStateControllerInterface> loadLevel(File file) {
+    public static Optional<GameStateController> loadLevel(File file) {
 		assert file != null;
-		return loadObj(file, GameStateControllerInterface.class);
+		return loadObj(file, GameStateController.class);
 	}
     
     /**
