@@ -16,16 +16,14 @@ public class LoadFile implements Loader {
 	public static Optional<GameStateController> loadLevel(String levelName) {
 		assert levelName != null;
 		assert !levelName.isEmpty();
-		final String pathPrefix = "levels/";
-		String path = pathPrefix + levelName;
-		return loadObj(path, GameStateController.class);
+		String path = Paths.levelPath + levelName;
+		return loadObj(levelName , GameStateController.class);
 	}
 
 	public static Optional<GameStateController> loadSave(String saveName){
 		assert saveName != null;
 		assert !saveName.isEmpty();
-		final String pathPrefix = "saves/";
-		String path = pathPrefix + saveName;
+		String path = Paths.savePath + saveName;
 		return loadObj(path, GameStateController.class);
 	}
 	

@@ -14,8 +14,21 @@ import java.util.Optional;
 // Domain imports
 
 
+
+
+
 public class PersistencyTest {
 
+	private GameStateController genGsc() {
+		Maze maze = Maze.createCustomMaze();
+		Chap chap = new Chap(2, 2);
+		GameState gs = new GameState(maze, chap, 2);
+		
+		GameStateController gsc = new GameStateController(maze, chap, gs);
+		return gsc;
+	}
+	
+	
     // Test nested object mockGameState into JSON
 //    @Test
 //    public void gameStateToJson(){
