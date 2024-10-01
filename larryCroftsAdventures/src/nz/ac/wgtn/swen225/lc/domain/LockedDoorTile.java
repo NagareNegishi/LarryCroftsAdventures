@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LockedDoorTile extends Tile{
 	
+	//public static final String RESET = "\u001B[0m";
+	//public static final String GREEN = "\u001B[32m";.
 	@JsonProperty
 	private String colour;
 	@JsonProperty

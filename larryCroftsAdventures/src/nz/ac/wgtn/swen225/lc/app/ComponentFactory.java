@@ -9,8 +9,18 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+/**
+ * Factory class for creating Swing components with common settings.
+ */
 public class ComponentFactory {
 
+    /**
+     * Create a JButton with the given text, action command and listener.
+     * @param text
+     * @param actionCommand
+     * @param listener
+     * @return JButton
+     */
     public static JButton createButton(String text, String actionCommand, ActionListener listener) {
         JButton button = new JButton(text);
         button.setActionCommand(actionCommand);
@@ -19,6 +29,13 @@ public class ComponentFactory {
         return button;
     }
 
+    /**
+     * Create a JToggleButton with the given text, action command and listener.
+     * @param text
+     * @param actionCommand
+     * @param listener
+     * @return JToggleButton
+     */
     public static JToggleButton createToggleButton(String text, String actionCommand, ActionListener listener) {
         JToggleButton button = new JToggleButton(text);
         button.setActionCommand(actionCommand);
@@ -28,12 +45,21 @@ public class ComponentFactory {
     }
 
     /**
-     * unlike buttons, slider requires a ChangeListener instead of ActionListener
-     * which has one method stateChanged(ChangeEvent e)
-     * the method is called whenever the slider's value changes
-     * but the source of the event is the slider itself
+     * Create a JSlider with the given min, max, value and sliderConsumer.
+     *
+     * note:
+     * unlike buttons, slider requires a ChangeListener instead of ActionListener,
+     * which has one method stateChanged(ChangeEvent e).
+     * the method is called whenever the slider's value changes,
+     * but the source of the event is the slider itself.
      * this method is called whenever the slider's value changes
      * and triggers the sliderConsumer with the new value in App
+     *
+     * @param min minimum value of the slider
+     * @param max maximum value of the slider
+     * @param value initial value of the slider
+     * @param sliderConsumer consumer to be called when the slider value changes
+     * @return JSlider
      */
     public static JSlider createSlider(int min, int max, int value, Consumer<Integer> sliderConsumer) {
         JSlider slider = new JSlider(JSlider.HORIZONTAL, min, max, value);

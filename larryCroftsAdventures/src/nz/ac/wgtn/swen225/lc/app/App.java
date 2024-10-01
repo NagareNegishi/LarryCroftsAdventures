@@ -1,7 +1,6 @@
 package nz.ac.wgtn.swen225.lc.app;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -18,69 +17,55 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import nz.ac.wgtn.swen225.lc.domain.Chap;
+import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
-import nz.ac.wgtn.swen225.lc.domain.GameStateControllerInterface;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
+import nz.ac.wgtn.swen225.lc.recorder.Recorder;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
-
+/**
+ * Main class for the game application.
+ */
 class App extends JFrame{
   private static final long serialVersionUID= 1L;
 
   private GameInfoPanel gameInfoPanel;
-  private JPanel sidePanel; // switch menu/ recorder panel
-  private MenuPanel menuPanel;
-  private RecorderPanel recorderPanel; // placeholder for "recorder UI"
-  private PauseDialog pauseDialog;
-  private PauseDialog startDialog;
-  private PauseDialog gameoverDialog;
+  private SidePanel sidePanel;
 
   private Timer gameTimer;
-  private int timeLeft = 60; // 1 minute for level 1??
-  private int currentLevel = 1;
+  private int timeLeft = 10;//60; // 1 minute for level 1??
+  private int currentLevel = 1; // we initialize with level 1
   private int keysCollected = 0; //or List<Key> keysCollected or items??? but in that case i shouldnt involeve the process
   private int treasuresLeft = 10; // Example value
 
-
-  private JPanel renderer;
-  
-  private JPanel DomainPanel; // placeholder for Jpanel i want to pass to the domain as interface keysLabel, treasuresLabel will be this
-  //currently directly making the parameter from domain
-
-  //private int score = 0; // not requirement????
-
   Runnable closePhase= ()->{};
-  //Phase currentPhase;
-  private Controller controller;
-
-  /**private Game game;
-  private Renderer renderer;
-  private Recorder recorder;*/
-  private boolean isPaused = false;
-
+  private Map<String, Runnable> actionBindings =  new HashMap<>(); // need to be passed to controller
   private GameStateController model;
-  private int width = 800;
-  private int height = 400;
+  private Controller controller;
+  //private JPanel renderer;
+  private Renderer renderer;
+  private Recorder recorder;
+  public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY, BETWEEN, RECORDING}
+  private AppState state = AppState.NEWGAME;
 
-
-
-//////////////////////////////
+  private static int width = 800;
+  private static int height = 400;
+  private static final int MAX_LEVEL = 2; //its not pretty... but i need to check loadNextLevel failure
 
 
   App(){
     setTitle("Larry Croft's Adventures");//or something else
 
-
     assert SwingUtilities.isEventDispatchThread();
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-
+    initializeModel();
     initializeUI();
+    initializeActionBindings();
     initializeController();
-    initializeGameTimer();
+    initializeGameTimer(); //must be after controller??
 
     setPreferredSize(new Dimension(width, height));
     pack();
@@ -93,52 +78,41 @@ class App extends JFrame{
     });
   }
 
-  
-
-
+  /**
+   * Initialize the model for the game by loading the first level.
+   */
+  private void initializeModel(){
+    Optional<GameStateController> loadedGame = LoadFile.loadLevel("level1");
+    if (loadedGame.isPresent()) {
+      model = loadedGame.get();
+    } else {
+      handleFileError("Failed to load game", "Load Error", 
+      new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
+      this::loadGame);
+    }
+  }
 
   private void initializeUI() {
-
-    // Top panel for game info
+    // game info
     gameInfoPanel = new GameInfoPanel(width/8, height);
     gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
     add(gameInfoPanel, BorderLayout.EAST);
-
-
-    sidePanel = new JPanel(new BorderLayout());
-    sidePanel.setPreferredSize(new Dimension(width/8, height));
+    // Side panel for menu/recorder UI
+    sidePanel = new SidePanel(width/8, height, e -> handleMenuAction(e), e -> handleRecorderAction(e), slider -> handleSliderChange(slider));
     add(sidePanel, BorderLayout.WEST);
 
-/**
- * note:
- * Jbutton need action listener
- * action listener is functional interface
- * Im implementing public void actionPerformed(ActionEvent e) here
- * in MenuPanel, i set action command for each button/ action event
- * so i can use getActionCommand() to get the action command
- * action command is string discribe the action
- * so i can use switch case to handle the action
- */
-    menuPanel = new MenuPanel(e -> handleMenuAction(e.getActionCommand()));
-    sidePanel.add(menuPanel);
-
-    recorderPanel = new RecorderPanel(e -> handleRecorderAction(e.getActionCommand())
-    ,slider -> handleSliderChange(slider));//yes! slider value change -. then call handleSliderChange i hope it works
-    //recorderPanel.setVisible(false); // initially hidden
-
-
-    // Center panel for game rendering (placeholder)
-    renderer = new Renderer();
-    //renderer.setPreferredSize(new Dimension(800, 400)); everythingelse is for the renderer
+/////////////////////////
+    // Center panel for game rendering
+    /*
+     * after the refactoring the code, I can instantiate the renderer with gamestate,
+     * however this is group decision, if we want to display game behind of the dialog.
+     * if not instantiating with gamestate may not safe.
+     * We have set method for gamestate in renderer already, so we can use it here.
+     */
+    renderer = new Renderer();//new Renderer();
     add(renderer, BorderLayout.CENTER);
-
-    pauseDialog = new PauseDialog(this,"Game is paused", Color.BLACK, new Color(150, 150, 0), 0.75);
-    startDialog = new PauseDialog(this, "Press Space to start", Color.GREEN, Color.YELLOW, 0.75);
-    gameoverDialog = new PauseDialog(this, "Game Over", Color.RED, Color.BLACK, 0.75);
-    startDialog.setVisible(true);
-
-
-
+    GameDialogs.InitializeDialogs(this);
+    GameDialogs.START.show();
 }
 
 /**
@@ -149,77 +123,71 @@ class App extends JFrame{
     switch(actionCommand){
       case "pause" -> {
         pauseGame();
-        menuPanel.setPauseButton("Unpause");
+        sidePanel.setPauseButtonText("Unpause");
       }
       case "unpause" -> {
         unpauseGame();
-        menuPanel.setPauseButton("Pause");
+        sidePanel.setPauseButtonText("Pause");
       }
       case "save" -> saveGame();
       case "load" -> loadFile();
-      case "help" -> showHelp();
-      case "exit" -> System.exit(0);// need proper method later
-      case "toggle" -> toggleSidePanel();
+      case "help" -> showHelp(MenuPanel.HELP);
+      case "exit" -> exitGameWithoutSaving();
+      case "toggle" -> sidePanel.togglePanel();
     }
     assert false: "Unknown action command: " + actionCommand;
   }
 
-
+  /**
+   * connect to recorder method when recorder is implemented
+   */
   private void handleRecorderAction(String actionCommand){
     switch(actionCommand){
-     /** case "step" -> step();
-      case "autoReplay" -> toggleAutoReplay();
-      case "loadRecording" -> loadRecording();
-      case "toggleRecording" -> toggleRecording();*/
-      case "toggle" -> toggleSidePanel();
+      case "step" -> recorder.nextStep();
+      //case "autoReplay" -> toggleAutoReplay();
+      case "loadRecording" -> recorder.loadRecording();
+      case "saveRecording" -> recorder.saveRecording();
+      case "toggle" -> sidePanel.togglePanel();
     }
     assert false: "Unknown action command: " + actionCommand;
   }
 
   /**
-   * for slider 
-   * so unlike i want to take the int value of the slider
-   * and i want to pass it to the recorder panel
-   * so what is this?
-   * runnables are not needed?.....oh, its consumer???
+   * Method to handle the change in the slider value in the recorder panel
+   * @param value the value of the slider
    */
   private void handleSliderChange(int value){
-    //do something with the value
-    System.out.println("speed is :" + value);
+    recorder.setPlaybackSpeed(value);
   }
-
-
-  private void toggleSidePanel() {
-    if (sidePanel.getComponent(0) == menuPanel) {
-      sidePanel.remove(menuPanel);
-      sidePanel.add(recorderPanel);
-    } else {
-      sidePanel.remove(recorderPanel);
-      sidePanel.add(menuPanel);
-    }
-    sidePanel.revalidate();
-    sidePanel.repaint();
-  }
-
-
-
 
   /**
-   * Initialize the controller for the game
-   * make map of key bindings and pass it to the controller
+   * Initialize the action bindings (Map of actions to Runnable) for the controller
    */
-  private void initializeController(){
-    Map<String, Runnable> actionBindings =  new HashMap<>();
+  private void initializeActionBindings() {
     actionBindings.put("exitWithoutSaving", this::exitGameWithoutSaving);
     actionBindings.put("exitAndSave", this::exitGameAndSave);
     actionBindings.put("resumeSavedGame", this::loadGame);
-    actionBindings.put("startNewGame1", () -> LoadFile.loadLevel("level1"));
-    actionBindings.put("startNewGame2", () -> LoadFile.loadLevel("level2"));
+    actionBindings.put("startNewGame1", () -> {
+      currentLevel = 1;
+      checkModel(LoadFile.loadLevel("level1"));
+      GameDialogs.hideAll();
+      gameRun();
+    });
+    actionBindings.put("startNewGame2", () -> {
+      currentLevel = 2;
+      checkModel(LoadFile.loadLevel("level2"));
+      GameDialogs.hideAll(); 
+      gameRun();
+    });
     actionBindings.put("pause", this::pauseGame);
     actionBindings.put("unpause", this::unpauseGame);
+  }
 
-
-    controller = new Controller(new Chap(2,2), new Maze(5,5), actionBindings);//temp maze and chap
+  /**
+   * Initialize the controller for the game
+   */
+  private void initializeController() {
+    controller = new Controller(model, actionBindings); //initialize with level 1
     addKeyListener(controller);
     setFocusable(true);//could be remove??
   }
@@ -228,55 +196,116 @@ class App extends JFrame{
   private void initializeGameTimer() {
       gameTimer = new Timer(1000, e -> {
           timeLeft--;
+          controller.updatetime(timeLeft);
           gameInfoPanel.setTime(timeLeft);
           if (timeLeft == 0) {
               gameTimer.stop();
-              gameoverDialog.setVisible(true);
+              GameDialogs.GAMEOVER.show();
+              state = AppState.GAMEOVER;
           }
       });
-      gameTimer.start();
+      gameTimer.stop();
   }
 
-
+  /**
+   * I want to pass it to loader
+   * for final submission
+   * so loader can pluge those method to the model
+   * either file of runable or abstract method
+   * field may not work since 2 of method takes int....
+   */
+  private AppNotifier getAppNotifier(){
+    return new AppNotifier(){
+      public void onGameWin(){
+        state = AppState.BETWEEN;
+        gameTimer.stop();
+        loadNextLevel();
+      }
+      public void onGameLose(){
+        state = AppState.GAMEOVER;
+        gameTimer.stop();
+        GameDialogs.GAMEOVER.show();
+      }
+      public void onKeyPickup(int keyCount){
+        keysCollected = keyCount;
+        gameInfoPanel.setKeys(keysCollected);
+      }
+      public void onTreasurePickup(int treasureCount){
+        treasuresLeft = treasureCount;
+        gameInfoPanel.setTreasures(treasuresLeft);
+      }
+    };
+  }
 
   private void pauseGame() {
-    if (isPaused) return;
-    isPaused = true;
+    if (state != AppState.PLAY) return;
+    state = AppState.PAUSED;
     // renderer.setFocusable(false); i probably want it
     gameTimer.stop();
-    pauseDialog.setVisible(true);
-    startDialog.setVisible(false);// should optimize this
+    GameDialogs.PAUSE.show();
   }
 
   private void unpauseGame() {
-    if (!isPaused) return;
-    isPaused = false;
-    // renderer.setFocusable(true); i probably want it
-    // renderer.requestFocus();
+    boolean unpause = switch (state) {
+      case PLAY -> false; // Already playing
+      case PAUSED -> {
+        GameDialogs.PAUSE.hide();
+        yield true;
+        }
+      case NEWGAME -> {
+        setLevel(model);
+        GameDialogs.START.hide();
+        yield true;}
+      case GAMEOVER -> {
+      /////////////////////////////////
+      timeLeft = 3;//60; // if we want to have different time for each level, we need to change this
+      // in that case, we need set time in setLevel
+      //////////////////////////////////////
+      checkModel(LoadFile.loadLevel("level" + currentLevel));
+      GameDialogs.GAMEOVER.hide();
+      yield true;
+      }
+      case VICTORY -> {
+        currentLevel = 1; // reset level to 1
+        checkModel(LoadFile.loadLevel("level1"));
+        GameDialogs.VICTORY.hide(); 
+        yield true; }
+      case RECORDING, BETWEEN -> false; // need to think about this
+    };
+    if(!unpause) return;
+    gameRun();
+  }
+
+  private void gameRun(){
+    state = AppState.PLAY;
+    renderer.setFocusable(true);
+    renderer.requestFocus();
     assert !gameTimer.isRunning(): "Game is already running";
     gameTimer.start();
-    pauseDialog.setVisible(false);
-    gameoverDialog.setVisible(false);// should optimize this
+  }
+
+  private void showHelp(String text) {
+      JOptionPane.showMessageDialog(this, text, "Help", JOptionPane.INFORMATION_MESSAGE);
   }
 
 
-  
 
 
-  private void showHelp() {
-      JOptionPane.showMessageDialog(this, "Help:\n" +
-              "Use the arrow keys to move the hero.\n" +
-              "Collect all treasures to complete the level.\n" +
-              "Collect keys to unlock doors.\n" +
-              "Avoid enemies.\n" +
-              "Press Ctrl + X to exit without saving.\n" +
-              "Press Ctrl + S to save the game.\n" +
-              "Press Ctrl + R to resume a saved game.\n" +
-              "Press Ctrl + 1 to start a new game at level 1.\n" +
-              "Press Ctrl + 2 to start a new game at level 2.\n" +
-              "Press Space to pause the game.\n" +
-              "Press Esc to resume the game.\n", "Help", JOptionPane.INFORMATION_MESSAGE);
-  }
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////Save and Load related methods here /////////////////////////////////////////////////
+///////////////// saveGame() and loadFile() are useing JFileChooser to get file from user/////////////////////
+///////////////// So probably Persistency want to modify that File to something it requires/////////////////
+
+////other methods related to save and load are also in this section, but they are not directly related to JFileChooser
+
+
 
   private void saveGame() {
     JFileChooser fileChooser = new JFileChooser();
@@ -292,253 +321,192 @@ class App extends JFrame{
       if (success) {
         JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
       } else {
-        JOptionPane.showMessageDialog(this, "Failed to save game", "Save Error", JOptionPane.ERROR_MESSAGE);
+        handleFileError("Failed to save game", "Save Error", 
+      new String[]{"Save Game", "start level 1", "quit"}, "Save Game",
+      this::saveGame);
       }
     }
   }
 
+
+  /**
+   * String-based methods expect filenames without the ".json" extension, as they automatically append it.
+   * File-based methods expect complete filenames including the ".json" extension, as they use the File object as-is.
+   */
   private Optional<GameStateController> loadFile() {
-    JFileChooser fileChooser = new JFileChooser();
+
+    File projectRoot = new File(System.getProperty("user.dir"));
+    System.out.println("project root is here: " + projectRoot.getAbsolutePath());////////////
+
+    File saveDirectory = new File(projectRoot, "levels");
+    ///////////////////////////////////
+    System.out.println("saves directly is here: " + saveDirectory.getAbsolutePath());
+    if (!saveDirectory.exists()) {
+      System.out.println("saves directory does not exist");
+    }
+    ///////////////////////////////////
+    JFileChooser fileChooser = new JFileChooser(saveDirectory);
     fileChooser.setDialogTitle("Load Game");
     FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON Game files", "json");//expecting json file
     fileChooser.setFileFilter(filter); // set filter
+    fileChooser.setAcceptAllFileFilterUsed(false); // disable "All files" option
+
     int picked = fileChooser.showOpenDialog(this);
     if (picked == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File file = fileChooser.getSelectedFile();
-
       String filename = file.getName(); // i should pass file
-      return LoadFile.loadSave(filename);
+      System.out.println("file name: " + filename);
+      //return LoadFile.loadSave(filename); //string based
+      return LoadFile.loadSave(file);
     }
+    System.err.println("this is Optional.empty() from load file");
     return Optional.empty();
   }
 
 
-  private void loadGame(){//(int level, Runnable onWin, Runnable onLose) {
-    Optional<GameStateController> loadedGame = loadFile();
-    if (loadedGame.isPresent()) {
-      model = loadedGame.get();
-      setLevel(model);
-    } else {
-      JOptionPane.showMessageDialog(this, "Failed to load game", "Load Error", JOptionPane.ERROR_MESSAGE);
-    }
 
+
+
+  /**
+   * currently simply Calling LoadFile()
+   */
+  private void loadGame(){//(int level, Runnable onWin, Runnable onLose) {
+    checkModel(loadFile());
   }
-  
+
+  /**
+   * Optional check here
+   */
+  private void checkModel(Optional<GameStateController> opm) { // may need variant for save
+    opm.ifPresentOrElse(this::setLevel, ()->{
+      handleFileError("Failed to load game", "Load Error", 
+      new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
+      this::loadGame);
+    });
+  }
+
+  //for prototype, i can assume max level is 2 to simplify the process
+  /**
+   * this should work fine, as LoadFile.loadLevel(String) is currently working
+   */
+  private void loadNextLevel() {
+    int nextlevel = currentLevel++;
+    if (nextlevel > MAX_LEVEL) {
+      state = AppState.VICTORY;
+      GameDialogs.VICTORY.show();
+      return;
+    }
+    checkModel(LoadFile.loadLevel("level" + nextlevel));
+  }
+
+  /**
+   * Handling load error
+   * choice is:
+   * 0: try again loadFile or saveGame
+   * 1: start level 1
+   * 2: quit game
+   */
+  private void handleFileError(String message, String title, String[] options, String defult, Runnable action){
+    int choice = JOptionPane.showOptionDialog(this, message, title,
+      JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE, null, options, defult);
+      switch(choice){
+        case 0 -> action.run();
+        case 1 -> {
+          checkModel(LoadFile.loadLevel("level1")); // it should loop unless model is set
+          GameDialogs.START.hide();
+        }
+        case 2 -> exitGameWithoutSaving();
+      }
+  }
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   private void exitGameWithoutSaving() {
+    closePhase.run();
     gameTimer.stop();
+    dispose();
     System.exit(0);
   }
 
   private void exitGameAndSave() {
     saveGame();
-    gameTimer.stop();
-    System.exit(0);
+    exitGameWithoutSaving();
   }
-
-/**
-    private void saveGame() {
-      GameSaver.saveGame();// i want to pass 2 runnable and int for level
-      JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
-  }
-
-  private void loadGame() {
-  // i think i need to pop up file chooser
-  // and get json file
-  // then pass it to persistency
-
-  JsonFile jsonFile = new JsonFile();?????
-//do i need to check it here? or in persistency??
-      Game loadedGame = GameLoader.loadGame(jsonFile);
-      if (loadedGame != null) {
-          game = loadedGame;
-          renderer.updateGame(game);
-          updateInfoLabels();
-          JOptionPane.showMessageDialog(this, "Game Loaded", "Load", JOptionPane.INFORMATION_MESSAGE);
-      }
-  }*/
-
-
-
-/**
- *  Still need to address Runnable next, Runnable first
- */
 
   void setLevel(GameStateController level){
-
-
-    /**
-     * Phase was model + controller and model need rannable to be complete
-     * app has controller, so if i can reuse it, just do so,
-     * if not get chap from model and make new controller
-     * pass it to the renderer
-     * 
-     * app shouldnt check the model,
-     * but for the prototype, i can check win/lose condition here
-     * to final submission, the model should be able to handle it
-     */
-
-
-
-
-
-    //set up the viewport and the timer
-    //MockView v= new MockView();   // pass model to it (p.model());
-
-    /**
-     * i dont need to make new renderer each time
-     * if renderer has setmethod to update the model(gamestatecontroller)
-     * i can just pass the model to the renderer
-     * so i dont need to risk breaking the jframe
-     */
-
-
+/////////////////////////////////delete this part
+    System.out.println("setLevel is called");
+////////////////////////////////////////////
 
     model = level;
-    renderer.addKeyListener(controller);//or just controller? can i reuse? i guess depend on others code
+    GameState gamestate = model.getGameState();
+    controller = new Controller(level, actionBindings);
+
+/////////////////////////////////delete this part
+    Maze m = model.getMaze();
+    System.out.println("this is the maze I just loaded");
+    m.printMaze();
+////////////////////////////////////////////
+
+    recorder = new Recorder((rc)-> {
+      gameInfoPanel.setTime(rc.updatedTime());
+      model = rc.updatedGame();
+      });
+    controller.setRecorder(recorder);
+
+/////////////////////////delete this part
+    System.out.println("recorder is set in setLevel");
+/////////////////////////////////
+
+    renderer.gameConsumer(gamestate);// just set new gamestate, don't instantiate new renderer
+    renderer.addKeyListener(controller);
     renderer.setFocusable(true);
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
 
-      if (!isPaused) { //isPaused may not be pretty solution..... should i use timer.running() instead??
-        new MockModel().ping();//p.model().ping();
-
-        //model.ping() or update() or something
+      if (state == AppState.PLAY) {
+        //need some sort of update method here for domain and recorder for level 2!!!!!!!!!!!!!!!!!
 
         /**
-         * its not pretty solution
-         * but i can take keys/ treasure info from the model and update the gameInfoPanel here
+         * its not pretty solution, but i can take keys/ treasure info from the model and update the gameInfoPanel here
          */
-
+        updateGameInfo(model); // this need to be gone
+        //renderer.updateCanvas();
         renderer.repaint();
       }
     });
     closePhase.run();//close phase before adding any element of the new phase
-    closePhase = ()->{ timer.stop();}; //remove(renderer); };
-/**
- * I should be able to remove this part
- *  
-    add(BorderLayout.CENTER, renderer);//add the new phase viewport
-    setPreferredSize(getSize());//to keep the current size
-    pack();                     //after pack
-*/
-
-    renderer.requestFocus();//need to be after pack
+    closePhase = ()->{ timer.stop();};
+    renderer.requestFocus();
     timer.start();
   }
 
 
-/** 
-  private void startGame() {
-    loadNextLevel();
-}
-
-private void loadNextLevel() {
-    Level level = persistency.load(this::onLevelComplete, this::onGameOver);
-    if (Level == null) {
-        showVictoryScreen();
-    } else {
-        setPhase(level);
-    }
-}
-
-private void onLevelComplete() {
-    loadNextLevel();
-}
-
-private void onGameOver() {
-    showGameOverScreen();
-}
-//or????
-private void onGameOver() {
-  restartCurrentLevel();
-}
-
-private void restartCurrentLevel() {
-  Level level = persistency.restartCurrentLevel(this::onLevelComplete, this::onGameOver);
-  if (level == null) {
-      // This should not happen, but just in case
-      showGameOverScreen();
-  } else {
-      setPhase(level);
-  }
-}
-*/
-
-
   /**
-   * We dont need start menu for this project but I will keep it for future reference
-
-
-
-  private void phaseZero() {
-    var panel = new JPanel(new GridLayout(0, 2));
-    var welcome= new JLabel("     Welcome to Compact. A compact Java game!");
-    var start= new JButton("     Start!");
-    panel.add(new JLabel("     Customize your controller (press keys to assign):")); // taks 2
-    panel.add(new JLabel()); // task 2 adjust the grid layout
-    closePhase.run();
-    closePhase = ()->{ getContentPane().removeAll(); }; // task 2 remove all addtional components
-    add(BorderLayout.NORTH, welcome);
-    add(BorderLayout.SOUTH, start);
-
-    // task 2 add the key bindings to the panel
-    for (String action : actions) {
-        panel.add(new JLabel("       " + action + ":")); // trying to make it prettier but "compact"
-        JTextField keyField = new JTextField(KeyEvent.getKeyText(keyBindings.get(action)));
-        keyField.setEditable(false); // only accept key press, not text input
-        keyField.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                int keyCode = e.getKeyCode();
-                if ((keyCode >= KeyEvent.VK_NUMPAD0 && keyCode <= KeyEvent.VK_NUMPAD9) ||
-                    (keyCode >= KeyEvent.VK_A && keyCode <= KeyEvent.VK_Z)) {
-                    keyBindings.put(action, keyCode);
-                    keyField.setText(KeyEvent.getKeyText(keyCode));
-                }
-            }
-        });
-        panel.add(keyField);
-    }
-
-    add(BorderLayout.CENTER, panel);
-    start.addActionListener(e -> phaseOne());
-    setPreferredSize(new Dimension(800, 400));
-    pack();
-  }*/
-
-
-
-  /**
-  I believe we dont need this for this project but I will keep it for future reference
-  
-  private void victory(){
-    closePhase.run();
-    closePhase = ()->{}; // could be removed but I think good practice to keep it
-    add(BorderLayout.CENTER, new JLabel("     Victory!!"));
-    pack();
+   * this is soooo unpretty solution definitely need to be changed
+   */
+  private void updateGameInfo(GameStateController level) {
+    keysCollected = level.getKeysCollected().size();
+    treasuresLeft = level.getTotalTreasures() - level.getTreasuresCollected();
+    gameInfoPanel.setKeys(keysCollected);
+    gameInfoPanel.setTreasures(treasuresLeft);
   }
-
-  private void phaseOne(){
-    setPhase(Phase.level1(()->phaseTwo(), ()->phaseZero(), keyBindings));
-  }
-
-  private void phaseTwo(){
-    setPhase(Phase.level2(()->victory(), ()->phaseZero(), keyBindings));
-  }*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

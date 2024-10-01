@@ -11,27 +11,43 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
 /**
- * Jdialog takes 3 parameters, JFrame as parent, String as title
- * and boolean as modal(it will block other windows).
+ * A dialog that displays a message when the game is paused.
+ * It is semi-transparent and blocks the game window.
  */
 public class PauseDialog extends JDialog {
     private static final long serialVersionUID = 1L;
-    private final double WIDTH_PERCENTAGE;
+    private final double WIDTH_PERCENTAGE; // how much of the parent it want to cover
     
 
+    /**
+     * Create a new PauseDialog with the given parent, text, background color, text color, and ratio.
+     * @param parent
+     * @param text
+     * @param backgroundColor
+     * @param textColor
+     * @param ratio
+     */
     public PauseDialog(JFrame parent, String text, Color backgroundColor, Color textColor, double ratio) {
+        // JDialog takes 3 parameters, JFrame as parent, String as title and boolean as modal(it will block other windows)
         super(parent, "Game Paused", false);
         WIDTH_PERCENTAGE = ratio;
         initializeUI(text, backgroundColor, textColor);
-        addParentResizeListener(parent);
+        addParentResizeListener(parent); // listen to parent's resize event
     }
 
+    /**
+     * Initialize the UI of the dialog.
+     * @param text
+     * @param backgroundColor
+     * @param textColor
+     */
     private void initializeUI(String text, Color backgroundColor, Color textColor) {
         setUndecorated(true); // remove title bar
         setBackground(new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 150)); // semi-transparent
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setOpaque(false);
+        panel.setOpaque(false); // make it transparent
 
         JLabel label = new JLabel(text, JLabel.CENTER);
         label.setFont(new Font("Arial", Font.BOLD, 50));
@@ -44,6 +60,7 @@ public class PauseDialog extends JDialog {
         setFocusableWindowState(false); // do not allow focus
     }
 
+    @Override
     public void setVisible(boolean visible) {
         if (visible) {
             setLocationRelativeTo(getParent());
@@ -52,14 +69,20 @@ public class PauseDialog extends JDialog {
     }
 
     /**
-     * Dialog want to know the parent's size change
-     * So I need component listener, but i dont need all methods
+     * Dialog want to know when the parent is resized or moved
+     * which requires a ComponentListener, but I don't need all methods
      * So I use ComponentAdapter
+     * @param parent
      */
     private void addParentResizeListener(JFrame parent) {
         parent.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
+                updateSizeAndPosition();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
                 updateSizeAndPosition();
             }
         });

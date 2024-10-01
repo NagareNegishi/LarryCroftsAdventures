@@ -91,7 +91,11 @@ public class Chap {
 		public int colDirection() {return colDir;}
 	}
 	
-	public void pickUpItem(Item item) {inventory.add(item);}	
+	public void pickUpItem(Item item) {
+		System.out.println("I picked up: " + item.description() + ";)");
+		inventory.add(item);
+		}	
+	
 	public List<Item> inventory(){return inventory;}
 	
 	// helpful method for laying out chaps inventory

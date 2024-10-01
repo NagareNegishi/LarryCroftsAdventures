@@ -2,6 +2,9 @@ package nz.ac.wgtn.swen225.lc.domain;
 
 public class ExitLockTile extends Tile{
 	
+	//public static final String GREEN = "\u001B[32m";
+	//public static final String RESET = "\u001B[0m";
+	
 	private boolean canMoveTo = false;
 	private boolean locked = true;
 
@@ -20,5 +23,5 @@ public class ExitLockTile extends Tile{
 	public boolean hasItem() {return false;}
 
 	@Override
-	public String initial() {return "EL";}
+	public String initial() {return "E ";}
 }

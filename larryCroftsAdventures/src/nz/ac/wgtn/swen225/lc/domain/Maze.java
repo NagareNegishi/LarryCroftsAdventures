@@ -45,7 +45,13 @@ public class Maze {
 		// assert tile instanceof ...
 	}
 	
-	public boolean validMove(int row, int col) {return maze[row][col].canMoveTo();}
+	public boolean validMove(int row, int col) {
+		if (row < 0 || row >= rows || col < 0 || col >= cols) {
+			System.err.println("Invalid move: row or column is outside the bounds of the maze.");
+			return false;
+		}
+		return maze[row][col] != null && maze[row][col].canMoveTo();
+		}
 	
 	// helper method for creating a custom maze for testing different tiles
 	public static Maze createCustomMaze() {
@@ -89,10 +95,82 @@ public class Maze {
 		}
                 return maze;
 	}
+
+	// method for creating level 1 *IN PROGRESS*
+	public static Maze createLevel1() {
+	    Maze maze = new Maze(17, 17);
+
+	    for (int row = 0; row < 17; row++) {
+	        for (int col = 0; col < 17; col++) {
+	            // Set WallTile on the outer boundary
+	            if (row == 0 || row == 16 || col == 0 || col == 16) {
+	                maze.setTile(row, col, new WallTile());
+	            } else {
+	                // Set FreeTile for the inner area
+	                maze.setTile(row, col, new FreeTile());
+	            }
+	        }
+	    }
+	    
+	    // key tiles
+	    maze.setTile(8, 14, new KeyTile(new Key("Blue")));
+	    maze.setTile(8, 2, new KeyTile(new Key("Red")));
+	    
+	    // info tile
+	    maze.setTile(10, 8, new InfoFieldTile("TEST"));
+
+	    // create 7x7 wall rooms in each corner
+	    // Top-left corner 
+	    createRoom(maze, 0, 0);
+	    maze.setTile(6, 3, new LockedDoorTile("Blue"));
+	    maze.setTile(2, 2, new TreasureTile());
+	    
+	    // Top-right corner 
+	    createRoom(maze, 0, 10);
+	    maze.setTile(6, 13, new LockedDoorTile("Red"));
+	    maze.setTile(2, 14, new TreasureTile());
+	    
+	    // Bottom-left corner 
+	    createRoom(maze, 10, 0);
+	    maze.setTile(13, 6, new LockedDoorTile("Blue"));
+	    maze.setTile(13, 3, new TreasureTile());
+	    
+	    // Bottom-right corner 
+	    createRoom(maze, 10, 10);
+	    maze.setTile(13, 10, new LockedDoorTile("Red"));
+	    maze.setTile(13, 13, new TreasureTile());
+	    
+	    // Create final room to exit at the top of the maze
+	    
+	    // first layer with a LockedDoorTile needing a blue key
+	    maze.setTile(6, 7, new WallTile());
+	    maze.setTile(6, 8, new LockedDoorTile("Blue"));
+	    maze.setTile(6, 9, new WallTile());
+	 
+	    // second layer with a ExitLockTile
+	    maze.setTile(4, 7, new WallTile());
+	    maze.setTile(4, 8, new ExitLockTile());
+	    maze.setTile(4, 9, new WallTile());
 	
-	// helper method for drawing a room in the maze with a LockedDoorTile and a treasure
-	public static void createRoom() {
-		
+	    // adding exit
+	    maze.setTile(2, 8, new Exit());
+	    return maze;
+	}
+
+	// Helper method to create a 7x7 room with walls at the specified start position
+	private static void createRoom(Maze maze, int startRow, int startCol) {
+	    // Create the outer walls (7x7 area)
+	    for (int row = startRow; row < startRow + 7; row++) {
+	        for (int col = startCol; col < startCol + 7; col++) {
+	            // Set WallTile on the edges (outer boundary)
+	            if (row == startRow || row == startRow + 6 || col == startCol || col == startCol + 6) {
+	                maze.setTile(row, col, new WallTile());
+	            } else {
+	                // Set FreeTile inside the room (inner 5x5 area)
+	                maze.setTile(row, col, new FreeTile());
+	            }
+	        }
+	    }
 	}
 	
 	public void printMaze() {
