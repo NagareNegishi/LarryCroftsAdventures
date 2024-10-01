@@ -13,8 +13,23 @@ Domain:
 
 
 App:
+    - nz.ac.wgtn.swen225.lc.app.App.initializeModel 84
+    - nz.ac.wgtn.swen225.lc.app.App.setLevel 467
+    - nz.ac.wgtn.swen225.lc.app.App.setLevel 491
+    - nz.ac.wgtn.swen225.lc.app.Keys 48
+        (the method called by this line is defined in Controller
+        nz.ac.wgtn.swen225.lc.app.Controller 33
+        nz.ac.wgtn.swen225.lc.app.Controller 34)
+  
+
 
 Rendering:
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.gameConsumer 101
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.updateCanvas 110
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.paintComponent 133
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.paintComponent 134
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.drawTiles 179
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.drawTiles 180
 
 Persistency:
     - nz.ac.wgtn.swen225.lc.persistency.LoadFile.loadLevel 17
@@ -24,5 +39,12 @@ Persistency:
     - nz.ac.wgtn.swen225.lc.persistency.SaveFile.saveGame 18
 
 Recorder:
-
+    - nz.ac.wgtn.swen225.lc.recorder.Recorder.Recorder(Consumer<RecordingChanges>) 91
+    - nz.ac.wgtn.swen225.lc.recorder.Recorder.loadRecording() 136
+    - nz.ac.wgtn.swen225.lc.recorder.Recorder.saveRecording() 147
+    - nz.ac.wgtn.swen225.lc.recorder.Recorder.ping(Direction, int) 159
+    - nz.ac.wgtn.swen225.lc.recorder.Recorder.setPlaybackSpeed(int) 171
+    - nz.ac.wgtn.swen225.lc.recorder.Recorder.nextStep() 200 
+    - nz.ac.wgtn.swen225.lc.recorder.Recorder.Recorder(Consumer<RecordingChanges>) 96
+    - nz.ac.wgtn.swen225.lc.recorder.Recorder.Recorder(Consumer<RecordingChanges>) 98
 Fuzz:
