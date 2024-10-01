@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameState implements GameStateInterface {
 	
 	@JsonProperty
@@ -20,11 +22,40 @@ public class GameState implements GameStateInterface {
 	private int totalTreasures;
 	@JsonProperty
 	private Map<Key, String> keysCollected;
+	// Added by Adam
+	// seconds left for level
+	@JsonProperty
+	private int timeLeft;
 	
+	
+	public GameState(Maze maze, Chap chap, int totalTreasures) {
+		
+		if(maze.equals(null) || chap.equals(null)) {throw new IllegalArgumentException("Chap or Maze is null");}
+		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
+		
+		this.maze = maze;
+		this.chap = chap;
+		this.treasuresCollected = 0;
+		this.totalTreasures = totalTreasures;
+		this.keysCollected = new HashMap<>();
+		this.timeLeft = 60; // 60 seconds by default
+	}
+	
+	
+	/**
+	 * New constructor specifically for Jackson reconstruction
+	 * @param maze
+	 * @param chap
+	 * @param totalTreasures
+	 * @param keysCollected
+	 * @param time
+	 */
 	@JsonCreator
 	public GameState(@JsonProperty("maze") Maze maze,
 					@JsonProperty("chap") Chap chap,
-					@JsonProperty("totalTreasures") int totalTreasures) {
+					@JsonProperty("totalTreasures") int totalTreasures,
+					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
+					@JsonProperty("timeLeft") int timeLeft){
 		
 		if(maze.equals(null) || chap.equals(null)) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
@@ -32,8 +63,10 @@ public class GameState implements GameStateInterface {
 		this.chap = chap;
 		this.treasuresCollected = 0;
 		this.totalTreasures = totalTreasures;
-		this.keysCollected = new HashMap<>();
+		this.keysCollected = keysCollected;
+		this.timeLeft =timeLeft;
 	}
+	
 	
 	public int totalTreasures() {return totalTreasures;}
 	public int getTreasuresCollected() {return treasuresCollected;}
@@ -42,9 +75,14 @@ public class GameState implements GameStateInterface {
 	public Map<Key,String> keysCollected(){return keysCollected;}
 	
 	public String chapPosition(){return chap.getPosition();}
+	// Added by Adam
+	public int getTime() {return timeLeft;}
+	public void setTime(int time) {this.timeLeft = time;}
 	
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
+		if(direction.equals(null)) {throw new IllegalArgumentException("Cannot move because direction is null");}
+		
 		int newRow = chap.getRow() + direction.rowDirection();
 		int newCol = chap.getCol() + direction.colDirection();
 		Tile nextTile = maze.getTile(newRow, newCol);
@@ -82,7 +120,7 @@ public class GameState implements GameStateInterface {
 			/////////////////////////////
 			System.out.println("Chap has reached the exit");
 			///////////////////////////
-        	// Finish level an go to next level
+        	// Finish level and go to next level
         }
         default -> {
             
@@ -93,7 +131,6 @@ public class GameState implements GameStateInterface {
 	    checkForItem();
 	}
 
-	// could use streams to tidy up
 	public void checkForItem() {
 		Tile currentTile = maze.getTile(chap.getRow(), chap.getCol());
         if (currentTile.hasItem()) {
@@ -115,6 +152,7 @@ public class GameState implements GameStateInterface {
 							   .map(item -> (Key) item)
 							   .anyMatch(key -> key.colour().equals(doorColour));
 	}
+	
 	public String chapSurroundings() {
 		return "To Chap's left is a: " + maze.getTile(chap.getRow(), chap.getCol() - 1).tileType() + "\n"
 				+ "Above Chap is a " + maze.getTile(chap.getRow() -1, chap.getCol()).tileType() + "\n"

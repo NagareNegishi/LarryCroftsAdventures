@@ -154,6 +154,7 @@ public class Maze {
 	
 	    // adding exit
 	    maze.setTile(2, 8, new Exit());
+	    
 	    return maze;
 	}
 
