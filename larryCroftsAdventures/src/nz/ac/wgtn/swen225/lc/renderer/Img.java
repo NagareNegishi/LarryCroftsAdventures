@@ -50,16 +50,22 @@ public enum Img {
 
     private static BufferedImage loadImage(String name) {
         Path p = startPath().resolve(name + ".png");
-        System.out.println("Loading image from: " + p.toString()); // Add this line
+        System.out.println("Loading image from: " + p.toString());
         assert Files.exists(p) : "Image " + name + " not found. Visible files are:\n" 
                                 + DirectoryStructure.of(startPath());
         try {
-            return ImageIO.read(p.toFile());
+            BufferedImage img = ImageIO.read(p.toFile());
+
+            // forcing image transparency, but still doesn't work
+            BufferedImage imgWithAlpha = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            imgWithAlpha.getGraphics().drawImage(img, 0, 0, null);
+            
+            return imgWithAlpha;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
-}
+
 
 
 
@@ -101,4 +107,5 @@ class DirectoryStructure {
             .map(Path::toString)
             .collect(Collectors.joining("\", \""));
     }
+}
 }
