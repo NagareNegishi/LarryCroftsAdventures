@@ -485,10 +485,19 @@ class App extends JFrame{
     m.printMaze();
     
 ////////////////////////////////////////////
-    recorder = new Recorder((rc)-> {
+    /**
+     * old code keep it for now 2/10
+     * recorder = new Recorder((rc)-> {
       gameInfoPanel.setTime(rc.updatedTime());
       model = rc.updatedGame();//gamestate pass game state insted i dont know why
-      });
+      });*/
+
+      
+    recorder = new Recorder((rc)-> { 
+      gameInfoPanel.setTime(rc.updatedTime());
+      model = rc.updatedGame();
+      renderer.gameConsumer(model.getGameState());
+    });
     controller.setRecorder(recorder);
 
 /////////////////////////delete this part
