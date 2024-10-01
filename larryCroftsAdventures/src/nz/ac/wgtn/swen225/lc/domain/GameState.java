@@ -28,11 +28,15 @@ public class GameState implements GameStateInterface {
 		
 		if(maze.equals(null) || chap.equals(null)) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
+		
 		this.maze = maze;
 		this.chap = chap;
 		this.treasuresCollected = 0;
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = new HashMap<>();
+		
+		assert this.totalTreasures == totalTreasures;
+		assert keysCollected.isEmpty() == true;
 	}
 	
 	public int totalTreasures() {return totalTreasures;}
@@ -45,6 +49,8 @@ public class GameState implements GameStateInterface {
 	
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
+		if(direction.equals(null)) {throw new IllegalArgumentException("Cannot move because direction is null");}
+		
 		int newRow = chap.getRow() + direction.rowDirection();
 		int newCol = chap.getCol() + direction.colDirection();
 		Tile nextTile = maze.getTile(newRow, newCol);
@@ -82,7 +88,7 @@ public class GameState implements GameStateInterface {
 			/////////////////////////////
 			System.out.println("Chap has reached the exit");
 			///////////////////////////
-        	// Finish level an go to next level
+        	// Finish level and go to next level
         }
         default -> {
             
@@ -93,7 +99,6 @@ public class GameState implements GameStateInterface {
 	    checkForItem();
 	}
 
-	// could use streams to tidy up
 	public void checkForItem() {
 		Tile currentTile = maze.getTile(chap.getRow(), chap.getCol());
         if (currentTile.hasItem()) {
@@ -115,6 +120,7 @@ public class GameState implements GameStateInterface {
 							   .map(item -> (Key) item)
 							   .anyMatch(key -> key.colour().equals(doorColour));
 	}
+	
 	public String chapSurroundings() {
 		return "To Chap's left is a: " + maze.getTile(chap.getRow(), chap.getCol() - 1).tileType() + "\n"
 				+ "Above Chap is a " + maze.getTile(chap.getRow() -1, chap.getCol()).tileType() + "\n"

@@ -18,8 +18,13 @@ public class LockedDoorTile extends Tile{
 	
 	
 	public LockedDoorTile(String colour) {
+		if(colour.equals(null)) {throw new IllegalArgumentException("Cannot instantiate LockedDoorTile with null colour");}
+		
 		this.colour = colour;
 		this.locked = true;
+		
+		assert this.colour.equals(colour);
+		assert this.locked == true;
 		}
 	
 	@JsonCreator

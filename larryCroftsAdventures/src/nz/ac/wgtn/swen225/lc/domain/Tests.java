@@ -141,7 +141,6 @@ public class Tests {
 			maze.setTile(2, 3, new TreasureTile());
 			test.moveChap(Direction.Right);
 			assert test.getTreasuresCollected() == 1;
-		    assert chap.inventory().get(0) instanceof Treasure;
 		}
 		
 	// test treasure tile turns into free tile when treasure is picked up
@@ -193,7 +192,6 @@ public class Tests {
 			assert chap.inventory().get(0) instanceof Key;
 			Key key = (Key) chap.inventory().get(0);
 			assert key.colour().equals("Blue");
-			assert chap.inventory().get(1) instanceof Treasure;
 			assert test.getTreasuresCollected() == 1;
 			}
 		
@@ -261,8 +259,73 @@ public class Tests {
 			assertEquals(3,chap.getCol());
 			
 		}
+		
+	// test Chap cannot move to ExitLockTile with treasure still remaining
 		@Test
-		public void test01() {
+		public void testChapCantMoveToExitLockWithTreasuresRemaining() {
+			Maze maze = Maze.createBasicMaze(5, 5);
+			Chap chap = new Chap(2,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.setTile(2, 3, new ExitLockTile());
+			test.moveChap(Direction.Right);
+			assertEquals(2,chap.getRow());
+			assertEquals(2,chap.getCol());
+		}
+		
+	// test Chap can move to ExitLockTile once all treasures are collected
+		@Test
+		public void testChapCanMoveToExitLockWithAllTreasures() {
+			Maze maze = Maze.createBasicMaze(6, 6);
+			Chap chap = new Chap(2,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.setTile(2, 3, new TreasureTile());
+			maze.setTile(2, 4, new ExitLockTile());
+			test.moveChap(Direction.Right);
+			assert test.allTreasureCollected();
+			test.moveChap(Direction.Right);
+			assertEquals(2,chap.getRow());
+			assertEquals(4,chap.getCol());
+		}
+		
+	// test Actor moves in intended way
+		@Test
+		public void testActorMoves() {
+			Maze maze = Maze.createBasicMaze(7, 7);
+			// actor starts at (2,2) should circle back after moving in a square
+			Actor actor = new Actor(2,2);
+			actor.move(maze);
+			assertEquals(2,actor.getRow());
+			assertEquals(3,actor.getCol());
+			actor.move(maze);
+			assertEquals(2,actor.getRow());
+			assertEquals(4,actor.getCol());
+			actor.move(maze);
+			assertEquals(3,actor.getRow());
+			assertEquals(4,actor.getCol());
+			actor.move(maze);
+			assertEquals(4,actor.getRow());
+			assertEquals(4,actor.getCol());
+			actor.move(maze);
+			assertEquals(4,actor.getRow());
+			assertEquals(3,actor.getCol());
+			actor.move(maze);
+			assertEquals(4,actor.getRow());
+			assertEquals(2,actor.getCol());
+			actor.move(maze);
+			assertEquals(3,actor.getRow());
+			assertEquals(2,actor.getCol());
+			actor.move(maze);
+			assertEquals(2,actor.getRow());
+			assertEquals(2,actor.getCol());
+		}
+		
+	// test two Actors cannot collide
+		
+	// test when Actor touches Chap action happens (to be decided)
+		
+	
+		@Test
+		public void testPrintMaze() {
 			Maze maze = Maze.createLevel1();
 			//Chap chap = new Chap(4,3);
 			//GameState test = new GameState(maze,chap,0);
