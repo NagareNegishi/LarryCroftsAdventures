@@ -1,4 +1,4 @@
-Domain:
+Domain: Ben
     - nz.ac.wgtn.swen225.lc.domain.GameStateController.GameStateController(Constructor) 27
     - nz.ac.wgtn.swen225.lc.domain.GameStateController.moveChap 58
     - nz.ac.wgtn.swen225.lc.domain.GameStateController.getChapPosition 59
@@ -12,7 +12,7 @@ Domain:
 
 
 
-App:
+App: Nagi
     - nz.ac.wgtn.swen225.lc.app.App.initializeModel 84
     - nz.ac.wgtn.swen225.lc.app.App.setLevel 467
     - nz.ac.wgtn.swen225.lc.app.App.setLevel 491
@@ -23,7 +23,7 @@ App:
   
 
 
-Rendering:
+Rendering: Marwan
     - nz.ac.wgtn.swen225.lc.renderer.Renderer.gameConsumer 101
     - nz.ac.wgtn.swen225.lc.renderer.Renderer.updateCanvas 110
     - nz.ac.wgtn.swen225.lc.renderer.Renderer.paintComponent 133
@@ -31,14 +31,14 @@ Rendering:
     - nz.ac.wgtn.swen225.lc.renderer.Renderer.drawTiles 179
     - nz.ac.wgtn.swen225.lc.renderer.Renderer.drawTiles 180
 
-Persistency:
+Persistency: Adam
     - nz.ac.wgtn.swen225.lc.persistency.LoadFile.loadLevel 17
     - nz.ac.wgtn.swen225.lc.persistency.LoadFile.loadSave 25
     - nz.ac.wgtn.swen225.lc.persistency.LoadFile.loadLevel 57
     - nz.ac.wgtn.swen225.lc.persistency.LoadFile.loadSave 67
     - nz.ac.wgtn.swen225.lc.persistency.SaveFile.saveGame 18
 
-Recorder:
+Recorder: Josh
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.Recorder(Consumer<RecordingChanges>) 91
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.loadRecording() 136
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.saveRecording() 147
@@ -47,7 +47,7 @@ Recorder:
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.nextStep() 200 
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.Recorder(Consumer<RecordingChanges>) 96
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.Recorder(Consumer<RecordingChanges>) 98
-Fuzz:
+Fuzz: Anthony
     - test.nz.ac.wgtn.swen225.lc.fuzz.Fuzz.Test1() 31
     - test.nz.ac.wgtn.swen225.lc.fuzz.Fuzz.Test1() 33
     - test.nz.ac.wgtn.swen225.lc.fuzz.Fuzz.Test1() 34
