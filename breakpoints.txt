@@ -15,6 +15,12 @@ Domain:
 App:
 
 Rendering:
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.gameConsumer 101
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.updateCanvas 110
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.paintComponent 133
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.paintComponent 134
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.drawTiles 179
+    - nz.ac.wgtn.swen225.lc.renderer.Renderer.drawTiles 180
 
 Persistency:
     - nz.ac.wgtn.swen225.lc.persistency.LoadFile.loadLevel 17
