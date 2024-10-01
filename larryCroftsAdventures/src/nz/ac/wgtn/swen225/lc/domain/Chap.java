@@ -10,9 +10,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Chap {
 	
-
 	private int row;
 	private int col;
+	@JsonProperty
 	private List<Item> inventory;
 	
 	public Chap(int startRow, int startCol) {
@@ -24,6 +24,12 @@ public class Chap {
 		assert this.inventory.size() == 0;
 		}
 	
+	/**
+	 * Constructor specifically for Jackson reconstruction
+	 * @param startRow
+	 * @param startCol
+	 * @param inventory
+	 */
 	@JsonCreator
 	public Chap(@JsonProperty("startRow") int startRow,
 				@JsonProperty("startCol") int startCol,

@@ -3,8 +3,7 @@ package nz.ac.wgtn.swen225.lc.app;
 import java.util.HashMap;
 import java.util.Map;
 
-import nz.ac.wgtn.swen225.lc.domain.Chap;
-import nz.ac.wgtn.swen225.lc.domain.Maze;
+import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 
 /**
  * Mock Controller for fuzz testing.
@@ -13,6 +12,10 @@ import nz.ac.wgtn.swen225.lc.domain.Maze;
  * but Fuzz need to test the game logic.
  */
 public class MockController extends Controller{
+
+	/*
+	## this need to go as we only use GameStateController to instantiate the controller
+
 	public Chap chap;
 	public Maze maze;
 	public MockController(Chap chap, Maze maze) {
@@ -25,6 +28,15 @@ public class MockController extends Controller{
 	}
 	public Maze getMaze() {
 		return maze;
+	}
+	*/
+
+
+
+	public GameStateController update;
+	public MockController(GameStateController stateController){
+		super(stateController, createMockActionBindings());
+		update = stateController;
 	}
 
 	/**
