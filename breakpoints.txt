@@ -13,6 +13,15 @@ Domain:
 
 
 App:
+    - nz.ac.wgtn.swen225.lc.app.App.initializeModel 84
+    - nz.ac.wgtn.swen225.lc.app.App.setLevel 467
+    - nz.ac.wgtn.swen225.lc.app.App.setLevel 491
+    - nz.ac.wgtn.swen225.lc.app.Keys 48
+        (the method called by this line is defined in Controller
+        nz.ac.wgtn.swen225.lc.app.Controller 33
+        nz.ac.wgtn.swen225.lc.app.Controller 34)
+  
+
 
 Rendering:
 
