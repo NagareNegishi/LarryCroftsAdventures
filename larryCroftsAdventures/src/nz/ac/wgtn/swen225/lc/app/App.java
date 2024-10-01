@@ -456,17 +456,17 @@ class App extends JFrame{
 
     model = level;
     GameState gamestate = model.getGameState();
-    controller = new Controller(level, actionBindings);
+    controller = new Controller(model, actionBindings);
 
 /////////////////////////////////delete this part
     Maze m = model.getMaze();
     System.out.println("this is the maze I just loaded");
     m.printMaze();
+    
 ////////////////////////////////////////////
-
     recorder = new Recorder((rc)-> {
       gameInfoPanel.setTime(rc.updatedTime());
-      model = rc.updatedGame();
+      model = rc.updatedGame();//gamestate pass game state insted i dont know why
       });
     controller.setRecorder(recorder);
 
@@ -482,7 +482,7 @@ class App extends JFrame{
 
       if (state == AppState.PLAY) {
         //need some sort of update method here for domain and recorder for level 2!!!!!!!!!!!!!!!!!
-
+        System.out.println(gamestate.chapPosition());
         /**
          * its not pretty solution, but i can take keys/ treasure info from the model and update the gameInfoPanel here
          */
