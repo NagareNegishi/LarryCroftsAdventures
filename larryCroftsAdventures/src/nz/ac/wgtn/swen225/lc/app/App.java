@@ -20,8 +20,8 @@ import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
-import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
 import nz.ac.wgtn.swen225.lc.persistency.Paths;
+import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
@@ -331,7 +331,7 @@ class App extends JFrame{
       File fileToSave = fileChooser.getSelectedFile();
 
       String filename = fileToSave.getName(); // i should pass file
-      boolean success = SaveFile.saveGame(filename, model);
+      boolean success = SaveFile.saveGame(filename, model); // do i need to pass model or gamestate? 2/10
       if (success) {
         JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
       } else {

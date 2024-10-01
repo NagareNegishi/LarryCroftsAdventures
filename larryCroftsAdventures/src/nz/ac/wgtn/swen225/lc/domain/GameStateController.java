@@ -86,19 +86,23 @@ public void setAppNotifier(AppNotifier appNotifier) {
 }
 
 public void Win(){
+	assert appNotifier != null: "AppNotifier is null";
 	appNotifier.onGameWin();
 }
 
 public void Lose(){
+	assert appNotifier != null: "AppNotifier is null";
 	appNotifier.onGameLose();
 	System.out.println("Game Over is called in GameStateController");
 }
 
 public void KeyPickup(int keyCount){
+	assert appNotifier != null: "AppNotifier is null";
 	appNotifier.onKeyPickup(keyCount);
 }
 
 public void TreasurePickup(int treasureCount){
+	assert appNotifier != null: "AppNotifier is null";
 	appNotifier.onTreasurePickup(treasureCount);
 }
 
