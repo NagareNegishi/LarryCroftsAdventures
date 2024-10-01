@@ -21,7 +21,7 @@ public class GameStateController implements GameStateControllerInterface {
 	@JsonProperty
 	private Chap chap;
 	
-	// change constructtor to avoid double use of maze
+	// change constructor to avoid double use of maze
 	
 	// most likely need to change mazeRows and mazeCols for the shape of the maze choose 
 	public GameStateController(int mazeRows, int mazeCols, int startRow, int startCol, int totalTreasures) {

@@ -15,11 +15,13 @@ public class Chap {
 	@JsonProperty
 	private List<Item> inventory;
 	
-	
 	public Chap(int startRow, int startCol) {
+		if(startRow < 0 || startCol < 0) {throw new IllegalArgumentException("Chap must be in bounds of the maze");}
 		this.row = startRow;
 		this.col = startCol;
 		this.inventory = new ArrayList<>();
+		assert this.row == startRow && this.col == startCol;
+		assert this.inventory.size() == 0;
 		}
 	
 	/**
@@ -52,7 +54,9 @@ public class Chap {
 	}
 	
 	public void move(Direction direction, Maze maze) {
-	    int newRow = this.row;
+		if(maze.equals(null) || direction.equals(null)) {throw new IllegalArgumentException("Maze or Direction is null cannot move Chap");}
+	   
+		int newRow = this.row;
 	    int newCol = this.col;
 	    
 	    switch (direction) {
@@ -71,11 +75,13 @@ public class Chap {
 	    }
 	    
 	    if (!maze.validMove(newRow, newCol)) {
-	        throw new IllegalArgumentException("Invalid move: Cannot move " + direction.name() + ".");
+	        throw new IllegalArgumentException(
+	        		"Invalid move: Cannot move " + direction.name() + ".");
 	    }
 	  
 	    this.row = newRow;
 	    this.col = newCol;
+	    
 	    assert this.row == newRow && this.col == newCol : "Move failed";
 	}
 
@@ -98,9 +104,13 @@ public class Chap {
 	}
 	
 	public void pickUpItem(Item item) {
-		System.out.println("I picked up: " + item.description() + ";)");
+		if(item.equals(null)) {throw new IllegalArgumentException("Cannot pick up item because it is null");}
+		//System.out.println("I picked up: " + item.description() + ";)");
+		if(item instanceof Key) {
 		inventory.add(item);
-		}	
+		assert inventory.contains(item);
+		}
+	}	
 	
 	public List<Item> inventory(){return inventory;}
 	
@@ -109,4 +119,6 @@ public class Chap {
 		System.out.println("Chap's inventory contains: "); 
 		inventory.forEach(s -> System.out.println(s.description()));
 		}
+	
+	
 }
