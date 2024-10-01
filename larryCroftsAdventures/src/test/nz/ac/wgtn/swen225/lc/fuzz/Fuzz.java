@@ -12,6 +12,8 @@ import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
+import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
+import nz.ac.wgtn.swen225.lc.persistency.Loader;
 
 
 public class Fuzz {
@@ -30,11 +32,12 @@ public class Fuzz {
 		//definining variables for access later
 		List<Tile> visitedTiles = new ArrayList<Tile>();
 		//create the level
-		GameStateController level = new GameStateController(7,7,2,2,0);
+		GameStateController level = LoadFile.loadLevel("level1").orElseThrow(IllegalArgumentException::new);
 		MockController mockController = new MockController(level);
 		Chap chap = mockController.update.getChap();
 		Maze maze = mockController.update.getMaze();
 		
+		List<Exception> exceptions = new ArrayList<Exception>();
 		//timer, currently set to 3000ms or 3 seconds
 		//note: System time was used, because Timeout annotation was not working in eclipse.
 		long startTime = System.currentTimeMillis();
@@ -73,7 +76,9 @@ public class Fuzz {
 					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
 				} catch (IllegalArgumentException e) {
 					visitedTiles.add(reverse.get(moveDirection));
-					System.out.println("Chap could not move " + moveDirection.name());
+					System.out.println(e);
+				} catch (Exception e) {
+					exceptions.add(e);
 				}
 			//otherwise move randomly
 			} else {
@@ -86,7 +91,9 @@ public class Fuzz {
 					chap.move(moveDirection, maze);
 					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
 				} catch (IllegalArgumentException e) {
-					System.out.println("Chap could not move " + moveDirection.name());
+					System.out.println(e);
+				} catch (Exception e) {
+					exceptions.add(e);
 				}
 				
 				
@@ -95,7 +102,12 @@ public class Fuzz {
 		}
 		//print a message to console, indicating the tiles visited.
 		System.out.println("Testing done!");
-		System.out.println(visitedTiles.size() + "/" + ((maze.getCols() * maze.getCols())-4) + "visitable tiles visited");
+		System.out.println(visitedTiles.size() + "/" + ((maze.getCols() * maze.getCols())-4) + " visitable tiles visited");
+		System.out.println("Detected exceptions:");
+		exceptions.stream().forEach(e-> System.out.println(e));
+		if (exceptions.size() == 0) {
+			System.out.println("NONE DETECTED!!! :)))");
+		}
 	}
 	
 }
