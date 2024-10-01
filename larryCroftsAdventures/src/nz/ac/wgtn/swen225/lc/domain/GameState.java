@@ -38,6 +38,8 @@ public class GameState implements GameStateInterface {
 		this.treasuresCollected = 0;
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = new HashMap<>();
+		assert this.totalTreasures == totalTreasures;
+		assert keysCollected.isEmpty() == true;
 		this.timeLeft = 60; // 60 seconds by default
 	}
 	
@@ -121,6 +123,13 @@ public class GameState implements GameStateInterface {
 			System.out.println("Chap has reached the exit");
 			///////////////////////////
         	// Finish level and go to next level
+        }
+        case WaterTile tile ->{
+        	// end game;
+        }
+        case TeleportTile tile ->{
+        	System.out.println("TELEPORT");
+        	chap.moveTo(tile.partner().row(),tile.partner().col(), maze);
         }
         default -> {
             
