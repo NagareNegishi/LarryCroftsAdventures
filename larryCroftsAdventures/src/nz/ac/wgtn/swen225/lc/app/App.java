@@ -34,7 +34,7 @@ class App extends JFrame{
   private SidePanel sidePanel;
 
   private Timer gameTimer;
-  private int timeLeft = 60; // 1 minute for level 1??
+  private int timeLeft = 3;//60; // 1 minute for level 1??
   private int currentLevel = 1; // we initialize with level 1
   private int keysCollected = 0; //or List<Key> keysCollected or items??? but in that case i shouldnt involeve the process
   private int treasuresLeft = 10; // Example value
@@ -42,6 +42,7 @@ class App extends JFrame{
   Runnable closePhase= ()->{};
   private Map<String, Runnable> actionBindings =  new HashMap<>(); // need to be passed to controller
   private GameStateController model;
+  private AppNotifier notifier = getAppNotifier(); // need to be passed to model
   private Controller controller;
   //private JPanel renderer;
   private Renderer renderer;
@@ -198,12 +199,17 @@ class App extends JFrame{
           controller.updatetime(timeLeft);
           gameInfoPanel.setTime(timeLeft);
           if (timeLeft == 0) {
-              gameTimer.stop();
-              GameDialogs.GAMEOVER.show();
-              state = AppState.GAMEOVER;
+              gameOver();
           }
       });
       gameTimer.stop();
+  }
+
+  public void gameOver(){
+    state = AppState.GAMEOVER;
+    gameTimer.stop();
+    GameDialogs.GAMEOVER.show();
+    controller.pause(true);
   }
 
   /**
@@ -221,9 +227,8 @@ class App extends JFrame{
         loadNextLevel();
       }
       public void onGameLose(){
-        state = AppState.GAMEOVER;
-        gameTimer.stop();
-        GameDialogs.GAMEOVER.show();
+        gameOver();
+        System.out.println("Game Over is called");
       }
       public void onKeyPickup(int keyCount){
         keysCollected = keyCount;
@@ -239,6 +244,7 @@ class App extends JFrame{
   private void pauseGame() {
     if (state != AppState.PLAY) return;
     state = AppState.PAUSED;
+    controller.pause(true);
     // renderer.setFocusable(false); i probably want it
     gameTimer.stop();
     GameDialogs.PAUSE.show();
@@ -277,6 +283,7 @@ class App extends JFrame{
 
   private void gameRun(){
     state = AppState.PLAY;
+    controller.pause(false);
     renderer.setFocusable(true);
     renderer.requestFocus();
     assert !gameTimer.isRunning(): "Game is already running";
@@ -455,6 +462,8 @@ class App extends JFrame{
 ////////////////////////////////////////////
 
     model = level;
+    model.setAppNotifier(notifier);
+
     GameState gamestate = model.getGameState();
     controller = new Controller(model, actionBindings);
 
