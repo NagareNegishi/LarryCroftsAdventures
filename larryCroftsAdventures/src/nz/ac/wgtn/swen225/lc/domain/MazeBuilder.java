@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * Set chunck ammount, predefined chuck methods that fill same size
+ */
+
 /**
  * Tool to help build a maze
  */
@@ -13,6 +18,11 @@ public class MazeBuilder {
 	int rows;
 	int cols;
 	
+	/**
+	 * 11 * 11 sized space leaves space for 9 * 9 empty space
+	 */
+	int chunk;
+	
 	Map<Coord, Tile> singleTiles; 
 	
 	List<Room> rooms = new ArrayList<>();
@@ -21,8 +31,9 @@ public class MazeBuilder {
 	/**
 	 * Initialise the builder
 	 */
-	public MazeBuilder() {
+	public MazeBuilder(int chunk) {
 		flexMaze = new ArrayList<List<Tile>>();
+		this.chunk = chunk;
 	}
 	
 	
@@ -36,7 +47,5 @@ public class MazeBuilder {
 		for(Room room : rooms) {
 			Maze.createRoom(maze, room.row(), room.col(),room.width(), room.height())_
 		}
-		
-		
 	}
 }
