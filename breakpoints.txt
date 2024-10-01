@@ -35,8 +35,7 @@ Recorder:
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.saveRecording() 147
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.ping(Direction, int) 159
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.setPlaybackSpeed(int) 171
-    - nz.ac.wgtn.swen225.lc.recorder.Recorder.nextStep() 200
-    - nz.ac.wgtn.swen225.lc.persistency.LoadFile 
+    - nz.ac.wgtn.swen225.lc.recorder.Recorder.nextStep() 200 
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.Recorder(Consumer<RecordingChanges>) 96
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.Recorder(Consumer<RecordingChanges>) 98
 Fuzz:
