@@ -38,7 +38,7 @@ public class PersistencyTest {
 	
 	@Test
     public void level1Level() {
-    	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel("level1");
+    	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
     	assert gscOptionLevel.isPresent();
     	GameStateController gscLevel = gscOptionLevel.get();
     }
@@ -189,6 +189,14 @@ public class PersistencyTest {
 		assert saved;   
 		
     }
+    
+    @Test
+    public void pathTest() {
+    	assert false : Paths.level1.getAbsolutePath();
+    	
+    }
+    
+   
     
     
     

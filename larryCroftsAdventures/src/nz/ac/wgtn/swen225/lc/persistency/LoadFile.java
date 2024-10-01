@@ -16,14 +16,16 @@ public class LoadFile implements Loader {
 	public static Optional<GameStateController> loadLevel(String levelName) {
 		assert levelName != null;
 		assert !levelName.isEmpty();
-		String path = Paths.levelPath + levelName;
-		return loadObj(levelName , GameStateController.class);
+		final String pathPrefix = "levels/";
+		String path = pathPrefix + levelName;
+		return loadObj(new File(Paths.levelsDir, levelName + ".json") , GameStateController.class);
 	}
 
 	public static Optional<GameStateController> loadSave(String saveName){
 		assert saveName != null;
 		assert !saveName.isEmpty();
-		String path = Paths.savePath + saveName;
+		final String pathPrefix = "saves/";
+		String path = pathPrefix + saveName;
 		return loadObj(path, GameStateController.class);
 	}
 	
@@ -78,8 +80,10 @@ public class LoadFile implements Loader {
     	try {
     		ObjectMapper mapper = new ObjectMapper();
         	T loadedObject = mapper.readValue(file, classType);
+        	return Optional.of(loadedObject);
     	} catch (IOException e) {
     		e.printStackTrace();
+    		System.out.println("IoException in loadObj");
     	}
     	return Optional.empty();
     }
