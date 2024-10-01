@@ -331,4 +331,21 @@ public class Tests {
 			//GameState test = new GameState(maze,chap,0);
 			maze.printMaze();
 		}
+		
+	// test TeleportTiles work
+		@Test
+		public void testTeleportTiles() {
+			Maze maze = Maze.createCustomMaze2();
+			Chap chap = new Chap(1,2);
+			GameState test = new GameState(maze,chap,1);
+			maze.printMaze();
+			System.out.println(maze.getTile(1, 1));
+			System.out.println(maze.getTile(1, 5));
+			test.moveChap(Direction.Left);
+			System.out.println(test.chapPosition());
+			test.moveChap(Direction.Right);
+			System.out.println(test.chapPosition());
+			//assertEquals(1,chap.getRow());
+			//assertEquals(5,chap.getCol());
+		}
 }
