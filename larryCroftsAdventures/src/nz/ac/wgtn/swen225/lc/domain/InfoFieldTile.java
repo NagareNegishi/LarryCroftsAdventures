@@ -10,12 +10,8 @@ public class InfoFieldTile extends Tile{
 	public InfoFieldTile(String helpText) {this.helpText = helpText;}
 
 	@Override
-	public boolean canMoveTo() {
-		return true;
-	}
-	
-	// (Applies to all tiles) could change method to just return tile name and add another
-	// method to return description (helpText in this case) of tile
+	public boolean canMoveTo() {return true;}
+
 	@Override
 	public String tileType() {
 		return "Info-Field Tile with helpText: " + helpText;
