@@ -20,12 +20,10 @@ public class SaveFile implements Saver{
         assert fileName != null && !fileName.isEmpty();
 
         ObjectMapper mapper = new ObjectMapper();
-
-        final String pathPrefix = "saves/";
         
         // Map obj to JSON file
         try{
-            mapper.writeValue( new File(pathPrefix + fileName + ".json"), gameControl );
+            mapper.writeValue( new File(Paths.savePath + fileName + ".json"), gameControl );
             return true;
         } catch(IOException e){
             e.printStackTrace();
