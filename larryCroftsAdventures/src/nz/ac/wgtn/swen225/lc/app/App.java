@@ -21,6 +21,7 @@ import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
+import nz.ac.wgtn.swen225.lc.persistency.Paths;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
@@ -82,7 +83,7 @@ class App extends JFrame{
    * Initialize the model for the game by loading the first level.
    */
   private void initializeModel(){
-    Optional<GameStateController> loadedGame = LoadFile.loadLevel("level1");
+    Optional<GameStateController> loadedGame = LoadFile.loadLevel(Paths.level1);
     if (loadedGame.isPresent()) {
       model = loadedGame.get();
     } else {
@@ -130,7 +131,12 @@ class App extends JFrame{
         sidePanel.setPauseButtonText("Pause");
       }
       case "save" -> saveGame();
-      case "load" -> loadFile();
+      case "load" -> loadFile(Paths.levelsDir);
+      /**
+       *  Currently never called. I would like different buttons for levels and saves
+       *  but if we cannot, we could just use the single levels folder - AdamT
+       */
+      case "loadSave" -> loadFile(Paths.savesDir); 
       case "help" -> showHelp(MenuPanel.HELP);
       case "exit" -> exitGameWithoutSaving();
       case "toggle" -> sidePanel.togglePanel();
@@ -169,7 +175,7 @@ class App extends JFrame{
     actionBindings.put("resumeSavedGame", this::loadGame);
     actionBindings.put("startNewGame1", () -> {
       currentLevel = 1;
-      checkModel(LoadFile.loadLevel("level1"));
+      checkModel(LoadFile.loadLevel(Paths.level1));
       GameDialogs.hideAll();
       gameRun();
     });
@@ -272,7 +278,7 @@ class App extends JFrame{
       }
       case VICTORY -> {
         currentLevel = 1; // reset level to 1
-        checkModel(LoadFile.loadLevel("level1"));
+        checkModel(LoadFile.loadLevel(Paths.level1));
         GameDialogs.VICTORY.hide(); 
         yield true; }
       case RECORDING, BETWEEN -> false; // need to think about this
@@ -317,7 +323,9 @@ class App extends JFrame{
     JFileChooser fileChooser = new JFileChooser();
     fileChooser.setDialogTitle("Save Game");
     fileChooser.setFileFilter(new FileNameExtensionFilter("JSON files", "json"));
-
+    // opens into saves directory
+    fileChooser.setCurrentDirectory(Paths.savesDir);
+    
     int userSelection = fileChooser.showSaveDialog(this); // show dialog and wait user input
     if (userSelection == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File fileToSave = fileChooser.getSelectedFile();
@@ -339,19 +347,18 @@ class App extends JFrame{
    * String-based methods expect filenames without the ".json" extension, as they automatically append it.
    * File-based methods expect complete filenames including the ".json" extension, as they use the File object as-is.
    */
-  private Optional<GameStateController> loadFile() {
+  private Optional<GameStateController> loadFile(File dir) { // Added File parameter
+	  // Static final Files are now generated at runtime in nz.ac.wgtn.swen225.lc.persistencyPaths - AdamT;
 
-    File projectRoot = new File(System.getProperty("user.dir"));
-    System.out.println("project root is here: " + projectRoot.getAbsolutePath());////////////
+    System.out.println("project root is here: " + Paths.root.getAbsolutePath());////////////
 
-    File saveDirectory = new File(projectRoot, "levels");
     ///////////////////////////////////
-    System.out.println("saves directly is here: " + saveDirectory.getAbsolutePath());
-    if (!saveDirectory.exists()) {
+    System.out.println("saves directly is here: " + Paths.savesDir.getAbsolutePath());
+    if (!Paths.savesDir.exists()) {
       System.out.println("saves directory does not exist");
     }
     ///////////////////////////////////
-    JFileChooser fileChooser = new JFileChooser(saveDirectory);
+    JFileChooser fileChooser = new JFileChooser(dir);
     fileChooser.setDialogTitle("Load Game");
     FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON Game files", "json");//expecting json file
     fileChooser.setFileFilter(filter); // set filter
@@ -363,11 +370,15 @@ class App extends JFrame{
       String filename = file.getName(); // i should pass file
       System.out.println("file name: " + filename);
       //return LoadFile.loadSave(filename); //string based
+      System.out.println("File successfully chosen and loaded");
       return LoadFile.loadSave(file);
+      // Added by Adam
     }
     System.err.println("this is Optional.empty() from load file");
     return Optional.empty();
   }
+  
+  
 
 
 
@@ -377,7 +388,7 @@ class App extends JFrame{
    * currently simply Calling LoadFile()
    */
   private void loadGame(){//(int level, Runnable onWin, Runnable onLose) {
-    checkModel(loadFile());
+    checkModel(loadFile(Paths.levelsDir));
   }
 
   /**
@@ -402,6 +413,7 @@ class App extends JFrame{
       GameDialogs.VICTORY.show();
       return;
     }
+    // This still works. I've converted everything else to Files, but not sure how to convert this atm -AdamT
     checkModel(LoadFile.loadLevel("level" + nextlevel));
   }
 
@@ -418,7 +430,7 @@ class App extends JFrame{
       switch(choice){
         case 0 -> action.run();
         case 1 -> {
-          checkModel(LoadFile.loadLevel("level1")); // it should loop unless model is set
+          checkModel(LoadFile.loadLevel(Paths.level1)); // it should loop unless model is set
           GameDialogs.START.hide();
         }
         case 2 -> exitGameWithoutSaving();
@@ -484,6 +496,11 @@ class App extends JFrame{
 /////////////////////////////////
 
     renderer.gameConsumer(gamestate);// just set new gamestate, don't instantiate new renderer
+    
+    /**
+     * pass aoonotifier to domain to make updates
+     */
+    		
     renderer.addKeyListener(controller);
     renderer.setFocusable(true);
     Timer timer= new Timer(34, unused->{

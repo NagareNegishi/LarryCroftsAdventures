@@ -1,6 +1,7 @@
 package test.nz.ac.wgtn.swen225.lc.persistency;
 
 import nz.ac.wgtn.swen225.lc.domain.*;
+import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 import nz.ac.wgtn.swen225.lc.persistency.*;
 
 
@@ -14,8 +15,21 @@ import java.util.Optional;
 // Domain imports
 
 
+
+
+
 public class PersistencyTest {
 
+	private GameStateController genGsc() {
+		Maze maze = Maze.createCustomMaze();
+		Chap chap = new Chap(2, 2);
+		GameState gs = new GameState(maze, chap, 2);
+		
+		GameStateController gsc = new GameStateController(gs);
+		return gsc;
+	}
+	
+	
     // Test nested object mockGameState into JSON
 //    @Test
 //    public void gameStateToJson(){
@@ -25,7 +39,7 @@ public class PersistencyTest {
 	
 	@Test
     public void level1Level() {
-    	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel("level1");
+    	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
     	assert gscOptionLevel.isPresent();
     	GameStateController gscLevel = gscOptionLevel.get();
     }
@@ -88,7 +102,7 @@ public class PersistencyTest {
     	Item redKey = new Key("red");
     	chap.pickUpItem(redKey);
     	GameState gs = new GameState(maze, chap, 2);
-    	GameStateController gsc = new GameStateController(maze, chap, gs);
+    	GameStateController gsc = new GameStateController(gs);
 
     	
     	
@@ -133,7 +147,7 @@ public class PersistencyTest {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	Chap chap = new Chap(2, 2);
     	GameState gs = new GameState(maze, chap, 2);
-    	GameStateController gsc = new GameStateController(maze, chap, gs);
+    	GameStateController gsc = new GameStateController(gs);
     	
     	assert SaveFile.saveObj("GameSaveLoadTest", gsc);
     	
@@ -154,7 +168,7 @@ public class PersistencyTest {
 		Chap chap = new Chap(2, 2);
 		GameState gs = new GameState(maze, chap, 2);
 		
-		GameStateController gsc = new GameStateController(maze, chap, gs);
+		GameStateController gsc = new GameStateController(gs);
 		
 		Boolean saved = SaveFile.saveGame("level1", gsc);
 		assert saved;
@@ -170,12 +184,40 @@ public class PersistencyTest {
     	Maze maze = Maze.createCustomMaze();
     	Chap chap = new Chap(2,2);
     	GameState gs = new GameState(maze, chap, 2);
-    	GameStateController gsc = new GameStateController(maze, chap, gs);
+    	GameStateController gsc = new GameStateController(gs);
 		
 		Boolean saved = SaveFile.saveGame("IntegrationEx", gsc);
 		assert saved;   
 		
     }
+    
+    @Test
+    public void pathTest() {
+    	assert false : Paths.level1.getAbsolutePath();
+    	
+    }
+    
+    @Test
+    public void workingController() {
+    	
+    GameStateController gsc = genGsc();
+    
+    assert SaveFile.saveGame("controlTest", gsc);
+    
+    Optional<GameStateController> gscO = LoadFile.loadSave("controlTest");
+    assert gscO.isPresent();
+    GameStateController gscD = gscO.get();
+    
+    System.out.println(gscD.getChapPosition());
+    gscD.moveChap(Direction.Right);
+    System.out.println(gscD.getChapPosition());
+    gscD.moveChap(Direction.Left);
+    System.out.println(gscD.getChapPosition());
+    gscD.getChap().moveTo(3, 3, gscD.getMaze());
+    
+    }
+    
+   
     
     
     
