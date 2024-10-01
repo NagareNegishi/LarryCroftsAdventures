@@ -33,13 +33,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 
-import nz.ac.wgtn.swen225.lc.domain.Chap;
-import nz.ac.wgtn.swen225.lc.domain.GameState;
-import nz.ac.wgtn.swen225.lc.domain.Item;
-import nz.ac.wgtn.swen225.lc.domain.Key;
-import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
-import nz.ac.wgtn.swen225.lc.domain.Tile;
-import nz.ac.wgtn.swen225.lc.domain.Treasure;
+import nz.ac.wgtn.swen225.lc.domain.*;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -65,12 +59,10 @@ public class Renderer extends JPanel {
 	private final int FPS = 60; // 60 frames per second
     private final int frameTime = 1000 / FPS; // time per frame in milliseconds
     
-    private int x;
-    private int y;
+    private int playerX;
+    private int playerY;
     private GameState game;
     
-    private int cX; //TODO remove this code
-    private int cY; //should be removed after the old rendering engine is removed
     
     private long lastTime = System.nanoTime();
     private int frames = 0;
@@ -80,7 +72,13 @@ public class Renderer extends JPanel {
     
     //Fields for the images
     final RenderImg renderKourie = new RenderImg(Img.Kourie);
+    final RenderImg LockedDoor = new RenderImg(Img.LockedDoor_blue);
+    final RenderImg Wall = new RenderImg(Img.Wall_Tile);
+    final RenderImg FreeTile = new RenderImg(Img.FreeTile);
+    final RenderImg Treasure = new RenderImg(Img.Treasure);
+    final RenderImg Blue_key = new RenderImg(Img.Blue_key);
     
+    final int imgSize;
     
     /**
      * Renderer constuctor inilizes a Timer to update every frame.
@@ -93,6 +91,8 @@ public class Renderer extends JPanel {
         
         System.out.println(this.getSize().getHeight());
         System.out.println(this.getSize().getWidth());
+        imgSize = renderKourie.size();
+        this.setBackground(Color.BLACK);
     }
     
     /*
@@ -126,25 +126,19 @@ public class Renderer extends JPanel {
         g.setFont(new Font("Arial", Font.PLAIN, 18));
         g.drawString("FPS: " + fps, 10, 20); // Draw FPS at top left
         
-
         
         Dimension size = this.getSize();
         
         //Point center = new Point(1,1);
-        y = game.getChap().getRow();
-        x = game.getChap().getCol();
+        playerY = game.getChap().getRow() * imgSize;
+        playerX = game.getChap().getCol() * imgSize;
         
-        Point center = new Point(x*32,y*32);
+        Point center = new Point(getWidth() / 2, getHeight()/2);
 		
         //There's a specific method for drawing Chap
-        renderKourie.drawChap(g, center, size);
-        
-      
-        
-        g.setColor(Color.WHITE);
-        //g.fillOval(size.width/2,(size.height/2), 40, 40);
         
         drawTiles();
+        renderKourie.drawChap(g, center, size);
         
         
         }
@@ -164,35 +158,45 @@ public class Renderer extends JPanel {
     
     /*
      * Draws the maze itself, centered on chap
+     * 
+     * There's an additional Offset `by half a size as to make it even more centered.
+     * as for some reasons, it doesn't "feel" very centered 
+     * 
      */
     private void drawTiles() {
+    	
+    	//Extra Offset
+    	
+    	
+    	int offset = 0;
+    	
+    	int screenCenterX = getWidth() / 2; // Center of the screen horizontally
+        int screenCenterY = getHeight() / 2; // Center of the screen vertically
 
-    	int maxCol = game.getMaze().getCols();
-    	int maxRow = game.getMaze().getRows();
+    	int offsetX = screenCenterX - (playerX);  // Offset for X
+        int offsetY = screenCenterY - (playerY);  // Offset for Y
+    	
+    	int maxCol = game.getMaze().getCols(); //Max col for maze
+    	int maxRow = game.getMaze().getRows(); //max Row for maze
     	
     	
     	//the current code doesn't offset properly, it will be reviewed at a later date
-    	for (int rowOffset = 0; rowOffset < maxRow; rowOffset++) {
-    		for(int colOffset = 0; colOffset < maxCol; colOffset++) {
+    	for (int row = 0; row < maxRow; row++) {
+    		for(int col = 0; col < maxCol; col++) {
     			
-    			int currentX = colOffset;
-    			int currentY = rowOffset;
+    			int currentX = col * imgSize + offsetX - offset; // There's an extra off set here as it didn't feel too centered
+    			int currentY = row * imgSize + offsetY - offset;//
     			
-                if(currentX < 0 || currentX >= maxCol || currentY < 0 || currentY >= maxRow) {
-                	g.setColor(Color.BLACK);
-                    g.drawRect( (currentX *32), currentY*32, 32,32);
-                }else {
-                	
-                Tile t = game.getMaze().getTile(currentY, currentX);
-	                //draw a free tile
-	                g.setColor(Color.GREEN);
-	                g.drawRect((currentX *32), currentY*32, 32, 32);
-	                //look if the tile has an item
-	                if(t.hasItem()) {
-	                	cX = currentX *32;
-	                	cY = currentY*32;
-	                	drawItem(t.getItem());}
-                }
+    			Tile t = game.getMaze().getTile(row, col);
+                
+                drawTile(t, currentX, currentY);
+                //draw a free tile
+                
+                //look if the tile has an item
+                if(t.hasItem()) {
+          
+                	drawItem(t.getItem(),currentX, currentY);}
+            
                 
     		}
     	
@@ -201,33 +205,57 @@ public class Renderer extends JPanel {
     	
     }
     
+    private void drawTile(Tile i, int x, int y) {
+    	
+    	if (i instanceof FreeTile || i instanceof KeyTile || i instanceof TreasureTile) {
+    		FreeTile.drawImg(g,x,y);
+    	}
+
+    	else if (i instanceof LockedDoorTile) {
+    		FreeTile.drawImg(g, x, y);
+    		LockedDoor.drawImg(g,x,y);
+    	}
+    	
+    	else if (i instanceof WallTile){
+    		Wall.drawImg(g,x,y);
+    	}
+    	
+    	else if (i instanceof ExitLockTile) {//I'm not sure what this one is
+    		g.setColor(Color.BLACK);
+    		g.fillRect(x, y, imgSize, imgSize);
+    	}
+    	
+    	else if (i instanceof InfoFieldTile) {//I'm not sure what this one is either
+    		g.setColor(Color.MAGENTA);
+    		g.drawRect(x, y, imgSize, imgSize);
+    	}
+    	
+    	
+    	
+    	
+    }
+    
     /**
      * draws the item set on the current Tile
      * 
      * @param Item in the current tile
      */
-    private void drawItem(Item i) {
+    private void drawItem(Item i, int x, int y) {
     	
     	//run a helper method to find what's on here and draw it}
     
         	if(i instanceof Key) {
         		//draw key
-        		g.setColor(Color.CYAN);
-        		g.drawRect(cX, cY, 32, 32);
+        		Blue_key.drawImg(g, x, y);
         		
         	}
         	
         	if(i instanceof Treasure) {
-        		g.setColor(Color.ORANGE);
-        		g.drawRect(cX, cY, 32, 32);
+	        	Treasure.drawImg(g, x, y);
         		
         	}
         	
-        	if(i instanceof LockedDoorTile) {
-        		g.setColor(Color.BLUE);
-        		g.drawRect(cX, cY, 32, 32);
-        		
-        	}
+
         	
         }
     

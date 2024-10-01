@@ -14,14 +14,17 @@ public class KeyTile extends Tile{
 	private boolean keyCollected = false;
 	
 	@JsonCreator
-	public KeyTile(Key key) {this.key = key;}
+	public KeyTile(Key key) {
+		if(key.equals(null)) {throw new IllegalArgumentException("Cannot initalise KeyTile with null key");}
+		this.key = key;
+		}
 
 	@Override
 	public boolean canMoveTo() {return true;}
 
 	@Override
 	public String tileType() {
-		return "Key Tile, contains a key of colour = " + key.colour() +  ". Key collected = " + keyCollected;
+		return "Key Tile, contains a " + key.description();
 	}
 
 	@Override
@@ -36,6 +39,7 @@ public class KeyTile extends Tile{
 		keyCollected = true;
 		}
 
-	@Override	public String initial() {return "K " ;}
+	@Override	
+	public String initial() {return "K " ;}
 	
 }

@@ -18,5 +18,5 @@ public class Key implements Item{
 	public String colour() {return this.colour;}
 
 	@Override
-	public String description() {return "Key, Colour = " + colour;}
+	public String description() {return colour + " Key";}
 }

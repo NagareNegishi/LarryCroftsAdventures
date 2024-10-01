@@ -12,7 +12,6 @@ import java.util.Optional;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel; // task 2
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -36,7 +35,7 @@ class App extends JFrame{
   private SidePanel sidePanel;
 
   private Timer gameTimer;
-  private int timeLeft = 10;//60; // 1 minute for level 1??
+  private int timeLeft = 60; // 1 minute for level 1??
   private int currentLevel = 1; // we initialize with level 1
   private int keysCollected = 0; //or List<Key> keysCollected or items??? but in that case i shouldnt involeve the process
   private int treasuresLeft = 10; // Example value
@@ -264,7 +263,7 @@ class App extends JFrame{
         yield true;}
       case GAMEOVER -> {
       /////////////////////////////////
-      timeLeft = 3;//60; // if we want to have different time for each level, we need to change this
+      timeLeft = 60; // if we want to have different time for each level, we need to change this
       // in that case, we need set time in setLevel
       //////////////////////////////////////
       checkModel(LoadFile.loadLevel("level" + currentLevel));
