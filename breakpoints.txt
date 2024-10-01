@@ -48,3 +48,8 @@ Recorder:
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.Recorder(Consumer<RecordingChanges>) 96
     - nz.ac.wgtn.swen225.lc.recorder.Recorder.Recorder(Consumer<RecordingChanges>) 98
 Fuzz:
+    - test.nz.ac.wgtn.swen225.lc.fuzz.Fuzz.Test1() 31
+    - test.nz.ac.wgtn.swen225.lc.fuzz.Fuzz.Test1() 33
+    - test.nz.ac.wgtn.swen225.lc.fuzz.Fuzz.Test1() 34
+    - test.nz.ac.wgtn.swen225.lc.fuzz.Fuzz.Test1() 35
+    - test.nz.ac.wgtn.swen225.lc.fuzz.Fuzz.Test1() 36
