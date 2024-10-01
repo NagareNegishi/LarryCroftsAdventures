@@ -1,4 +1,16 @@
 Domain:
+    - nz.ac.wgtn.swen225.lc.domain.GameStateController.GameStateController(Constructor) 27
+    - nz.ac.wgtn.swen225.lc.domain.GameStateController.moveChap 58
+    - nz.ac.wgtn.swen225.lc.domain.GameStateController.getChapPosition 59
+    - nz.ac.wgtn.swen225.lc.domain.GameStateController.getChapInventory 61
+    - nz.ac.wgtn.swen225.lc.domain.GameStateController.getTotalTreasures 64
+    - nz.ac.wgtn.swen225.lc.domain.GameStateController.isAllTreasuresCollected 66
+    - nz.ac.wgtn.swen225.lc.domain.GameStateController.getTreasuresCollected 65
+    - nz.ac.wgtn.swen225.lc.domain.GameStateController.getTileAtChapPosition 73
+    - nz.ac.wgtn.swen225.lc.domain.GameStateController.getMaze 68
+    - nz.ac.wgtn.swen225.lc.domain.GameStateController.getChap 69
+
+
 
 App:
 
