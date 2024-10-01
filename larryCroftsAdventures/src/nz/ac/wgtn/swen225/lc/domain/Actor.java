@@ -80,7 +80,6 @@ public class Actor {
 	// method for if Actor touches Chap (may just need to be moved to the move method, also add to Chap)
 	public void onTouch(Chap chap) {
 		if(this.row == chap.getRow() && this.col == chap.getCol()) {
-			// action for when Chap and Actor are touching (freezing Chap? end level?)
 			
 		}
 	}
