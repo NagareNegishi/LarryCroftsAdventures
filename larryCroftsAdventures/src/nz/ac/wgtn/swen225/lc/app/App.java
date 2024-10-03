@@ -198,6 +198,13 @@ class App extends JFrame{
     setFocusable(true);//could be remove??
   }
 
+  private void disposeController() {
+    if (controller != null) {
+        removeKeyListener(controller);
+        controller = null;
+    }
+    setFocusable(false); // Assuming we want to reverse the setFocusable(true)
+}
   //1000ms = 1s
   private void initializeGameTimer() {
       gameTimer = new Timer(1000, e -> {
@@ -471,18 +478,31 @@ class App extends JFrame{
   void setLevel(GameStateController level){
 /////////////////////////////////delete this part
     System.out.println("setLevel is called");
+    System.out.println("but what is this?");
+    System.out.println(level.chapSurroundings());
+    System.out.println(level.mazeSize());
 ////////////////////////////////////////////
 
     model = level;
     model.setAppNotifier(notifier);
 
     GameState gamestate = model.getGameState();
-    controller = new Controller(model, actionBindings);
+    //controller = new Controller(model, actionBindings);
+    disposeController();
+    initializeController();
 
 /////////////////////////////////delete this part
     Maze m = model.getMaze();
     System.out.println("this is the maze I just loaded");
     m.printMaze();
+    System.out.println("this is from gamestate controller");
+    System.out.println(model.chapSurroundings());
+    System.out.println(model.getChapPosition());
+    
+    System.out.println("this is from gamestate");
+    System.out.println(gamestate.chapSurroundings());
+    System.out.println(gamestate.chapPosition());
+    
     
 ////////////////////////////////////////////
     /**
@@ -517,7 +537,7 @@ class App extends JFrame{
 
       if (state == AppState.PLAY) {
         //need some sort of update method here for domain and recorder for level 2!!!!!!!!!!!!!!!!!
-        System.out.println(gamestate.chapPosition());
+        //System.out.println(gamestate.chapPosition());
         /**
          * its not pretty solution, but i can take keys/ treasure info from the model and update the gameInfoPanel here
          */
