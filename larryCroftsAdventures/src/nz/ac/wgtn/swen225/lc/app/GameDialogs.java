@@ -43,7 +43,7 @@ public enum GameDialogs {
      * Only this class can call this method.
      * @param parent the parent JFrame
      */
-    private void InitializeDialog(JFrame parent) {
+    private void initializeDialog(JFrame parent) {
         dialog = new PauseDialog(parent, message, textColor, backgroundColor, opacity);
     }
 
@@ -51,8 +51,8 @@ public enum GameDialogs {
      * Initialize all dialogs with the given parent.
      * @param parent the parent JFrame
      */
-    public static void InitializeDialogs(JFrame parent) {
-        Stream.of(GameDialogs.values()).forEach(dialog -> dialog.InitializeDialog(parent));
+    public static void initializeDialogs(JFrame parent) {
+        Stream.of(GameDialogs.values()).forEach(type -> type.initializeDialog(parent));
     }
 
     /**
@@ -75,6 +75,6 @@ public enum GameDialogs {
      * Hide all dialogs.
      */
     public static void hideAll() {
-        Stream.of(GameDialogs.values()).forEach(dialog -> dialog.hide());
+        Stream.of(GameDialogs.values()).forEach(type -> type.hide());
         }
 }
