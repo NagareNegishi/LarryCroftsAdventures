@@ -35,6 +35,7 @@ class App extends JFrame{
   private SidePanel sidePanel;
 
   private Timer gameTimer;
+  private static final int MAX_TIME = 60; // 1 minute for level 1??
   private int timeLeft = 3;//60; // 1 minute for level 1??
   private int currentLevel = 1; // we initialize with level 1
   private int keysCollected = 0; //or List<Key> keysCollected or items??? but in that case i shouldnt involeve the process
@@ -131,12 +132,16 @@ class App extends JFrame{
         sidePanel.setPauseButtonText("Pause");
       }
       case "save" -> saveGame();
-      case "load" -> loadFile(Paths.levelsDir);
       /**
        *  Currently never called. I would like different buttons for levels and saves
        *  but if we cannot, we could just use the single levels folder - AdamT
+       * 
+       * -> I believe loading from saved game is only requirement. need to be confirmed
        */
-      case "loadSave" -> loadFile(Paths.savesDir); 
+      case "load" -> {
+        checkModel(loadFile(Paths.savesDir));
+        gameRun();
+      }
       case "help" -> showHelp(MenuPanel.HELP);
       case "exit" -> exitGameWithoutSaving();
       case "toggle" -> sidePanel.togglePanel();
@@ -174,12 +179,14 @@ class App extends JFrame{
     actionBindings.put("exitAndSave", this::exitGameAndSave);
     actionBindings.put("resumeSavedGame", this::loadGame);
     actionBindings.put("startNewGame1", () -> {
+      //resetGame();
       currentLevel = 1;
       checkModel(LoadFile.loadLevel(Paths.level1));
       GameDialogs.hideAll();
       gameRun();
     });
     actionBindings.put("startNewGame2", () -> {
+      //resetGame();
       currentLevel = 2;
       checkModel(LoadFile.loadLevel("level2"));
       GameDialogs.hideAll(); 
@@ -252,6 +259,16 @@ class App extends JFrame{
         gameInfoPanel.setTreasures(treasuresLeft);
       }
     };
+  }
+
+  private void resetGame(){
+    state = AppState.PAUSED;
+    controller.pause(true);
+    // renderer.setFocusable(false); i probably want it
+    gameTimer.stop();
+    timeLeft = MAX_TIME;
+    keysCollected = 0;
+    treasuresLeft = model.getTotalTreasures();
   }
 
   private void pauseGame() {
@@ -476,6 +493,7 @@ class App extends JFrame{
   }
 
   void setLevel(GameStateController level){
+    resetGame();
 /////////////////////////////////delete this part
     System.out.println("setLevel is called");
     System.out.println("but what is this?");
@@ -487,9 +505,9 @@ class App extends JFrame{
     model.setAppNotifier(notifier);
 
     GameState gamestate = model.getGameState();
-    //controller = new Controller(model, actionBindings);
-    disposeController();
-    initializeController();
+    controller = new Controller(model, actionBindings);
+    //disposeController();
+    //initializeController();
 
 /////////////////////////////////delete this part
     Maze m = model.getMaze();
