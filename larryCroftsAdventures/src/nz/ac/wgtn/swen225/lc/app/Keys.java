@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -21,8 +22,14 @@ import javax.swing.SwingUtilities;
  */
 class Keys implements KeyListener {
     private final Map<KeyStroke,Runnable> actionsPressed= new HashMap<>();// need to check Ctrl(modifiers) key
-    private final Map<KeyStroke,Runnable> actionsReleased= new HashMap<>();// so keyevent is not enough
-
+    //private final Map<KeyStroke,Runnable> actionsReleased= new HashMap<>();// so keyevent is not enough
+    private boolean paused = false;
+    private final Set<KeyStroke> directionKeys = Set.of(
+        KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0),
+        KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0),
+        KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0),
+        KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0)
+    );
 
 
     /**
@@ -32,10 +39,10 @@ class Keys implements KeyListener {
      * @param onPressed action to be performed when the key is pressed
      * @param onReleased action to be performed when the key is released
      */
-    public void setAction(int keyCode, int modifiers, Runnable onPressed, Runnable onReleased){
+    public void setAction(int keyCode, int modifiers, Runnable onPressed){//, Runnable onReleased){
         KeyStroke keyStroke = KeyStroke.getKeyStroke(keyCode, modifiers);
         actionsPressed.put(keyStroke, onPressed);
-        actionsReleased.put(keyStroke, onReleased);
+        //actionsReleased.put(keyStroke, onReleased);
     }
 
     @Override
@@ -45,13 +52,23 @@ class Keys implements KeyListener {
     public void keyPressed(KeyEvent e){
         assert SwingUtilities.isEventDispatchThread(); // thread safety check
         KeyStroke keyStroke = KeyStroke.getKeyStrokeForEvent(e);
-        actionsPressed.getOrDefault(keyStroke, ()->{}).run();
+        //actionsPressed.getOrDefault(keyStroke, ()->{}).run();
+        if (!paused || !directionKeys.contains(keyStroke)) {
+            actionsPressed.getOrDefault(keyStroke, () -> {}).run();
+        }
     }
     
     @Override
     public void keyReleased(KeyEvent e){
-        assert SwingUtilities.isEventDispatchThread();
+       /** assert SwingUtilities.isEventDispatchThread();
         KeyStroke keyStroke = KeyStroke.getKeyStrokeForEvent(e);
-        actionsReleased.getOrDefault(keyStroke, ()->{}).run();
+        actionsReleased.getOrDefault(keyStroke, ()->{}).run();*/
+    }
+
+    /**
+     * Pause the key listener
+     */
+    public void pause(boolean pause){
+        paused = pause;
     }
 }

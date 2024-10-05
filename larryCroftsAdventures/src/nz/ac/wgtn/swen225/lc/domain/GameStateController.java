@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
 // Entry point for other modules to access 
@@ -74,4 +75,39 @@ public class GameStateController implements GameStateControllerInterface {
 	public GameState getGameState() {
 		return gameState;
 	}
+
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////attempt to inject AppNotifer into GameStateController/////////////
+////////////////// maybe what need though method is GameState, not GameStateController??//////////
+public AppNotifier appNotifier;
+// this should go but for the test, I need it
+public void setAppNotifier(AppNotifier appNotifier) {
+	this.appNotifier = appNotifier;
+}
+
+public void Win(){
+	assert appNotifier != null: "AppNotifier is null";
+	appNotifier.onGameWin();
+}
+
+public void Lose(){
+	assert appNotifier != null: "AppNotifier is null";
+	appNotifier.onGameLose();
+	System.out.println("Game Over is called in GameStateController");
+}
+
+public void KeyPickup(int keyCount){
+	assert appNotifier != null: "AppNotifier is null";
+	appNotifier.onKeyPickup(keyCount);
+}
+
+public void TreasurePickup(int treasureCount){
+	assert appNotifier != null: "AppNotifier is null";
+	appNotifier.onTreasurePickup(treasureCount);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+
+
 }

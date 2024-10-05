@@ -80,6 +80,19 @@ public class GameState implements GameStateInterface {
 	// Added by Adam
 	public int getTime() {return timeLeft;}
 	public void setTime(int time) {this.timeLeft = time;}
+
+	///////////////////////////////////////////////////////
+	// if we want to store the time at the save/load we probably need it for level too
+	// remove if it not needed
+	public int currentLevel;
+	public int getCurrentLevel() {
+		return currentLevel;
+	}
+	public void setCurrentLevel(int currentLevel) {
+		this.currentLevel = currentLevel;
+	}
+	///////////////////////////////////////////////////////////////
+
 	
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
@@ -178,6 +191,9 @@ public class GameState implements GameStateInterface {
 	public Maze getMaze() {
 		return maze;
 	}
+
+
+
 }
 
 
