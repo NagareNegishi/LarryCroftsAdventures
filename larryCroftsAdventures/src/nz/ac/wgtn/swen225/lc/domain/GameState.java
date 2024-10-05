@@ -1,6 +1,7 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -26,7 +27,8 @@ public class GameState implements GameStateInterface {
 	// seconds left for level
 	@JsonProperty
 	private int timeLeft;
-	
+	// List for enemies in the level
+	List<Actor> enemies;
 	
 	public GameState(Maze maze, Chap chap, int totalTreasures) {
 		
@@ -38,9 +40,10 @@ public class GameState implements GameStateInterface {
 		this.treasuresCollected = 0;
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = new HashMap<>();
+		this.timeLeft = 60; // 60 seconds by default
+
 		assert this.totalTreasures == totalTreasures;
 		assert keysCollected.isEmpty() == true;
-		this.timeLeft = 60; // 60 seconds by default
 	}
 	
 	
@@ -67,6 +70,9 @@ public class GameState implements GameStateInterface {
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = keysCollected;
 		this.timeLeft =timeLeft;
+
+		assert this.totalTreasures == totalTreasures;
+		assert keysCollected.isEmpty() == true;
 	}
 	
 	

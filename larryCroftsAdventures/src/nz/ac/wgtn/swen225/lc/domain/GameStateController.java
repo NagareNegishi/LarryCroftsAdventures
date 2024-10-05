@@ -20,11 +20,11 @@ public class GameStateController implements GameStateControllerInterface {
 	private GameState gameState;
 	@JsonProperty
 	private Chap chap;
-	
+
 	// change constructor to avoid double use of maze
 	
 	// most likely need to change mazeRows and mazeCols for the shape of the maze choose 
-	public GameStateController(int mazeRows, int mazeCols, int startRow, int startCol, int totalTreasures) {
+	/*public GameStateController(int mazeRows, int mazeCols, int startRow, int startCol, int totalTreasures) {
 		if(mazeRows < 0 || mazeCols < 0 || startRow < 0 || startCol < 0 || totalTreasures < 0) {
 			throw new IllegalArgumentException("Maze must have parameters above 0 to create properly");}
 		if(startRow > mazeRows || startCol > mazeCols) {
@@ -49,6 +49,9 @@ public class GameStateController implements GameStateControllerInterface {
 	public GameStateController(@JsonProperty("maze") Maze maze,
 							@JsonProperty("chap") Chap chap,
 							@JsonProperty("gameState") GameState gameState) {
+		if(maze.equals(null) || chap.equals(null) || gameState.equals(null)) {
+			throw new IllegalArgumentException("Can't create new GameStateController with null parameters");}
+		
 		this.maze = maze;
 		this.chap = chap;
 		this.gameState = gameState;
