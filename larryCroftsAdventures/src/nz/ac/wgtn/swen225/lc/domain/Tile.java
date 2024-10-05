@@ -5,6 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+/**
+ * Super class that all tiles in the game will extend from.
+ * @author fergusbenj1 300656321
+ */
+
 // Annotations for serialization
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
@@ -16,19 +21,17 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-//super class of Tile that all tiles will extend
+
 public abstract class Tile {
 	
 	
 	public abstract boolean canMoveTo();
 
-	// return type could be String or Tile, leaving as string for debugging purposes for now
 	@JsonIgnore
 	public abstract String tileType();
 
 	public abstract boolean hasItem();
 	
-	// both these methods could be abstract, leaving as default methods for now as only treasure and key tiles need to use
 	public Item getItem() {return null;}
 	
 	public  void removeItem() {}
@@ -36,5 +39,3 @@ public abstract class Tile {
 	// purely to help print maze
 	public abstract String initial();
 }
-	// method/methods to return x and y coords of a specific tile?
-

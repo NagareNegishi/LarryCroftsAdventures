@@ -11,8 +11,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
+/**
+ * GameState class represents the state the game is currently in. This includes the current maze, Chap,
+ * number of treasures collected, total treasures, keys, time left, enemies etc.
+ * 
+ * @author fergusbenj1 300656321
+ */
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GameState implements GameStateInterface {
+public class GameState{
 	
 	@JsonProperty
 	private Maze maze;
@@ -30,10 +37,12 @@ public class GameState implements GameStateInterface {
 	private int timeLeft;
 	// List for enemies in the level
 	List<Actor> enemies;
+	// AppNotifier
+	public AppNotifier appNotifier;
 	
 	public GameState(Maze maze, Chap chap, int totalTreasures) {
 		
-		if(maze.equals(null) || chap.equals(null)) {throw new IllegalArgumentException("Chap or Maze is null");}
+		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
 		
 		this.maze = maze;
@@ -64,17 +73,20 @@ public class GameState implements GameStateInterface {
 					@JsonProperty("timeLeft") int timeLeft,
 					AppNotifier appNotifier){
 		
-		if(maze.equals(null) || chap.equals(null)) {throw new IllegalArgumentException("Chap or Maze is null");}
-		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
+		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
+		if(totalTreasures < 0 || timeLeft < 0) {throw new IllegalArgumentException("Total treasures and time left must be greater than 0");}
+		if(keysCollected == null) {throw new IllegalArgumentException("KeysCollected list is null");}
+		
 		this.maze = maze;
 		this.chap = chap;
 		this.treasuresCollected = 0;
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = keysCollected;
 		this.timeLeft =timeLeft;
+		this.appNotifier = appNotifier;
 
 		assert this.totalTreasures == totalTreasures;
-		assert keysCollected.isEmpty() == true;
+		assert this.timeLeft == timeLeft;
 	}
 	
 	
@@ -84,7 +96,6 @@ public class GameState implements GameStateInterface {
 	public boolean allTreasureCollected() {return treasuresCollected == totalTreasures ? true : false;}
 	public Map<Key,String> keysCollected(){return keysCollected;}
 	
-	public String chapPosition(){return chap.getPosition();}
 	// Added by Adam
 	public int getTime() {return timeLeft;}
 	public void setTime(int time) {this.timeLeft = time;}
@@ -101,7 +112,6 @@ public class GameState implements GameStateInterface {
 	}
 	///////////////////////////////////////////////////////////////
 
-	
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
 		if(direction.equals(null)) {throw new IllegalArgumentException("Cannot move because direction is null");}
@@ -114,9 +124,7 @@ public class GameState implements GameStateInterface {
         case LockedDoorTile tile -> {
             if (checkForMatchingKey(tile.colour())) {
                 tile.unlock();
-				////////////////////////////
-				System.out.println("Chap has unlocked the door");
-				//////////////////////////
+				//System.out.println("Chap has unlocked the door");
                 maze.setTile(newRow, newCol, new FreeTile()); // Replace the locked door with a free tile
             } else {
                 return; // Stop Chap from moving if he doesn't have the right key
@@ -125,32 +133,23 @@ public class GameState implements GameStateInterface {
         case ExitLockTile tile -> {
             if (allTreasureCollected()) {
                 tile.unlock();
-				////////////////////////////////
-				System.out.println("Chap has unlocked the exit");
-				//////////////////////////////
+				//System.out.println("Chap has unlocked the exit");
             } else {
                 return; // Stop Chap from moving if there's still treasure to collect
             }
         }
         case InfoFieldTile tile -> {
-			/////////////////////////////
-			System.out.println("Chap has entered an info field");
-			///////////////////////////
-
+			//System.out.println("Chap has entered an info field");
             tile.displayText(); // Display information on the tile
         }
         case Exit tile ->{
-			/////////////////////////////
-			System.out.println("Chap has reached the exit");
-			///////////////////////////
-        	// Finish level and go to next level
+			//System.out.println("Chap has reached the exit");
 			Win();
         }
         case WaterTile tile ->{
         	Lose();
         }
         case TeleportTile tile ->{
-        	System.out.println("TELEPORT");
         	chap.moveTo(tile.partner().row(),tile.partner().col(), maze);
         }
         default -> {
@@ -158,7 +157,8 @@ public class GameState implements GameStateInterface {
         }
     }
 	    chap.move(direction, maze);
-	    // checks for an item everytime Chap moves to a tile
+	    // checks for an item and enemy everytime Chap moves to a tile
+	   // checkForEnemy();
 	    checkForItem();
 	}
 
@@ -176,6 +176,17 @@ public class GameState implements GameStateInterface {
             maze.setTile(chap.getRow(), chap.getCol() , new FreeTile());
         }
 	}
+	
+	/*public void checkForEnemy() {
+		int row = chap.getRow();
+		int col = chap.getCol();
+		
+		for(Actor a : enemies) {
+			if(a.getRow() == row && a.getCol() == col) {
+				Lose();
+			}
+		}
+	} */
 		
 	public boolean checkForMatchingKey(String doorColour) {
 		return chap.inventory().stream()
@@ -184,24 +195,9 @@ public class GameState implements GameStateInterface {
 							   .anyMatch(key -> key.colour().equals(doorColour));
 	}
 	
-	public String chapSurroundings() {
-		return "To Chap's left is a: " + maze.getTile(chap.getRow(), chap.getCol() - 1).tileType() + "\n"
-				+ "Above Chap is a " + maze.getTile(chap.getRow() -1, chap.getCol()).tileType() + "\n"
-				+ "To Chap's right is a " + maze.getTile(chap.getRow(), chap.getCol() + 1).tileType() + "\n"
-				+ "Below Chap is a " + maze.getTile(chap.getRow() + 1, chap.getCol()).tileType();
-	}
-
-
-
-	////////////////////nagi's code remove me later
-	public Chap getChap() {
-		return chap;
-	}
-	public Maze getMaze() {
-		return maze;
-	}
+	public Chap getChap() {return chap;}
+	public Maze getMaze() {return maze;}
 	
-	public AppNotifier appNotifier;
 	// this should go but for the test, I need it
 	public void setAppNotifier(AppNotifier appNotifier) {
 		this.appNotifier = appNotifier;

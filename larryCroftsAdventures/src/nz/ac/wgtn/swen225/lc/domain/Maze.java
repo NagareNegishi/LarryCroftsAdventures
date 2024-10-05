@@ -3,6 +3,13 @@ package nz.ac.wgtn.swen225.lc.domain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Maze class represents a 2D array of tiles used in the game for each Level, also holds information for each tile 
+ * in the array and includes method to access that information.
+ * 
+ * @author fergusbenj1 300656321 
+ */
+
 public class Maze {
 
 

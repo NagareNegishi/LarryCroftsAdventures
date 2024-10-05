@@ -1,5 +1,9 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
+/**
+ * @author fergusbenj1 300656321
+ */
+
 public class ExitLockTile extends Tile{
 	
 	//public static final String GREEN = "\u001B[32m";
