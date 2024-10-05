@@ -21,10 +21,10 @@ public class MazeBuilder {
 	/**
 	 * 11 * 11 sized space leaves space for 9 * 9 empty space
 	 */
+	
 	int chunk;
 	
 	Map<Coord, Tile> singleTiles; 
-	
 	List<Room> rooms = new ArrayList<>();
 	
 	
@@ -45,7 +45,7 @@ public class MazeBuilder {
 		Maze maze = new Maze(rows, cols);
 		
 		for(Room room : rooms) {
-			Maze.createRoom(maze, room.row(), room.col(),room.width(), room.height())_
+			Maze.createRoom(maze, room.row(), room.col(),room.width(), room.height());
 		}
 	}
 }
