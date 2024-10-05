@@ -81,6 +81,38 @@ public class Maze {
 		return maze;
 	}
 	
+	public static Maze createCustomMaze2() {
+		int rows = 7;
+		int cols = 7;
+		TeleportTile t1 = new TeleportTile();
+		TeleportTile t2 = new TeleportTile();
+		Maze maze = new Maze(rows, cols);
+		for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                if (row == 0 || row == rows -1 || col == 0 || col == cols -1) {
+                    maze.setTile(row, col, new WallTile());
+                } 
+                else if(row == 1 && col == 1) {
+                	maze.setTile(row,col, t1);
+                	t1.row(row);
+                	t1.col(col);
+                	}
+                else if(row == 1 && col == 5) {
+                	maze.setTile(row, col, t2);
+                	t2.row(row);
+                	t2.col(col);
+                	}
+                else {
+                    maze.setTile(row, col, new FreeTile());
+                }
+                
+            }
+        }
+		t1.setPartner(t2);
+		t2.setPartner(t1);
+		return maze;
+	}
+	
 	// helper method for creating a square maze with FreeTiles in the middle and WallTiles on the outside
 	public static Maze createBasicMaze(int rows, int cols) {
 		Maze maze = new Maze(rows, cols);
@@ -141,13 +173,8 @@ public class Maze {
 	    maze.setTile(13, 13, new TreasureTile());
 	    
 	    // Create final room to exit at the top of the maze
-	    
-	    // first layer with a LockedDoorTile needing a blue key
-	    maze.setTile(6, 7, new WallTile());
-	    maze.setTile(6, 8, new LockedDoorTile("Blue"));
-	    maze.setTile(6, 9, new WallTile());
-	 
-	    // second layer with a ExitLockTile
+	   
+	    // layer with a ExitLockTile
 	    maze.setTile(4, 7, new WallTile());
 	    maze.setTile(4, 8, new ExitLockTile());
 	    maze.setTile(4, 9, new WallTile());
