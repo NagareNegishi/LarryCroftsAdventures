@@ -8,23 +8,23 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
 // Entry point for other modules to access 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameStateController implements GameStateControllerInterface {
 
-	@JsonProperty
-	private Maze maze;
+
 	@JsonProperty
 	private GameState gameState;
-	@JsonProperty
+	@JsonIgnore
 	private Chap chap;
 
 	// change constructor to avoid double use of maze
 	
 	// most likely need to change mazeRows and mazeCols for the shape of the maze choose 
-	/*public GameStateController(int mazeRows, int mazeCols, int startRow, int startCol, int totalTreasures) {
+	public GameStateController(int mazeRows, int mazeCols, int startRow, int startCol, int totalTreasures) {
 		if(mazeRows < 0 || mazeCols < 0 || startRow < 0 || startCol < 0 || totalTreasures < 0) {
 			throw new IllegalArgumentException("Maze must have parameters above 0 to create properly");}
 		if(startRow > mazeRows || startCol > mazeCols) {
@@ -38,6 +38,11 @@ public class GameStateController implements GameStateControllerInterface {
         assert mazeRows == maze.getRows() && mazeCols == maze.getCols();
         assert startRow == chap.getRow() && startCol == chap.getCol();
         }
+
+	@JsonIgnore
+	private Maze maze;
+
+
 	
 	/**
 	 * Constructor for Jackson de-serialization
@@ -54,22 +59,28 @@ public class GameStateController implements GameStateControllerInterface {
 		
 		this.maze = maze;
 		this.chap = chap;
+	}
+
+	public GameStateController(@JsonProperty("gameState") GameState gameState) {
+
 		this.gameState = gameState;
+		this.chap = gameState.getChap();
+		this.maze = gameState.getMaze();
 	}
 	
 	
 	public void moveChap(Direction direction) {gameState.moveChap(direction);}
-	public String getChapPosition() {return chap.getPosition();}
+	public String getChapPosition() {return gameState.getChap().getPosition();}
 	@JsonIgnore
-	public List<Item> getChapInventory(){return chap.inventory();}
-	public void getChapInventoryDesc(){ chap.inventoryDescription();}
+	public List<Item> getChapInventory(){return gameState.getChap().inventory();}
+	public void getChapInventoryDesc(){ gameState.getChap().inventoryDescription();}
 	public Map<Key,String> getKeysCollected(){return gameState.keysCollected();}
 	public int getTotalTreasures() {return gameState.totalTreasures();}
 	public int getTreasuresCollected() {return gameState.getTreasuresCollected();}
 	public boolean isAllTreasureCollected() {return gameState.allTreasureCollected();}
 	 
-	public Maze getMaze() {return maze;}
-	public Chap getChap() {return chap;}
+	public Maze getMaze() {return gameState.getMaze();}
+	public Chap getChap() {return gameState.getChap();}
 	// Added by Adam
 	public int getTime() {return gameState.getTime();}
 	public void setTime(int time) {gameState.setTime(time);}
@@ -95,4 +106,39 @@ public class GameStateController implements GameStateControllerInterface {
 	public GameState getGameState() {
 		return gameState;
 	}
+
+//////////////////////////////////////////////////////////////////////////////////
+//////////////////attempt to inject AppNotifer into GameStateController/////////////
+////////////////// maybe what need though method is GameState, not GameStateController??//////////
+public AppNotifier appNotifier;
+// this should go but for the test, I need it
+public void setAppNotifier(AppNotifier appNotifier) {
+	this.appNotifier = appNotifier;
+}
+
+public void Win(){
+	assert appNotifier != null: "AppNotifier is null";
+	appNotifier.onGameWin();
+}
+
+public void Lose(){
+	assert appNotifier != null: "AppNotifier is null";
+	appNotifier.onGameLose();
+	System.out.println("Game Over is called in GameStateController");
+}
+
+public void KeyPickup(int keyCount){
+	assert appNotifier != null: "AppNotifier is null";
+	appNotifier.onKeyPickup(keyCount);
+}
+
+public void TreasurePickup(int treasureCount){
+	assert appNotifier != null: "AppNotifier is null";
+	appNotifier.onTreasurePickup(treasureCount);
+}
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+
+
 }

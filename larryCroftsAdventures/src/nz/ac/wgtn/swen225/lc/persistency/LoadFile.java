@@ -18,7 +18,7 @@ public class LoadFile implements Loader {
 		assert !levelName.isEmpty();
 		final String pathPrefix = "levels/";
 		String path = pathPrefix + levelName;
-		return loadObj(path, GameStateController.class);
+		return loadObj(new File(Paths.levelsDir, levelName + ".json") , GameStateController.class);
 	}
 
 	public static Optional<GameStateController> loadSave(String saveName){
@@ -53,9 +53,9 @@ public class LoadFile implements Loader {
      * @param file : .json file containing serialised GameStateControllerInterface
      * @return de-serialsed GameStateControllerInterface
      */
-    public static Optional<GameStateControllerInterface> loadLevel(File file) {
+    public static Optional<GameStateController> loadLevel(File file) {
 		assert file != null;
-		return loadObj(file, GameStateControllerInterface.class);
+		return loadObj(file, GameStateController.class);
 	}
     
     /**
@@ -80,8 +80,10 @@ public class LoadFile implements Loader {
     	try {
     		ObjectMapper mapper = new ObjectMapper();
         	T loadedObject = mapper.readValue(file, classType);
+        	return Optional.of(loadedObject);
     	} catch (IOException e) {
     		e.printStackTrace();
+    		System.out.println("IoException in loadObj");
     	}
     	return Optional.empty();
     }
