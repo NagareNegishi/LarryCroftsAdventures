@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -60,7 +61,8 @@ public class GameState implements GameStateInterface {
 					@JsonProperty("chap") Chap chap,
 					@JsonProperty("totalTreasures") int totalTreasures,
 					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
-					@JsonProperty("timeLeft") int timeLeft){
+					@JsonProperty("timeLeft") int timeLeft,
+					AppNotifier appNotifier){
 		
 		if(maze.equals(null) || chap.equals(null)) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
@@ -142,9 +144,10 @@ public class GameState implements GameStateInterface {
 			System.out.println("Chap has reached the exit");
 			///////////////////////////
         	// Finish level and go to next level
+			Win();
         }
         case WaterTile tile ->{
-        	// end game;
+        	Lose();
         }
         case TeleportTile tile ->{
         	System.out.println("TELEPORT");
@@ -197,9 +200,33 @@ public class GameState implements GameStateInterface {
 	public Maze getMaze() {
 		return maze;
 	}
+	
+	public AppNotifier appNotifier;
+	// this should go but for the test, I need it
+	public void setAppNotifier(AppNotifier appNotifier) {
+		this.appNotifier = appNotifier;
+	}
 
+	public void Win(){
+		assert appNotifier != null: "AppNotifier is null";
+		appNotifier.onGameWin();
+	}
 
+	public void Lose(){
+		assert appNotifier != null: "AppNotifier is null";
+		appNotifier.onGameLose();
+		System.out.println("Game Over is called in GameStateController");
+	}
 
+	public void KeyPickup(int keyCount){
+		assert appNotifier != null: "AppNotifier is null";
+		appNotifier.onKeyPickup(keyCount);
+	}
+
+	public void TreasurePickup(int treasureCount){
+		assert appNotifier != null: "AppNotifier is null";
+		appNotifier.onTreasurePickup(treasureCount);
+	}
 }
 
 
