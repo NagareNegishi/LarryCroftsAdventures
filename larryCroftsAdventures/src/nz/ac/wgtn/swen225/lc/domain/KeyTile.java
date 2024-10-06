@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * 
+ *@author fergusbenj1 300656321 
+ */
+
 public class KeyTile extends Tile{
 	
 	 //public static final String RESET = "\u001B[0m"; 
