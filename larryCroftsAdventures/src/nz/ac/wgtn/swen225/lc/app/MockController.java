@@ -18,8 +18,6 @@ public class MockController extends Controller{
 
 	public Chap chap;
 	public Maze maze;
-	public MockController(Chap chap, Maze maze) {
-		super(chap,maze,createMockActionBindings());
 		this.chap = chap;
 		this.maze = maze;
 	}

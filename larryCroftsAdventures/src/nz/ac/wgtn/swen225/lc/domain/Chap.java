@@ -34,9 +34,12 @@ public class Chap {
 	public Chap(@JsonProperty("startRow") int startRow,
 				@JsonProperty("startCol") int startCol,
 				@JsonProperty("inventory") ArrayList<Item> inventory) {
+		if(startRow < 0 || startCol < 0) {throw new IllegalArgumentException("Chap must be in bounds of the maze");}
 		this.row = startRow;
 		this.col = startCol;
 		this.inventory = inventory;
+		assert this.row == startRow && this.col == startCol;
+		assert this.inventory.size() == 0;
 	}
 	
 	public int getRow() {return row;}
