@@ -1,8 +1,11 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
-import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
+/**
+ * Water Tile that will end game and restart level if Chap touches it,
+ * 
+ *@author fergusbenj1 300656321 
+ */
 
-// Tile for level 2....
 public class WaterTile extends Tile{
 	
 	public WaterTile() {}

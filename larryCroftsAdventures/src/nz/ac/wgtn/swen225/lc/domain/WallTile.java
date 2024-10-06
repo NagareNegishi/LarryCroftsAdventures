@@ -1,5 +1,9 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
+/**
+ *@author fergusbenj1 300656321 
+ */
+
 public class WallTile extends Tile{
 	
 	//public static final String RED = "\u001B[31m";
