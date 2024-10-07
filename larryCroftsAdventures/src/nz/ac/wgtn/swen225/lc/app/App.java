@@ -466,14 +466,15 @@ class App extends JFrame{
       assert SwingUtilities.isEventDispatchThread();
 
       if (state == AppState.PLAY) {
-        //need some sort of update method here for domain and recorder for level 2!!!!!!!!!!!!!!!!!
-        //System.out.println(gamestate.chapPosition());
+        model.moveActor();
+        recorder.ping();
+
         /**
          * its not pretty solution, but i can take keys/ treasure info from the model and update the gameInfoPanel here
          */
         updateGameInfo(model); // this need to be gone
         //renderer.updateCanvas();
-        renderer.repaint();
+        renderer.updateCanvas();
       }
     });
     closePhase.run();//close phase before adding any element of the new phase
