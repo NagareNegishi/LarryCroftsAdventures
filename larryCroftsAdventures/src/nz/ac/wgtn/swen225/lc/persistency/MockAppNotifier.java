@@ -7,7 +7,8 @@ import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 public class MockAppNotifier implements AppNotifier{
 
 	@JsonProperty
-	private Runnable win = () -> System.out.println("You win!");
+	private SerialRunnable win = () -> System.out.println("You win!");
+	
 	
 	@JsonCreator
 	public MockAppNotifier() {}

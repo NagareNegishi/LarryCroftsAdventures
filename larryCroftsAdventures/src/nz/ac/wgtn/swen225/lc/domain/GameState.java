@@ -8,9 +8,12 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
+import nz.ac.wgtn.swen225.lc.persistency.MockAppNotifier;
 
 /**
  * GameState class represents the state the game is currently in. This includes the current maze, Chap,
@@ -40,6 +43,9 @@ public class GameState{
 	@JsonProperty
 	ArrayList<Actor> enemies;
 	// AppNotifier
+	@JsonProperty
+	@JsonSerialize(as = MockAppNotifier.class)
+	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
 	
 	public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
