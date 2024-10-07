@@ -91,7 +91,7 @@ public class GameState{
 		this.keysCollected = keysCollected;
 		this.timeLeft =timeLeft;
 		this.appNotifier = appNotifier;
-		this.enemies = enemies;
+		this.enemies = (ArrayList<Actor>) enemies;
 		assert this.totalTreasures == totalTreasures;
 		assert this.timeLeft == timeLeft;
 	}
