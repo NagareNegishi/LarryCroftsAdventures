@@ -11,6 +11,10 @@ import javax.swing.event.ChangeListener;
 
 /**
  * Factory class for creating Swing components with common settings.
+ * It has 3 static methods to create JButton, JToggleButton, and JSlider.
+ *
+ * @author Nagare Negishi
+ * @studentID 300653779
  */
 public class ComponentFactory {
 
@@ -64,9 +68,9 @@ public class ComponentFactory {
     public static JSlider createSlider(int min, int max, int value, Consumer<Integer> sliderConsumer) {
         JSlider slider = new JSlider(JSlider.HORIZONTAL, min, max, value);
         slider.setFocusable(false);
-        /**
-         * this can be lambda expression, but lets prioritize readability for now
-         */
+        
+        //this can be lambda expression, but prioritizing readability
+        //as lambda expression it will be: slider.addChangeListener(e -> sliderConsumer.accept(slider.getValue()));
         ChangeListener changeListener = new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {

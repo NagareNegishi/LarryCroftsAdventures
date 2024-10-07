@@ -28,6 +28,10 @@ import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
 /**
  * Main class for the game application.
+ * Using JFrame to create the game window.
+ *
+ * @author Nagare Negishi
+ * @studentID 300653779
  */
 class App extends JFrame{
   private static final long serialVersionUID= 1L;
@@ -51,7 +55,7 @@ class App extends JFrame{
   //private JPanel renderer;
   private Renderer renderer;
   private Recorder recorder;
-  public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY, BETWEEN, RECORDING}
+  public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY}
   private AppState state = AppState.NEWGAME;
 
   private static int width = 800;
@@ -277,8 +281,8 @@ class App extends JFrame{
       case VICTORY -> {
         currentLevel = 1; // reset level to 1
         checkModel(LoadFile.loadLevel(Paths.level1));
-        yield true; }
-      case RECORDING, BETWEEN -> false; // need to think about this
+        yield true;
+      }
     };
     if(!unpause) return;
     gameRun();
@@ -361,8 +365,6 @@ class App extends JFrame{
     System.err.println("this is Optional.empty() from load file");
     return Optional.empty();
   }
-  
-  
 
   /**
    * currently simply Calling LoadFile()
@@ -467,7 +469,7 @@ class App extends JFrame{
 
       if (state == AppState.PLAY) {
         model.moveActor();
-        recorder.ping();
+        //recorder.ping();
 
         /**
          * its not pretty solution, but i can take keys/ treasure info from the model and update the gameInfoPanel here

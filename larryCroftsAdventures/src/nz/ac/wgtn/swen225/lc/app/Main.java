@@ -4,10 +4,12 @@ import javax.swing.SwingUtilities;
 
 /**
  * Main class to start the game
- * 
  * This class is the entry point for the game. It creates a new instance of the App class.
- * 
+ *
  * @see App
+ *
+ * @author Nagare Negishi
+ * @studentID 300653779
  */
 public class Main {
 	/**

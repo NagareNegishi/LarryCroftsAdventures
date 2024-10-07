@@ -10,12 +10,15 @@ import javax.swing.JFrame;
  * PauseDialog can not be enum singleton because it needs to extend JDialog.
  * This class must call InitializeDialogs(JFrame parent) to initialize all dialogs.
  * (This class showcases the use of enum singleton pattern and Stream.)
+ *
+ * @author Nagare Negishi
+ * @studentID 300653779
  */
 public enum GameDialogs {
     PAUSE("Game is paused", Color.BLACK, new Color(150, 150, 0), 0.75),
-    START("Press Escape to start", Color.BLUE, Color.YELLOW, 0.75),
-    GAMEOVER("Game Over 'Esc' to retry", Color.RED, Color.BLACK, 0.75),
-    VICTORY("Victory 'Esc' to play again", Color.GREEN, Color.ORANGE, 0.75);
+    START("<html>New Game<br>Press Escape to start</html>", Color.BLUE, Color.YELLOW, 0.75),
+    GAMEOVER("<html>Game Over<br>'Esc' to retry</html>", Color.RED, Color.BLACK, 0.75),
+    VICTORY("<html>Victory<br>'Esc' to play again</html>", Color.GREEN, Color.ORANGE, 0.75);
 
     PauseDialog dialog;
     String message;

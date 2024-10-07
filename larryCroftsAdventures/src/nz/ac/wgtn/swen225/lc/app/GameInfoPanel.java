@@ -11,6 +11,9 @@ import javax.swing.JPanel;
 
 /**
  * A panel that displays the game information, including the time, level, keys, and treasures.
+ *
+ * @author Nagare Negishi
+ * @studentID 300653779
  */
 public class GameInfoPanel extends JPanel {
     private JLabel timeTextLabel;
@@ -102,7 +105,4 @@ public class GameInfoPanel extends JPanel {
         };
         timeLabel.setForeground(color);
     }
-
-
-
 }
