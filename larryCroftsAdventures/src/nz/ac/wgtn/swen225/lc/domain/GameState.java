@@ -87,7 +87,6 @@ public class GameState{
 		this.timeLeft =timeLeft;
 		this.appNotifier = appNotifier;
 		this.enemies = enemies;
-
 		assert this.totalTreasures == totalTreasures;
 		assert this.timeLeft == timeLeft;
 	}
