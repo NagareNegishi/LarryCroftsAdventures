@@ -68,7 +68,7 @@ public class GameStateController{
 	public void setTime(int time) {gameState.setTime(time);}
 
 	public Tile getTileAtChapPosition() { return maze.getTile(chap.getRow(), chap.getCol());}	 
-
+	public GameState getGameState() {return gameState;}
 	/*
 	// debugging method for returning the tiles around Chap REMOVE
 	public String chapSurroundings() {
