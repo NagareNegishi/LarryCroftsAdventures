@@ -141,7 +141,7 @@ class App extends JFrame{
       case "exit" -> exitGameWithoutSaving();
       case "toggle" -> {
         sidePanel.togglePanel();
-        pauseGame();
+        stopGame();
       }
     }
     assert false: "Unknown action command: " + actionCommand;
@@ -223,8 +223,7 @@ class App extends JFrame{
   private AppNotifier getAppNotifier(){
     return new AppNotifier(){
       public void onGameWin(){
-        state = AppState.BETWEEN;
-        gameTimer.stop();
+        stopGame();
         loadNextLevel();
       }
       public void onGameLose(){
@@ -243,13 +242,13 @@ class App extends JFrame{
   }
 
   private void stopGame(){
+    state = AppState.PAUSED;
     controller.pause(true);
     // renderer.setFocusable(false); i probably want it
     gameTimer.stop();
   }
 
   private void resetGame(){
-    state = AppState.PAUSED;
     stopGame();
     timeLeft = MAX_TIME;
     keysCollectednum = 0;
@@ -258,7 +257,6 @@ class App extends JFrame{
 
   private void pauseGame() {
     if (state != AppState.PLAY) return;
-    state = AppState.PAUSED;
     stopGame();
     GameDialogs.PAUSE.show();
   }
