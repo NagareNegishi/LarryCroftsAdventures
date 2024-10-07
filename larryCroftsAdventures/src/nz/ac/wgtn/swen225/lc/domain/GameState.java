@@ -36,6 +36,7 @@ public class GameState{
 	@JsonProperty
 	private int timeLeft;
 	// List for enemies in the level
+	@JsonProperty
 	List<Actor> enemies;
 	// AppNotifier
 	public AppNotifier appNotifier;
@@ -71,7 +72,8 @@ public class GameState{
 					@JsonProperty("totalTreasures") int totalTreasures,
 					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
 					@JsonProperty("timeLeft") int timeLeft,
-					AppNotifier appNotifier){
+					@JsonProperty("appNotifier") AppNotifier appNotifier,
+					@JsonProperty("enemies")List<Actor> enemies) {
 		
 		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0 || timeLeft < 0) {throw new IllegalArgumentException("Total treasures and time left must be greater than 0");}
@@ -84,7 +86,7 @@ public class GameState{
 		this.keysCollected = keysCollected;
 		this.timeLeft =timeLeft;
 		this.appNotifier = appNotifier;
-
+		this.enemies = enemies;
 		assert this.totalTreasures == totalTreasures;
 		assert this.timeLeft == timeLeft;
 	}

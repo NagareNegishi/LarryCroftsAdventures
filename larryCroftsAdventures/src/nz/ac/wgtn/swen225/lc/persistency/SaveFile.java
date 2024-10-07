@@ -14,7 +14,7 @@ import java.io.IOException;
 // TODO
 public class SaveFile implements Saver{
 
-    public static boolean saveGame(String fileName, GameStateControllerInterface gameControl){
+    public static boolean saveGame(String fileName, GameStateController gameControl){
 
         assert gameControl != null;
         assert fileName != null && !fileName.isEmpty();
