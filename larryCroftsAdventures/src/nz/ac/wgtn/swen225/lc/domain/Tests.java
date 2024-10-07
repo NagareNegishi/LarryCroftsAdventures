@@ -7,7 +7,9 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
+
 
 /**
  * @author fergusbenj1 300656321
@@ -145,7 +147,16 @@ public class Tests {
 		public void testChapPicksUpTreasure() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1, new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			testController.getMaze().setTile(2, 3, new TreasureTile());
 			testController.moveChap(Direction.Right);
@@ -157,7 +168,16 @@ public class Tests {
 		public void testTreasureTileTurnsIntoFreeTile() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1, new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			testController.getMaze().setTile(2, 3, new TreasureTile());
 			testController.moveChap(Direction.Right);
@@ -169,7 +189,16 @@ public class Tests {
 		public void testAllTreasuresCollected() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1,new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			testController.getMaze().setTile(2, 3, new TreasureTile());
 			testController.moveChap(Direction.Right);
@@ -181,7 +210,16 @@ public class Tests {
 		public void testChapCanPickUpKey() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1,new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			testController.getMaze().setTile(2, 3, new KeyTile(new Key("Blue")));
 			assert maze.getTile(2,3) instanceof KeyTile;
@@ -196,7 +234,16 @@ public class Tests {
 		public void testChapCanPickUpKeyAndTreasure() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1,new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			maze.setTile(2, 3, new KeyTile(new Key("Blue")));
 			maze.setTile(3, 3, new TreasureTile());
@@ -213,7 +260,16 @@ public class Tests {
 		public void testKeyTileTurnsIntoFreeTile() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1,new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			maze.setTile(2, 3, new KeyTile(new Key("Blue")));
 			testController.moveChap(Direction.Right);
@@ -225,7 +281,16 @@ public class Tests {
 		public void testLockedDoorTileUnlocksAndTurnsIntoFreeTile() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1,new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			maze.setTile(2, 3, new KeyTile(new Key("Blue")));
 			maze.setTile(3, 3, new LockedDoorTile("Blue"));
@@ -244,7 +309,16 @@ public class Tests {
 		public void testChapCantMoveToLockedDoorWithoutKey() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1,new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			maze.setTile(2, 3, new LockedDoorTile("Blue"));
 			assert maze.getTile(2, 3) instanceof LockedDoorTile;
@@ -261,7 +335,16 @@ public class Tests {
 		public void testChapCantMoveToLockedDoorWithWrongKey() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1,new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			maze.setTile(2, 3, new KeyTile(new Key("Red")));
 			maze.setTile(3, 3, new LockedDoorTile("Blue"));
@@ -282,7 +365,16 @@ public class Tests {
 		public void testChapCantMoveToExitLockWithTreasuresRemaining() {
 			Maze maze = Maze.createBasicMaze(5, 5);
 			Chap chap = new Chap(2,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1,new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			maze.setTile(2, 3, new ExitLockTile());
 			testController.moveChap(Direction.Right);
@@ -295,7 +387,16 @@ public class Tests {
 		public void testChapCanMoveToExitLockWithAllTreasures() {
 			Maze maze = Maze.createBasicMaze(6, 6);
 			Chap chap = new Chap(2,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1,new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			maze.setTile(2, 3, new TreasureTile());
 			maze.setTile(2, 4, new ExitLockTile());
@@ -375,7 +476,16 @@ public class Tests {
 		public void testTeleportTiles() {
 			Maze maze = Maze.createCustomMaze2();
 			Chap chap = new Chap(1,2, new ArrayList<>());
-			GameState test = new GameState(maze,chap,1);
+			GameState test = new GameState(maze,chap,1,new AppNotifier() {
+				@Override
+				public void onGameWin() {}
+				@Override
+			    public void onGameLose() {}
+				@Override
+			    public void onKeyPickup(int keyCount) {}
+				@Override
+			    public void onTreasurePickup(int treasureCount) {}
+			});
 			GameStateController testController = new GameStateController(test);
 			testController.moveChap(Direction.Left);
 			assertEquals(1,chap.getRow());
@@ -400,7 +510,8 @@ public class Tests {
 		@Test
 		public void testIncorrectGameState() {
 			assertThrows(IllegalArgumentException.class, () -> {
-				//GameState test = new GameState(null, null, -1, null, -1, null);
+
+				GameState test = new GameState(null, null, -1, null, -1, null,null);
 			});
 		}
 		@Test

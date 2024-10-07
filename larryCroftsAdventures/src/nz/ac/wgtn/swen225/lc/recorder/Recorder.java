@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
@@ -162,6 +163,12 @@ public class Recorder {
 		if(events.size() == EventsLimit) return;
 		events.add(new DirectionEvent(direction, currentTime));
 	}
+	
+	public void ping(int currentTime) {
+		assert events != null : "Recorder events storage is null!";
+		if(events.size() == EventsLimit) return;
+		events.add(new DirectionEvent(null, currentTime));
+	}
 
 	/**
 	 * Used by App module to just set the automatic replay speed.
@@ -239,9 +246,9 @@ public class Recorder {
 	 * 
 	 * @return Chap's position in game model recording can view.
 	 */
-//	public String getChapPosition() {
-//		return recordingGame.getChapPosition();
-//	}
+	public Chap getChap() {
+		return recordingGame.getChap();
+	}
 }
 
 /**
