@@ -76,7 +76,7 @@ public class Fuzz {
 				try {
 					chap.move(moveDirection, maze);
 					visitedTiles.add(mockController.update.getTileAtChapPosition());
-					//System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
+					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
 				} catch (IllegalArgumentException e) {
 					visitedTiles.add(reverse.get(moveDirection));
 					System.out.println(e);
@@ -92,7 +92,7 @@ public class Fuzz {
 						).get(random.nextInt(4));
 				try {
 					chap.move(moveDirection, maze);
-					//System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
+					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
 				} catch (IllegalArgumentException e) {
 					System.out.println(e);
 				} catch (Exception e) {
