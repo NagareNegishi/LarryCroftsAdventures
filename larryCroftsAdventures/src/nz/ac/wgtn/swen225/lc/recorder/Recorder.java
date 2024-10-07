@@ -163,6 +163,12 @@ public class Recorder {
 		if(events.size() == EventsLimit) return;
 		events.add(new DirectionEvent(direction, currentTime));
 	}
+	
+	public void ping(int currentTime) {
+		assert events != null : "Recorder events storage is null!";
+		if(events.size() == EventsLimit) return;
+		events.add(new DirectionEvent(null, currentTime));
+	}
 
 	/**
 	 * Used by App module to just set the automatic replay speed.
