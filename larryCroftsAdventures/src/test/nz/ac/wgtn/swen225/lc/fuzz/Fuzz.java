@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.junit.Test;
+//import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
 
 import nz.ac.wgtn.swen225.lc.app.MockController;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
@@ -73,7 +76,7 @@ public class Fuzz {
 				try {
 					chap.move(moveDirection, maze);
 					visitedTiles.add(mockController.update.getTileAtChapPosition());
-					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
+					//System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
 				} catch (IllegalArgumentException e) {
 					visitedTiles.add(reverse.get(moveDirection));
 					System.out.println(e);
@@ -89,7 +92,7 @@ public class Fuzz {
 						).get(random.nextInt(4));
 				try {
 					chap.move(moveDirection, maze);
-					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
+					//System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
 				} catch (IllegalArgumentException e) {
 					System.out.println(e);
 				} catch (Exception e) {

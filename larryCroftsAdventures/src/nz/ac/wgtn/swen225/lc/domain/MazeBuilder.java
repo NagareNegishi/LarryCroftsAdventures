@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
+
 
 /**
  * Set chunck ammount, predefined chuck methods that fill same size
@@ -14,6 +16,15 @@ import java.util.Map;
  */
 public class MazeBuilder {
 	
+	public enum Direction{
+		Up,
+		Down,
+		Left,
+		Right;
+	}
+	
+	
+	
 	List<List<Tile>> flexMaze;
 	int rows;
 	int cols;
@@ -22,18 +33,37 @@ public class MazeBuilder {
 	 * 11 * 11 sized space leaves space for 9 * 9 empty space
 	 */
 	
-	int chunk;
+	/**
+	 * Each chunk is 9x9
+	 * 1 space thick wall between chunks
+	 * 1 thick wall around entire space
+	 * 
+	 */
 	
-	Map<Coord, Tile> singleTiles; 
+	
+	
+	int chunk = 0;
+	
+	//Map<Coord, Tile> singleTiles;
 	List<Room> rooms = new ArrayList<>();
 	
 	
 	/**
 	 * Initialise the builder
 	 */
-	public MazeBuilder(int chunk) {
+	public MazeBuilder() {
 		flexMaze = new ArrayList<List<Tile>>();
-		this.chunk = chunk;
+	}
+	
+	
+	public MazeBuilder chapRoom() {
+		
+		
+	}
+	
+	public MazeBuilder addSimpleRoom(Direction direction) {
+		
+		
 	}
 	
 	
@@ -41,11 +71,11 @@ public class MazeBuilder {
 	 * Complete build process
 	 * @return
 	 */
-	public Maze build() {
-		Maze maze = new Maze(rows, cols);
-		
-		for(Room room : rooms) {
-			Maze.createRoom(maze, room.row(), room.col(),room.width(), room.height());
-		}
-	}
+//	public Maze build() {
+//		Maze maze = new Maze(rows, cols);
+//
+//		for(Room room : rooms) {
+//			Maze.createRoom(maze, room.row(), room.col(),room.width(), room.height());
+//		}
+//	}
 }
