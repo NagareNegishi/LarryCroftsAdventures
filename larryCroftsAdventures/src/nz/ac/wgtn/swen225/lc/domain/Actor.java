@@ -1,13 +1,18 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
-// Actor for level 2 that should move in a pattern (in a square) 
+/**
+ * Actor class representing a moving entity for Level 2 of the game, an Actor moves in a square pattern and
+ * if an Actor comes into contact with Chap, the game is over and the level will restart.
+ * 
+ * @author fergusbenj1 300656321
+ * 
+ */
+
 public class Actor {
 
 	private int row;
 	private int col;
 	private Direction currentDirection;
-	
-	// field to store number of step in a direction actor has taken
 	private int steps;
 	
 	public Actor(int startRow, int startCol) {
@@ -40,9 +45,6 @@ public class Actor {
 	public int getRow() {return row;}
 	public int getCol() {return col;}
 	
-	public String getPosition() {return "Actor is at row: " + row + ", column: " + col;}
-		
-	// movement method for actor (make sure cant move to wall etc.)	
 	public void move(Maze maze) {
 		int newRow = row + currentDirection.rowDirection();
         int newCol = col + currentDirection.colDirection();
@@ -52,14 +54,13 @@ public class Actor {
             col = newCol;
             steps++;
         }
-        // making max steps 2 in this case for now
+        
         if (steps >= 2) {
-            changeDirection(); 
+            changeDirection();
             steps = 0; 
         }
 	}
-	
-	// method to change actors direction in pattern if it hits 3 steps
+
 	public  void changeDirection() {
 		 switch (currentDirection) {
          case Right:
@@ -75,12 +76,5 @@ public class Actor {
              currentDirection = Direction.Right;
              break;
 			 } 
-	}
-	
-	// method for if Actor touches Chap (may just need to be moved to the move method, also add to Chap)
-	public void onTouch(Chap chap) {
-		if(this.row == chap.getRow() && this.col == chap.getCol()) {
-			
-		}
 	}
 }
