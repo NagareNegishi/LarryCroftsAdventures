@@ -12,19 +12,24 @@ import java.util.stream.StreamSupport;
 
 /**
  * This class is responsible for loading audio files into memory.
- * It ensures all audio files corresponding to enum names are loaded on start-up.
+ * It ensures all audio files corresponding to enum names and are loaded on start-up.
  * If the audio file is missing, the program will fail.
  * 
- * Can only use Wav files unfortunatly.
+ * Can only use Wav files unfortunately with a very specific formatting.
  *
- * Example usage:
- * Audio.JumpSound.play();
+ * Here's an example usage:
+ * Audio.Thud.play();
+ * 
+ * This will work anywhere
  * 
  * @author Marwan Mohamed
  * @studentID 300653693
+ * 
  */
+
+
 public enum AudioP {
-    aThud,
+    Thud,
     TreasureCollected,
     death;
 
@@ -35,12 +40,19 @@ public enum AudioP {
     }
 
     	private static Path startPath() {
-        // Adjust this path to your audio folder
         Path path = Paths.get(System.getProperty("user.dir"), "src", "audio");
         System.out.println("Audio path: " + path.toString());
         return path;
     }
 
+    	/**
+    	 * 
+    	 * Load Audio Tries to convert the Audio into a supported format if it isn't already supported.
+    	 * it takes a String containing the Path for the audio file itself
+    	 * 
+    	 * @param name
+    	 * @return Clip
+    	 */
     	private static Clip loadAudio(String name) {
     	    Path p = startPath().resolve(name + ".wav");
     	    System.out.println("Loading audio from: " + p.toString());
@@ -80,25 +92,26 @@ public enum AudioP {
     	}
 
 
-    // Method to play the audio
+    // Play the audio
     public void play() {
         if (clip != null) {
             clip.setFramePosition(0); // Rewind to the start of the clip
-            clip.start();              // Play the audio clip
+            clip.start();             // Play the audio clip
         }
     }
 
-    // Method to stop the audio
+    //You should only Use Stop to end the Audio Clip that's running abruptly. 
+    //You don't need this for the music to stop, it stops when the file reaches it's end
     public void stop() {
         if (clip != null && clip.isRunning()) {
-            clip.stop(); // Stop the audio
+            clip.stop();
         }
     }
 
     // Method to loop the audio continuously
     public void loop() {
         if (clip != null) {
-            clip.loop(Clip.LOOP_CONTINUOUSLY); // Loop the audio continuously
+            clip.loop(Clip.LOOP_CONTINUOUSLY); 
         }
     }
 
@@ -108,7 +121,7 @@ public enum AudioP {
     }
 
     /**
-     * For Directory Structure: similar to your image loader, used for debugging and listing files.
+     * Basically a copy and paste from Img
      */
     static class DirectoryStructure {
         public static String of(Path startPath) {

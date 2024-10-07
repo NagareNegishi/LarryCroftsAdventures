@@ -32,6 +32,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.util.List;
 
 import nz.ac.wgtn.swen225.lc.domain.*;
 
@@ -69,6 +70,7 @@ public class Renderer extends JPanel {
     final RenderImg Chap1 = new RenderImg(Img.chap);
     final RenderImg Chap2 = new RenderImg(Img.Kourie);
     //more fields for diffrent images for a simple animation
+    final AnimatedImages chap = new AnimatedImages(List.of(Chap1, Chap2));
     
     final RenderImg LockedDoor = new RenderImg(Img.LockedDoor_blue);
     final RenderImg Wall = new RenderImg(Img.Wall_Tile);
@@ -77,8 +79,18 @@ public class Renderer extends JPanel {
     final RenderImg Blue_key = new RenderImg(Img.Blue_key);
     
     final RenderImg Actor1 = new RenderImg(Img.Actor);
+    final RenderImg Actor2 = new RenderImg(Img.Actor);
+    final AnimatedImages Actor = new AnimatedImages(List.of(Actor1,Actor2));
     
     final int imgSize;
+    
+    
+    private int offsetX;
+	private int offsetY;
+	private int screenCenterX;
+	private int screenCenterY;
+	private int maxCol;
+	private int maxRow;
     
     /**
      * Renderer constuctor inilizes a Timer to update every frame.
@@ -123,14 +135,42 @@ public class Renderer extends JPanel {
         this.g = g;
         
         
+    	screenCenterX = getWidth() / 2; // Center of the screen horizontally
+        screenCenterY = getHeight() / 2; // Center of the screen vertically
+
+    	offsetX = screenCenterX - (playerX);  // Offset for X
+        offsetY = screenCenterY - (playerY);  // Offset for Y
+    	
+        //Can move this somewhere else
+    	maxCol = game.getMaze().getCols(); //Max Col for maze
+    	maxRow = game.getMaze().getRows(); //max Row for maze
+        
+        
+        
         playerY = game.getChap().getRow() * imgSize;
         playerX = game.getChap().getCol() * imgSize;
         
         
         drawTiles();
       //Draws Chap at the center of the screen after drawing all the tiles
-        Chap1.drawImg(g, getWidth() / 2, getHeight()/2); 
+        chap.draw(g, getWidth() / 2, getHeight()/2); 
         
+
+
+    }
+    
+    private void drawActors(List<Object> actors) {
+//    	
+//    	for (Object actor : actors) {
+//    		col = actor.getcol();
+//    		row = actor.getRow();
+//    		int currentX = col * imgSize + offsetX;
+//			int currentY = row * imgSize + offsetY;
+//    		
+//			Actor.draw(g, currentX, currentY);
+//    	}
+    	
+    	
     }
     
     
@@ -147,16 +187,6 @@ public class Renderer extends JPanel {
     	//Extra Offset, the current iteration doesn't quite need it
     	int offset = 0;
     	
-    	int screenCenterX = getWidth() / 2; // Center of the screen horizontally
-        int screenCenterY = getHeight() / 2; // Center of the screen vertically
-
-    	int offsetX = screenCenterX - (playerX);  // Offset for X
-        int offsetY = screenCenterY - (playerY);  // Offset for Y
-    	
-    	int maxCol = game.getMaze().getCols(); //Max Col for maze
-    	int maxRow = game.getMaze().getRows(); //max Row for maze
-    	
-    	
     	for (int row = 0; row < maxRow; row++) {
     		for(int col = 0; col < maxCol; col++) {
     			
@@ -169,15 +199,9 @@ public class Renderer extends JPanel {
                 
                 //look if the tile has an item
                 if(t.hasItem()) {
-          
                 	drawItem(t.getItem(),currentX, currentY);}
-            
-                
     		}
-    	
-    		
     	}
-    	
     }
     
     private void drawTile(Tile i, int x, int y) {
@@ -195,6 +219,10 @@ public class Renderer extends JPanel {
     		Wall.drawImg(g,x,y);
     	}
     	
+//    	else if(i instanceof TP) {
+//    		tp.drawImg(g,x,y);
+//    	}
+    	
     	else if (i instanceof ExitLockTile) {//I'm not sure what this one is
     		g.setColor(Color.BLACK);
     		g.fillRect(x, y, imgSize, imgSize);
@@ -210,7 +238,7 @@ public class Renderer extends JPanel {
     /**
      * draws the item set on the current Tile
      * 
-     * @param Item in the current tile
+     * @param Item i and x and y
      */
     private void drawItem(Item i, int x, int y) {
     	
@@ -226,12 +254,7 @@ public class Renderer extends JPanel {
 	        	Treasure.drawImg(g, x, y);
         		
         	}
-        	
-
-        	
         }
-    
-    
     
 }
     	
