@@ -210,7 +210,9 @@ class App extends JFrame{
     setFocusable(true);//could be remove??
   }
 
-  //1000ms = 1s
+  /**
+   * Initialize the game timer to count down the time left in the game.
+   */
   private void initializeGameTimer() {
       gameTimer = new Timer(1000, e -> {
           timeLeft--;
@@ -225,6 +227,10 @@ class App extends JFrame{
 
 
 
+  /**
+   * Get the AppNotifier for the game.
+   * @return AppNotifier
+   */
   private AppNotifier getAppNotifier(){
     return new AppNotifier(){
       public void onGameWin(){
@@ -248,6 +254,9 @@ class App extends JFrame{
     };
   }
 
+  /**
+   * Stop the game without showing any dialog.
+   */
   private void stopGame(){
     state = AppState.PAUSED;
     controller.pause(true);
@@ -255,6 +264,9 @@ class App extends JFrame{
     gameTimer.stop();
   }
 
+  /**
+   * Reset the game to the initial state.
+   */
   private void resetGame(){
     stopGame();
     timeLeft = MAX_TIME;
@@ -262,12 +274,18 @@ class App extends JFrame{
     treasuresLeft = model.getTotalTreasures();
   }
 
+  /**
+   * Pause the game and show the pause dialog.
+   */
   private void pauseGame() {
     if (state != AppState.PLAY) return;
     stopGame();
     GameDialogs.PAUSE.show();
   }
 
+  /**
+   * Depending on the current state, either start a new game or unpause the game.
+   */
   private void unpauseGame() {
     boolean unpause = switch (state) {
       case PLAY -> false; // Already playing
@@ -290,6 +308,9 @@ class App extends JFrame{
     gameRun();
   }
 
+  /**
+   * unpause the game and start the timer
+   */
   private void gameRun(){
     GameDialogs.hideAll(); // a bit wasteful to hide all dialogs, but I chose safety and compact code here
     state = AppState.PLAY;
@@ -300,10 +321,17 @@ class App extends JFrame{
     gameTimer.start();
   }
 
+  /**
+   * Show help dialog with given text
+   * @param text
+   */
   private void showHelp(String text) {
       JOptionPane.showMessageDialog(this, text, "Help", JOptionPane.INFORMATION_MESSAGE);
   }
 
+  /**
+   * Game over, show game over dialog and pause the game.
+   */
   public void gameOver(){
     state = AppState.GAMEOVER;
     gameTimer.stop();
@@ -313,23 +341,41 @@ class App extends JFrame{
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////Save and Load related methods here /////////////////////////////////////////////////
-///////////////// saveGame() and loadFile() are useing JFileChooser to get file from user/////////////////////
-///////////////// So probably Persistency want to modify that File to something it requires/////////////////
 
-////other methods related to save and load are also in this section, but they are not directly related to JFileChooser
+/**
+ * Create custom file chooser with given directory, title and description
+ * User can not change the directory and can only select json files
+ * @param dir
+ * @param title
+ * @param description
+ * @return JFileChooser
+ */
+private JFileChooser customFileChooser(File dir, String title, String description) {
+  JFileChooser fileChooser = new JFileChooser(dir) {
+      /**
+       * Overriding setCurrentDirectory to prevent user from changing directory
+       */
+      @Override
+      public void setCurrentDirectory(File directory) {
+          super.setCurrentDirectory(getCurrentDirectory());
+      }
+  };
+  fileChooser.setDialogTitle(title);
+  FileNameExtensionFilter filter = new FileNameExtensionFilter(description, "json");
+  fileChooser.setFileFilter(filter);
+  fileChooser.setAcceptAllFileFilterUsed(false);
+  fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+  return fileChooser;
+}
 
+  /**
+   * Save the game to a file in the saves directory.
+   */
   private void saveGame() {
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Save Game");
-    fileChooser.setFileFilter(new FileNameExtensionFilter("JSON files", "json"));
-    // opens into saves directory
-    fileChooser.setCurrentDirectory(Paths.savesDir);
-    
+    JFileChooser fileChooser = customFileChooser(Paths.savesDir, "Save Game", "JSON files");
     int userSelection = fileChooser.showSaveDialog(this); // show dialog and wait user input
     if (userSelection == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File fileToSave = fileChooser.getSelectedFile();
-
       String filename = fileToSave.getName(); // i should pass file
       boolean success = SaveFile.saveGame(filename, model); // do i need to pass model or gamestate? 2/10
       if (success) {
@@ -342,23 +388,13 @@ class App extends JFrame{
     }
   }
 
-
   /**
-   * String-based methods expect filenames without the ".json" extension, as they automatically append it.
-   * File-based methods expect complete filenames including the ".json" extension, as they use the File object as-is.
-   * ->
-   * Moving to use File based methods for all file operations.
+   * Load a file from the given directory.
    * Paths class in nz.ac.wgtn.swen225.lc.persistency.Paths contains static final Files for desired directories.
-   *
    * @param dir it should use File from Paths class in nz.ac.wgtn.swen225.lc.persistency.Paths
    */
   private Optional<GameStateController> loadFile(File dir) { // Added File parameter
-    JFileChooser fileChooser = new JFileChooser(dir);
-    fileChooser.setDialogTitle("Load Game");
-    FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON Game files", "json");//expecting json file
-    fileChooser.setFileFilter(filter); // set filter
-    fileChooser.setAcceptAllFileFilterUsed(false); // disable "All files" option
-
+    JFileChooser fileChooser = customFileChooser(dir, "Load Game", "JSON Game files");
     int picked = fileChooser.showOpenDialog(this);
     if (picked == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File file = fileChooser.getSelectedFile();
@@ -376,7 +412,8 @@ class App extends JFrame{
   }
 
   /**
-   * Optional check here
+   * Check presence of model, if present set the level, if not show error dialog.
+   * @param opm Optional of GameStateController
    */
   private void checkModel(Optional<GameStateController> opm) { // may need variant for save
     opm.ifPresentOrElse(this::setLevel, ()->{
@@ -386,9 +423,9 @@ class App extends JFrame{
     });
   }
 
-  //for prototype, i can assume max level is 2 to simplify the process
   /**
-   * this should work fine, as LoadFile.loadLevel(String) is currently working
+   * Load the next level of the game.
+   * If the next level is not found, the game is won.
    */
   private void loadNextLevel() {
     int nextlevel = currentLevel++;
@@ -402,11 +439,15 @@ class App extends JFrame{
   }
 
   /**
-   * Handling load error
-   * choice is:
+   * Handling load error. the choices are:
    * 0: try again loadFile or saveGame
    * 1: start level 1
    * 2: quit game
+   * @param message error message
+   * @param title error title
+   * @param options options for user
+   * @param defult default option
+   * @param action action to be taken for the first option
    */
   private void handleFileError(String message, String title, String[] options, String defult, Runnable action){
     int choice = JOptionPane.showOptionDialog(this, message, title,
@@ -423,30 +464,39 @@ class App extends JFrame{
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+  /**
+   * Exit the game without saving
+   */
   private void exitGameWithoutSaving() {
     closePhase.run();
     gameTimer.stop();
-    dispose();
+    dispose(); // release resources
     System.exit(0);
   }
 
+  /**
+   * Exit the game and save the game
+   */
   private void exitGameAndSave() {
     saveGame();
     exitGameWithoutSaving();
   }
 
 
-
+  /**
+   * Set the model of the game, and all the necessary components for the game to run.
+   * Once timer starts, the game will run.
+   * @param level model of the game (GameStateController)
+   */
   void setLevel(GameStateController level){
     resetGame();
 
     model = level;
-
     treasuresLeft = model.getTotalTreasures();
     keysCollectednum = model.getKeysCollected().size();
     keysCollected = new HashSet<>(model.getKeysCollected().values());
-    System.out.println(keysCollected);//////////////////////////////////////
+    gameInfoPanel.setKeys(keysCollectednum);
+    gameInfoPanel.setTreasures(treasuresLeft);
 
     GameState gamestate = model.getGameState();
     //gamestate.setAppNotifier(notifier);
@@ -477,7 +527,6 @@ class App extends JFrame{
          * its not pretty solution, but i can take keys/ treasure info from the model and update the gameInfoPanel here
          */
         updateGameInfo(model); // this need to be gone
-        //renderer.updateCanvas();
         renderer.updateCanvas();
       }
     });
