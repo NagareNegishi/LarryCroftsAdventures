@@ -62,7 +62,7 @@ public enum GameDialogs {
      * Show the dialog.
      */
     public void show() {
-        assert dialog != null;
+        assert dialog != null: "Dialog is not initialized";
         dialog.setVisible(true);
     }
 
@@ -70,7 +70,7 @@ public enum GameDialogs {
      * Hide the dialog.
      */
     public void hide() {
-        assert dialog != null;
+        assert dialog != null: "Dialog is not initialized";
         dialog.setVisible(false);
     }
 

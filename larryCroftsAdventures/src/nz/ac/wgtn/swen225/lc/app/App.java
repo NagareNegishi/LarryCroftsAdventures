@@ -236,10 +236,12 @@ class App extends JFrame{
         System.out.println("Game Over is called");
       }
       public void onKeyPickup(int keyCount){
+        assert keyCount >= 0: "keyCount is negative";
         keysCollectednum = keyCount;
         gameInfoPanel.setKeys(keysCollectednum);
       }
       public void onTreasurePickup(int treasureCount){
+        assert treasureCount >= 0: "treasureCount is negative";
         treasuresLeft = treasureCount;
         gameInfoPanel.setTreasures(treasuresLeft);
       }

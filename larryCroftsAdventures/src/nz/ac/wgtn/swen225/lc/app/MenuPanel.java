@@ -55,6 +55,7 @@ public class MenuPanel extends JPanel{
      * @param text
      */
     public void setPauseButton(String text) {
+        assert text.equals("Pause") || text.equals("Unpause") : "Invalid text for pause button";
         pauseButton.setText(text);
         pauseButton.setActionCommand(text.toLowerCase());
     }

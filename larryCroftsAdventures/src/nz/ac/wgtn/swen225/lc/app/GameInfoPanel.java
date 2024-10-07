@@ -65,6 +65,7 @@ public class GameInfoPanel extends JPanel {
      * @param time
      */
     public void setTime(int time) {
+        assert time >= 0 : "Time cannot be negative";
         timeLabel.setText(String.valueOf(time));
         updateTimerColor(time);
     }
@@ -74,6 +75,7 @@ public class GameInfoPanel extends JPanel {
      * @param level
      */
     public void setLevel(int level) {
+        assert level == 1 || level == 2 : "Invalid level";// hardcoding for this project
         levelLabel.setText("Level: " + level);
     }
 
@@ -82,6 +84,7 @@ public class GameInfoPanel extends JPanel {
      * @param keys
      */
     public void setKeys(int keys) {
+        assert keys >= 0 : "Keys cannot be negative";
         keysLabel.setText("Keys: " + keys);
     }
 
@@ -90,6 +93,7 @@ public class GameInfoPanel extends JPanel {
      * @param treasures
      */
     public void setTreasures(int treasures) {
+        assert treasures >= 0 : "Treasures cannot be negative";
         treasuresLabel.setText("Treasures left: " + treasures);
     }
 

@@ -31,6 +31,8 @@ class Controller extends Keys{
      * @param actionBindings contains the methods defined in App class
      */
     Controller(GameStateController StateController , Map<String, Runnable> actionBindings){
+        assert StateController != null: "StateController is null";
+        assert actionBindings != null: "actionBindings is null";
         update = StateController;
         setAction(KeyEvent.VK_UP, 0,() -> {
             update.moveChap(Chap.Direction.Up);
