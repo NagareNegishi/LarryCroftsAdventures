@@ -199,6 +199,10 @@ public class GameState{
 			}
 		}
 	} */
+	
+	public void moveActor() {
+		enemies.forEach(a -> a.move(maze));
+	}
 		
 	public boolean checkForMatchingKey(String doorColour) {
 		return chap.inventory().stream()
