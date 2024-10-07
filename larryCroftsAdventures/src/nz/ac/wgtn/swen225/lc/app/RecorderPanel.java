@@ -16,11 +16,14 @@ import javax.swing.JToggleButton;
  */
 public class RecorderPanel extends JPanel {
     private JButton stepButton;
+    private JButton backButton;
     private JToggleButton autoReplayToggle;
     private JSlider speedControl;
     private JButton loadRecordingButton;
     private JButton saveRecordingButton;
     private JButton toggleButton;
+    private enum PlayType {AUTO, MANUAL}
+    private PlayType current = PlayType.AUTO;
 
     /**
      * Create a new RecorderPanel with the given ActionListener and Consumer.
@@ -35,6 +38,7 @@ public class RecorderPanel extends JPanel {
 
     private void initializeComponents(ActionListener listener, Consumer<Integer> sliderConsumer) {
         stepButton = ComponentFactory.createButton("Step", "step", listener);
+        backButton = ComponentFactory.createButton("Step Back", "back", listener);
         autoReplayToggle = ComponentFactory.createToggleButton("Auto Replay", "autoReplay", listener);
         speedControl = ComponentFactory.createSlider(1, 5, 3, sliderConsumer);
         loadRecordingButton = ComponentFactory.createButton("Load Recording", "loadRecording", listener);
@@ -44,6 +48,7 @@ public class RecorderPanel extends JPanel {
 
     private void addComponents() {
         add(stepButton);
+        add(backButton);
         add(autoReplayToggle);
         add(new JLabel("Speed:"));
         add(speedControl);

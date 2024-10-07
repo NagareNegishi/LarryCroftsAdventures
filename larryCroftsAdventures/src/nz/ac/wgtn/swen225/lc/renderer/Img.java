@@ -34,6 +34,8 @@ public enum Img {
     Wall_Tile,
     Treasure,
     Blue_key,
+    chap,
+    Actor,
     Kourie; //Kourie is a test object, don't mind him.
     public final BufferedImage image;
     
