@@ -9,6 +9,9 @@ public class MockAppNotifier implements AppNotifier{
 	@JsonProperty
 	private SerialRunnable win = () -> System.out.println("You win!");
 	
+	public void run() {
+		win.run();
+	}
 	
 	@JsonCreator
 	public MockAppNotifier() {}

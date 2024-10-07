@@ -41,7 +41,7 @@ public class GameState{
 	private int timeLeft;
 	// List for enemies in the level
 	@JsonProperty
-	ArrayList<Actor> enemies;
+	private ArrayList<Actor> enemies;
 	// AppNotifier
 	@JsonProperty
 	@JsonSerialize(as = MockAppNotifier.class)
@@ -61,6 +61,7 @@ public class GameState{
 		this.keysCollected = new HashMap<>();
 		this.timeLeft = 60; // 60 seconds by default
 		this.appNotifier = appNotifier;
+		this.enemies = new ArrayList<Actor>();
 
 		assert this.totalTreasures == totalTreasures;
 		assert keysCollected.isEmpty() == true;
