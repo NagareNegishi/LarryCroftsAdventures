@@ -75,13 +75,8 @@ public class GameState{
 					@JsonProperty("totalTreasures") int totalTreasures,
 					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
 					@JsonProperty("timeLeft") int timeLeft,
-<<<<<<< larryCroftsAdventures/src/nz/ac/wgtn/swen225/lc/domain/GameState.java
-					AppNotifier appNotifier,
-					ArrayList<Actor> enemies){
-=======
 					@JsonProperty("appNotifier") AppNotifier appNotifier,
 					@JsonProperty("enemies")List<Actor> enemies) {
->>>>>>> larryCroftsAdventures/src/nz/ac/wgtn/swen225/lc/domain/GameState.java
 		
 		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0 || timeLeft < 0) {throw new IllegalArgumentException("Total treasures and time left must be greater than 0");}

@@ -445,7 +445,7 @@ class App extends JFrame{
     System.out.println(keysCollected);//////////////////////////////////////
 
     GameState gamestate = model.getGameState();
-    gamestate.setAppNotifier(notifier);
+    //gamestate.setAppNotifier(notifier);
     controller = new Controller(model, actionBindings);
 
     recorder = new Recorder((rc)-> { 
