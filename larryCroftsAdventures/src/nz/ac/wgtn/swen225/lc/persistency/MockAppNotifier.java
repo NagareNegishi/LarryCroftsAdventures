@@ -24,10 +24,6 @@ public class MockAppNotifier implements AppNotifier, Serializable{
 		win.run();
 	}
 	
-	public static void print() {
-		System.out.println("Fuck");
-	}
-	
 	@JsonCreator
 	public MockAppNotifier() {}
 	
