@@ -21,9 +21,22 @@ public class RecorderPanel extends JPanel {
     private JSlider speedControl;
     private JButton loadRecordingButton;
     private JButton saveRecordingButton;
+    private JButton helpButton;
     private JButton toggleButton;
     private enum PlayType {AUTO, MANUAL}
     private PlayType current = PlayType.AUTO;
+    public static final String HELP = "Help:\n" +
+    "Use the arrow keys to move the hero.\n" +
+    "Collect all treasures to complete the level.\n" +
+    "Collect keys to unlock doors.\n" +
+    "Avoid enemies.\n" +
+    "Press Ctrl + X to exit without saving.\n" +
+    "Press Ctrl + S to save the game.\n" +
+    "Press Ctrl + R to resume a saved game.\n" +
+    "Press Ctrl + 1 to start a new game at level 1.\n" +
+    "Press Ctrl + 2 to start a new game at level 2.\n" +
+    "Press Space to pause the game.\n" +
+    "Press Esc to resume the game.\n";
 
     /**
      * Create a new RecorderPanel with the given ActionListener and Consumer.
@@ -43,6 +56,7 @@ public class RecorderPanel extends JPanel {
         speedControl = ComponentFactory.createSlider(1, 5, 3, sliderConsumer);
         loadRecordingButton = ComponentFactory.createButton("Load Recording", "loadRecording", listener);
         saveRecordingButton = ComponentFactory.createButton("Save Recording", "saveRecording", listener);
+        helpButton = ComponentFactory.createButton("Help", "help", listener);
         toggleButton = ComponentFactory.createButton("Show Menu", "toggle", listener);
     }
 
@@ -54,6 +68,7 @@ public class RecorderPanel extends JPanel {
         add(speedControl);
         add(loadRecordingButton);
         add(saveRecordingButton);
+        add(helpButton);
         add(toggleButton);
     }
 

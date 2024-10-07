@@ -157,6 +157,7 @@ class App extends JFrame{
       case "autoReplay" -> recorder.autoReplay();
       case "loadRecording" -> recorder.loadRecording();
       case "saveRecording" -> recorder.saveRecording();
+      case "help" -> showHelp(RecorderPanel.HELP);
       case "toggle" -> {
         sidePanel.togglePanel();
         unpauseGame();
