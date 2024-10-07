@@ -1,5 +1,7 @@
 package nz.ac.wgtn.swen225.lc.persistency;
 
+import java.util.List;
+
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
@@ -23,11 +25,12 @@ public class Level1 {
 		
 		
 			
-		Chap chap = new Chap(2, 2);
+		Chap chap = new Chap(2, 2, null);
 		GameState gs = new GameState(maze, chap, 2);
 		
-		GameStateController gsc = new GameStateController(maze, chap, gs);
+		GameStateController gsc = new GameStateController(gs);
 		
+
 		Boolean saved = SaveFile.saveGame("IntegrationEx", gsc);
 		assert saved;
 	}
