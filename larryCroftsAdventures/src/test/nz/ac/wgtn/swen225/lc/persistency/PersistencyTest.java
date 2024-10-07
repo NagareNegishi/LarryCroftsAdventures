@@ -232,7 +232,6 @@ public class PersistencyTest {
     @Test
     public void pathTest() {
     	assert false : Paths.level1.getAbsolutePath();
-    	
     }
     
     @Test
@@ -254,4 +253,38 @@ public class PersistencyTest {
     gscD.getChap().moveTo(3, 3, gscD.getMaze());
     
     }
+    
+
+    
+    @Test
+    public void runnableTest() {
+		MockAppNotifier notif = new MockAppNotifier();
+		notif.run();
+		ArrayList<String> checkLog = new ArrayList<String>();
+    	assert saveObj("runnableTest", notif);
+    	Optional<MockAppNotifier> notifO = LoadFile.loadObj("runnableTest", MockAppNotifier.class);
+    	assert notifO.isPresent();
+    	MockAppNotifier notifD = notifO.get();
+    	notifD.run();
+    }
+    
+   
+    
+    
+    @Test
+    public void runnableTest2() {
+		MockAppNotifier notif = new MockAppNotifier();
+		notif.log = new ArrayList<String>();
+		assert notif.log.equals(new ArrayList<String>());
+		System.out.println(notif.log);
+		notif.run();
+		ArrayList<String> checkLog = new ArrayList<String>();
+		checkLog.add("win");
+		assert notif.log.equals(checkLog);
+    	assert saveObj("runnableTest", notif);
+    	Optional<MockAppNotifier> notifO = LoadFile.loadObj("runnableTest", MockAppNotifier.class);
+    	assert notifO.isPresent();
+    	MockAppNotifier notifD = notifO.get();
+    }
+    
 }
