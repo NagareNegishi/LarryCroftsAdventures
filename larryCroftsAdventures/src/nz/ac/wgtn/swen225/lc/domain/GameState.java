@@ -1,5 +1,6 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,14 +37,15 @@ public class GameState{
 	@JsonProperty
 	private int timeLeft;
 	// List for enemies in the level
-	List<Actor> enemies;
+	ArrayList<Actor> enemies;
 	// AppNotifier
 	public AppNotifier appNotifier;
 	
-	public GameState(Maze maze, Chap chap, int totalTreasures) {
+	public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
 		
 		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
+		if(appNotifier.equals(null)) {throw new IllegalArgumentException("App notifier is null");}
 		
 		this.maze = maze;
 		this.chap = chap;
@@ -51,6 +53,7 @@ public class GameState{
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = new HashMap<>();
 		this.timeLeft = 60; // 60 seconds by default
+		this.appNotifier = appNotifier;
 
 		assert this.totalTreasures == totalTreasures;
 		assert keysCollected.isEmpty() == true;
@@ -71,11 +74,14 @@ public class GameState{
 					@JsonProperty("totalTreasures") int totalTreasures,
 					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
 					@JsonProperty("timeLeft") int timeLeft,
-					AppNotifier appNotifier){
+					AppNotifier appNotifier,
+					ArrayList<Actor> enemies){
 		
 		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0 || timeLeft < 0) {throw new IllegalArgumentException("Total treasures and time left must be greater than 0");}
 		if(keysCollected == null) {throw new IllegalArgumentException("KeysCollected list is null");}
+		if(enemies == null) {throw new IllegalArgumentException("List of enemies is null");}
+		if(appNotifier.equals(null)) {throw new IllegalArgumentException("App notifier is null");}
 		
 		this.maze = maze;
 		this.chap = chap;
@@ -84,7 +90,7 @@ public class GameState{
 		this.keysCollected = keysCollected;
 		this.timeLeft =timeLeft;
 		this.appNotifier = appNotifier;
-
+		this.enemies = enemies;
 		assert this.totalTreasures == totalTreasures;
 		assert this.timeLeft == timeLeft;
 	}
