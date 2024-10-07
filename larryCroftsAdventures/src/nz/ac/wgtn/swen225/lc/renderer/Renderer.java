@@ -63,20 +63,20 @@ public class Renderer extends JPanel {
     private int playerY;
     private GameState game;
     
-    
-    private long lastTime = System.nanoTime();
-    private int frames = 0;
-    private int fps = 0;
-    
     private Graphics g;
     
     //Fields for the images
-    final RenderImg renderKourie = new RenderImg(Img.Kourie);
+    final RenderImg Chap1 = new RenderImg(Img.chap);
+    final RenderImg Chap2 = new RenderImg(Img.Kourie);
+    //more fields for diffrent images for a simple animation
+    
     final RenderImg LockedDoor = new RenderImg(Img.LockedDoor_blue);
     final RenderImg Wall = new RenderImg(Img.Wall_Tile);
     final RenderImg FreeTile = new RenderImg(Img.FreeTile);
     final RenderImg Treasure = new RenderImg(Img.Treasure);
     final RenderImg Blue_key = new RenderImg(Img.Blue_key);
+    
+    final RenderImg Actor1 = new RenderImg(Img.Actor);
     
     final int imgSize;
     
@@ -89,9 +89,10 @@ public class Renderer extends JPanel {
         Timer timer = new Timer(frameTime, e -> updateCanvas());
         timer.start();
         
+        
         System.out.println(this.getSize().getHeight());
         System.out.println(this.getSize().getWidth());
-        imgSize = renderKourie.size();
+        imgSize = Chap1.size();
         this.setBackground(Color.BLACK);
     }
     
@@ -104,8 +105,10 @@ public class Renderer extends JPanel {
     
     
     /*
-     * updates the frame after waiting for the previous frame to finish, do NOT call paintComponent directly
-     * it will cause problems
+     * updates the frame after waiting for the previous frame to finish, 
+     * Only call updateCanvas
+     * do NOT call paintComponent directly
+     * it will cause problems.
      */
     public void updateCanvas() {
        repaint();
@@ -115,59 +118,33 @@ public class Renderer extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); 
         
-        if(game == null) {return;}
+        if(game == null) {return;}//in case the game is not set, display nothing
         
         this.g = g;
         
-        fpsCheck();
-
-        // Display FPS on the screen
-        g.setColor(Color.BLACK);
-        g.setFont(new Font("Arial", Font.PLAIN, 18));
-        g.drawString("FPS: " + fps, 10, 20); // Draw FPS at top left
         
-        
-        Dimension size = this.getSize();
-        
-        //Point center = new Point(1,1);
         playerY = game.getChap().getRow() * imgSize;
         playerX = game.getChap().getCol() * imgSize;
         
-        Point center = new Point(getWidth() / 2, getHeight()/2);
-		
-        //There's a specific method for drawing Chap
         
         drawTiles();
-        renderKourie.drawChap(g, center, size);
+      //Draws Chap at the center of the screen after drawing all the tiles
+        Chap1.drawImg(g, getWidth() / 2, getHeight()/2); 
         
-        
-        }
-    
-    private void fpsCheck() {
-    	
-    	long currentTime = System.nanoTime();
-        frames++;
-        if (currentTime - lastTime >= 1_000_000_000) {
-            fps = frames;
-            frames = 0;
-            lastTime = currentTime;
-        }
-    	
     }
+    
     
     
     /*
      * Draws the maze itself, centered on chap
      * 
      * There's an additional Offset `by half a size as to make it even more centered.
-     * as for some reasons, it doesn't "feel" very centered 
+     * as for some reasons, it doesn't "feel" very centered
      * 
      */
     private void drawTiles() {
     	
-    	//Extra Offset
-    	
-    	
+    	//Extra Offset, the current iteration doesn't quite need it
     	int offset = 0;
     	
     	int screenCenterX = getWidth() / 2; // Center of the screen horizontally
@@ -176,21 +153,19 @@ public class Renderer extends JPanel {
     	int offsetX = screenCenterX - (playerX);  // Offset for X
         int offsetY = screenCenterY - (playerY);  // Offset for Y
     	
-    	int maxCol = game.getMaze().getCols(); //Max col for maze
+    	int maxCol = game.getMaze().getCols(); //Max Col for maze
     	int maxRow = game.getMaze().getRows(); //max Row for maze
     	
     	
-    	//the current code doesn't offset properly, it will be reviewed at a later date
     	for (int row = 0; row < maxRow; row++) {
     		for(int col = 0; col < maxCol; col++) {
     			
-    			int currentX = col * imgSize + offsetX - offset; // There's an extra off set here as it didn't feel too centered
-    			int currentY = row * imgSize + offsetY - offset;//
+    			int currentX = col * imgSize + offsetX - offset;
+    			int currentY = row * imgSize + offsetY - offset;
     			
     			Tile t = game.getMaze().getTile(row, col);
                 
                 drawTile(t, currentX, currentY);
-                //draw a free tile
                 
                 //look if the tile has an item
                 if(t.hasItem()) {
@@ -228,10 +203,7 @@ public class Renderer extends JPanel {
     	else if (i instanceof InfoFieldTile) {//I'm not sure what this one is either
     		g.setColor(Color.MAGENTA);
     		g.drawRect(x, y, imgSize, imgSize);
-    	}
-    	
-    	
-    	
+    	}    	
     	
     }
     

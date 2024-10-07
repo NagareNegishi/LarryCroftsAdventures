@@ -139,7 +139,10 @@ class App extends JFrame{
       }
       case "help" -> showHelp(MenuPanel.HELP);
       case "exit" -> exitGameWithoutSaving();
-      case "toggle" -> sidePanel.togglePanel();
+      case "toggle" -> {
+        sidePanel.togglePanel();
+        pauseGame();
+      }
     }
     assert false: "Unknown action command: " + actionCommand;
   }
@@ -150,10 +153,14 @@ class App extends JFrame{
   private void handleRecorderAction(String actionCommand){
     switch(actionCommand){
       case "step" -> recorder.nextStep();
-      //case "autoReplay" -> toggleAutoReplay();
+      case "back" -> recorder.previousStep();
+      case "autoReplay" -> recorder.autoReplay();
       case "loadRecording" -> recorder.loadRecording();
       case "saveRecording" -> recorder.saveRecording();
-      case "toggle" -> sidePanel.togglePanel();
+      case "toggle" -> {
+        sidePanel.togglePanel();
+        unpauseGame();
+      }
     }
     assert false: "Unknown action command: " + actionCommand;
   }
@@ -432,13 +439,14 @@ class App extends JFrame{
     resetGame();
 
     model = level;
-    model.setAppNotifier(notifier);
+
     treasuresLeft = model.getTotalTreasures();
     keysCollectednum = model.getKeysCollected().size();
     keysCollected = new HashSet<>(model.getKeysCollected().values());
     System.out.println(keysCollected);//////////////////////////////////////
 
     GameState gamestate = model.getGameState();
+    gamestate.setAppNotifier(notifier);
     controller = new Controller(model, actionBindings);
 
     recorder = new Recorder((rc)-> { 

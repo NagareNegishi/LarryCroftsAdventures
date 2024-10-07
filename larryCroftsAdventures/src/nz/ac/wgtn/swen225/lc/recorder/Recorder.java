@@ -14,9 +14,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
+import nz.ac.wgtn.swen225.lc.persistency.Paths;
 
 /**
  * Class used by the App module to generate a Recorder object.
@@ -93,9 +95,9 @@ public class Recorder {
 		this.updateReciever = updateReciever;
 		firstLevelSupplier = () -> {
 			//assert LoadFile.loadSave("level1").isPresent()
-			assert LoadFile.loadLevel("level1").isPresent()
+			assert LoadFile.loadLevel(Paths.level1).isPresent()
 					: "Exception occured when attempting to load first level for recorder!";
-			return LoadFile.loadLevel("level1").get();
+			return LoadFile.loadLevel(Paths.level1).get();
 			//return LoadFile.loadSave("level1").get();
 		};
 		recordingGame = firstLevelSupplier.get();
@@ -238,8 +240,8 @@ public class Recorder {
 	 * 
 	 * @return Chap's position in game model recording can view.
 	 */
-	public String getChapPosition() {
-		return recordingGame.getChapPosition();
+	public Chap getChap() {
+		return recordingGame.getChap();
 	}
 }
 
