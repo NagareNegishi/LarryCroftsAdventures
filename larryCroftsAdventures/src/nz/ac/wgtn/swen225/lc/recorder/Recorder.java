@@ -29,7 +29,7 @@ public class Recorder {
 	private ObjectMapper eventMapper = new ObjectMapper();
 
 	// Holds Chap's recorded movements and when they happened.
-	private List<DirectionEvent> events = new ArrayList<>();
+	private List<ChapEvent> events = new ArrayList<>();
 
 	// Limit to prevent memory issues 
 	// Probably not an issue unless trying to stress test game :/
@@ -59,10 +59,10 @@ public class Recorder {
 	 * @param direction The direction actor is moving.
 	 * @param time      Time when user inputed to move actor.
 	 */
-	private record DirectionEvent(Direction direction, int time) {
-		public DirectionEvent {
-			assert direction != null : "DirectionEvent can't have null direction!";
-			assert time >= 0 : "DirectionEvent's time cannot be below 0";
+	private record ChapEvent(Direction direction, int time) {
+		public ChapEvent {
+			assert direction != null : "ChapEvent can't have null direction!";
+			assert time >= 0 : "ChapEvent's time cannot be below 0";
 		}
 	}
 
@@ -75,7 +75,7 @@ public class Recorder {
 	public record RecordingChanges(GameStateController updatedGame, int updatedTime) {
 		public RecordingChanges {
 			assert updatedGame != null : "RecordingChanges can't have null GameStateController!";
-			assert updatedTime >= 0 : "DirectionEvent's time cannot be below 0";
+			assert updatedTime >= 0 : "ChapEvent's time cannot be below 0";
 		}
 	}
 
@@ -133,18 +133,18 @@ public class Recorder {
 
 	/**
 	 * Used by App module.
-	 * Reads JSON file, interpreting data into a list of DirectionEvent objects.
+	 * Reads JSON file, interpreting data into a list of ChapEvent objects.
 	 */
 	public void loadRecording() {
 		handleRecording("load", rfc -> {
 			events = eventMapper.readValue(rfc.recordingLoc,
-					eventMapper.getTypeFactory().constructCollectionType(List.class, DirectionEvent.class));
+					eventMapper.getTypeFactory().constructCollectionType(List.class, ChapEvent.class));
 		});
 	}
 
 	/**
 	 * Used by App module.
-	 * Writes JSON file, by serializing a list of DirectionEvent objects.
+	 * Writes JSON file, by serializing a list of ChapEvent objects.
 	 */
 	public void saveRecording() {
 		handleRecording("save", rfc -> {
@@ -161,13 +161,13 @@ public class Recorder {
 	public void ping(Direction direction, int currentTime) {
 		assert events != null : "Recorder events storage is null!";
 		if(events.size() == EventsLimit) return;
-		events.add(new DirectionEvent(direction, currentTime));
+		events.add(new ChapEvent(direction, currentTime));
 	}
 	
 	public void ping(int currentTime) {
 		assert events != null : "Recorder events storage is null!";
 		if(events.size() == EventsLimit) return;
-		events.add(new DirectionEvent(null, currentTime));
+		events.add(new ChapEvent(null, currentTime));
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class Recorder {
 		currentEventIndex--;
 
 		for (int i = 0; i <= currentEventIndex; i++) {
-			DirectionEvent curEvent = events.get(i);
+			ChapEvent curEvent = events.get(i);
 			recordingGame.moveChap(curEvent.direction());
 		}
 		updateReciever.accept(new RecordingChanges(recordingGame, events.get(currentEventIndex).time()));
@@ -213,7 +213,7 @@ public class Recorder {
 			return;
 		}
 		currentEventIndex = Math.min(currentEventIndex + 1, events.size() - 1);
-		DirectionEvent curEvent = events.get(currentEventIndex);
+		ChapEvent curEvent = events.get(currentEventIndex);
 		recordingGame.moveChap(curEvent.direction());
 		updateReciever.accept(new RecordingChanges(recordingGame, curEvent.time()));
 	}
