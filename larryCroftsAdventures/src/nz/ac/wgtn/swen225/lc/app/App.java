@@ -101,6 +101,8 @@ class App extends JFrame{
   }
 
   private void initializeUI() {
+    // Dialogs to pause the game
+    GameDialogs.initializeDialogs(this);
     // game info
     gameInfoPanel = new GameInfoPanel(width/8, height);
     gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
@@ -112,7 +114,6 @@ class App extends JFrame{
     // Center panel for game rendering
     renderer = new Renderer();
     add(renderer, BorderLayout.CENTER);
-    GameDialogs.initializeDialogs(this);
     GameDialogs.START.show();
 }
 
@@ -499,6 +500,7 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
     recorder = new Recorder((rc)-> {
       gameInfoPanel.setTime(rc.updatedTime());
       model = rc.updatedGame();
+      controller.setGameStateController(model);
       renderer.gameConsumer(model.getGameState());
     });
     controller.setRecorder(recorder);
@@ -514,7 +516,7 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
       assert SwingUtilities.isEventDispatchThread();
 
       if (state == AppState.PLAY) {
-        System.out.println(model.getChap().getCol() + ":" + model.getChap().getRow());
+        //System.out.println(model.getChap().getCol() + ":" + model.getChap().getRow());
 
         //model.moveActor();
         //recorder.ping();
@@ -544,3 +546,19 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
   }
 
 }
+
+/**
+ * better if we let the player to pick up where they left off
+ *
+ * recorder = new Recorder((rc)-> {
+        
+      timeLeft = rc.updatedTime();
+      model = rc.updatedGame();
+      gameInfoPanel.setTime(timeLeft);
+      initializeGameTimer();
+      controller.setGameStateController(model);
+      renderer.gameConsumer(model.getGameState());
+      
+    });
+
+ */

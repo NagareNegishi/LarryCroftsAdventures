@@ -64,15 +64,15 @@ public class RecorderPanel extends JPanel {
      * @param text
      */
     private void initializeComponents(ActionListener listener, Consumer<Integer> sliderConsumer) {
-        stepButton = ComponentFactory.createButton("Step", "step", listener);
-        backButton = ComponentFactory.createButton("Back", "back", listener);
-        autoReplayToggle = ComponentFactory.createToggleButton("Auto Replay", "autoReplay",
+        stepButton = ComponentFactory.createButton("\u23E9", "step", listener);
+        backButton = ComponentFactory.createButton("\u23EA", "back", listener);
+        autoReplayToggle = ComponentFactory.createToggleButton(GameDialogs.format("Auto Replay"), "autoReplay",
             e -> {listener.actionPerformed(e);
                 autoMode();
         });
         speedControl = ComponentFactory.createSlider(1, 5, 3, sliderConsumer);
-        loadRecordingButton = ComponentFactory.createButton("Load Recording", "loadRecording", listener);
-        saveRecordingButton = ComponentFactory.createButton("Save Recording", "saveRecording", listener);
+        loadRecordingButton = ComponentFactory.createButton(GameDialogs.format("Load Recording"), "loadRecording", listener);
+        saveRecordingButton = ComponentFactory.createButton(GameDialogs.format("Save Recording"), "saveRecording", listener);
         helpButton = ComponentFactory.createButton("Help", "help", listener);
         toggleButton = ComponentFactory.createButton("Show Menu", "toggle", listener);
     }
@@ -89,8 +89,10 @@ public class RecorderPanel extends JPanel {
         stepPanel.add(stepButton);
         add(stepPanel);
         add(autoReplayToggle);
-        add(new JLabel("Speed:"));
-        add(speedControl);
+        JPanel speedPanel = new JPanel(new GridLayout(2,1));
+        speedPanel.add(new JLabel("Speed:"));
+        speedPanel.add(speedControl);
+        add(speedPanel);
         add(loadRecordingButton);
         add(saveRecordingButton);
         add(helpButton);

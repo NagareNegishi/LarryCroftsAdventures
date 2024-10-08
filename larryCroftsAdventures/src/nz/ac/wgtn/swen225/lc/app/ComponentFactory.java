@@ -1,12 +1,7 @@
 package nz.ac.wgtn.swen225.lc.app;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
 import java.util.function.Consumer;
 
@@ -14,7 +9,6 @@ import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
-import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -27,8 +21,8 @@ import javax.swing.event.ChangeListener;
  */
 public class ComponentFactory {
 
-    private static Color BUTTON_BACKGROUND = new Color(0, 0, 100);
-    private static Color BUTTON_FOREGROUND = Color.WHITE;
+    private static Color BUTTON_BACKGROUND = new Color(100, 100, 100);
+    private static Color BUTTON_FOREGROUND = Color.YELLOW;
     private static Font BUTTON_FONT = new Font("Arial", Font.BOLD, 14);
 
     /**
@@ -40,10 +34,10 @@ public class ComponentFactory {
      */
     public static JButton createButton(String text, String actionCommand, ActionListener listener) {
         JButton button = new JButton(text);
-        styleButton(button);
+        //styleButton(button);
         button.setActionCommand(actionCommand);
         button.addActionListener(listener);
-        //button.setFocusable(false); // remove focus from buttons
+        button.setFocusable(false); // remove focus from buttons
         return button;
     }
 
@@ -56,10 +50,10 @@ public class ComponentFactory {
      */
     public static JToggleButton createToggleButton(String text, String actionCommand, ActionListener listener) {
         JToggleButton button = new JToggleButton(text);
-        styleButton(button);
+        //styleButton(button);
         button.setActionCommand(actionCommand);
         button.addActionListener(listener);
-        //button.setFocusable(false); // remove focus from buttons
+        button.setFocusable(false); // remove focus from buttons
         return button;
     }
 
@@ -100,10 +94,9 @@ public class ComponentFactory {
         button.setBackground(BUTTON_BACKGROUND);
         button.setForeground(BUTTON_FOREGROUND);
         button.setFont(BUTTON_FONT);
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setOpaque(true);
-        button.setBorder(new RoundedBorder(10));
+        //button.setFocusPainted(false);
+        //button.setBorderPainted(false);
+        //button.setOpaque(true);
         button.setFocusable(false);
     }
 
@@ -118,43 +111,6 @@ public class ComponentFactory {
     public static void setButtonFont(Font font) {
         BUTTON_FONT = font;
     }
-
-
-
-
-    private static class RoundedBorder implements Border {
-        private int radius;
-
-        RoundedBorder(int radius) {
-            this.radius = radius;
-        }
-
-        @Override
-        public Insets getBorderInsets(Component c) {
-            return new Insets(this.radius+1, this.radius+1, this.radius+2, this.radius);
-        }
-
-        @Override
-        public boolean isBorderOpaque() {
-            return true;
-        }
-
-        @Override
-        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(BUTTON_BACKGROUND);
-            g2.fillRoundRect(x, y, width-1, height-1, radius, radius);
-            g2.dispose();
-        }
-    }
-
-
-
-
-
-
-
 
 
 }

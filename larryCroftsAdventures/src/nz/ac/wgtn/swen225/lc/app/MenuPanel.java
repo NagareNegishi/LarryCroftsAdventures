@@ -46,9 +46,9 @@ public class MenuPanel extends JPanel{
         add(ComponentFactory.createButton("Load", "load", listener));
         add(ComponentFactory.createButton("Help", "help", listener));
         add(ComponentFactory.createButton("Exit", "exit", listener));
-        add(ComponentFactory.createButton("Show Recorder", "toggle", listener));
+        add(ComponentFactory.createButton(GameDialogs.format("Show<br>Recorder"), "toggle", listener));
     }
-    
+
     /**
      * Set the text and action command of the pause button.
      * Used to switch the functionality of the button between pause and unpause.
