@@ -49,7 +49,9 @@ public class Chap {
 		this.inventory = inventory;
 		
 		assert this.row == startRow && this.col == startCol;
-		assert this.inventory.size() == 0;
+		
+		// This line breaks de-serialisation of chap - AdamT
+		//assert this.inventory.size() == 0;
 	}
 	
 	public int getRow() {return row;}

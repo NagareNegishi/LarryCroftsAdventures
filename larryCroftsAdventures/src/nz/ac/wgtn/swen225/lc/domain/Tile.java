@@ -17,7 +17,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = WallTile.class, name = "WallTile"),
     @JsonSubTypes.Type(value = LockedDoorTile.class, name = "LockedDoorTile"),
     @JsonSubTypes.Type(value = KeyTile.class, name = "KeyTile"),
-    @JsonSubTypes.Type(value = TreasureTile.class, name = "TreasureTile")
+    @JsonSubTypes.Type(value = TreasureTile.class, name = "TreasureTile"),
+    @JsonSubTypes.Type(value = Exit.class, name = "Exit"),
+    @JsonSubTypes.Type(value = ExitLockTile.class, name = "ExitLockTile"),
+    @JsonSubTypes.Type(value = InfoFieldTile.class, name = "InfoFieldTile")
 })
 
 @JsonIgnoreProperties(ignoreUnknown = true)

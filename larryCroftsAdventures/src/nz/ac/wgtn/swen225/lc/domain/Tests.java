@@ -510,6 +510,7 @@ public class Tests {
 		@Test
 		public void testIncorrectGameState() {
 			assertThrows(IllegalArgumentException.class, () -> {
+
 				GameState test = new GameState(null, null, -1, null, -1, null,null);
 			});
 		}
