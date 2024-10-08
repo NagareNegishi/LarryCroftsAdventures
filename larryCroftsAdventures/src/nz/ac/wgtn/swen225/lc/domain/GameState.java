@@ -8,9 +8,12 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
+import nz.ac.wgtn.swen225.lc.persistency.MockAppNotifier;
 
 /**
  * GameState class represents the state the game is currently in. This includes the current maze, Chap,
@@ -38,8 +41,11 @@ public class GameState{
 	private int timeLeft;
 	// List for enemies in the level
 	@JsonProperty
-	ArrayList<Actor> enemies;
+	private ArrayList<Actor> enemies;
 	// AppNotifier
+	@JsonProperty
+	@JsonSerialize(as = MockAppNotifier.class)
+	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
 	
 	public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
@@ -55,6 +61,7 @@ public class GameState{
 		this.keysCollected = new HashMap<>();
 		this.timeLeft = 60; // 60 seconds by default
 		this.appNotifier = appNotifier;
+		this.enemies = new ArrayList<Actor>();
 
 		assert this.totalTreasures == totalTreasures;
 		assert keysCollected.isEmpty() == true;
@@ -75,13 +82,8 @@ public class GameState{
 					@JsonProperty("totalTreasures") int totalTreasures,
 					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
 					@JsonProperty("timeLeft") int timeLeft,
-<<<<<<< larryCroftsAdventures/src/nz/ac/wgtn/swen225/lc/domain/GameState.java
-					AppNotifier appNotifier,
-					ArrayList<Actor> enemies){
-=======
 					@JsonProperty("appNotifier") AppNotifier appNotifier,
-					@JsonProperty("enemies")List<Actor> enemies) {
->>>>>>> larryCroftsAdventures/src/nz/ac/wgtn/swen225/lc/domain/GameState.java
+					@JsonProperty("enemies")ArrayList<Actor> enemies) {
 		
 		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0 || timeLeft < 0) {throw new IllegalArgumentException("Total treasures and time left must be greater than 0");}

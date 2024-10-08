@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.junit.Test;
+//import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
 
 import nz.ac.wgtn.swen225.lc.app.MockController;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
