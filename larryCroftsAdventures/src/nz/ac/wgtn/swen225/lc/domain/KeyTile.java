@@ -19,7 +19,7 @@ public class KeyTile extends Tile{
 	private boolean keyCollected = false;
 	
 	@JsonCreator
-	public KeyTile(Key key) {
+	public KeyTile(@JsonProperty("key") Key key) {
 		if(key.equals(null)) {throw new IllegalArgumentException("Cannot initalise KeyTile with null key");}
 		this.key = key;
 		}
