@@ -7,7 +7,16 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 /**
- * A panel that displays the menu options, including pause, save, load, help, exit, and show recorder.
+ * A panel that displays the menu options, options include:
+ * - Pause/ unpause the game.
+ * - Save the game.
+ * - Load a saved game.
+ * - Display help for the game.
+ * - Exit the game.
+ * - Show the recorder panel.
+ *
+ * @author Nagare Negishi
+ * @studentID 300653779
  */
 public class MenuPanel extends JPanel{
     private static final long serialVersionUID= 1L;
@@ -42,9 +51,11 @@ public class MenuPanel extends JPanel{
     
     /**
      * Set the text and action command of the pause button.
+     * Used to switch the functionality of the button between pause and unpause.
      * @param text
      */
     public void setPauseButton(String text) {
+        assert text.equals("Pause") || text.equals("Unpause") : "Invalid text for pause button";
         pauseButton.setText(text);
         pauseButton.setActionCommand(text.toLowerCase());
     }

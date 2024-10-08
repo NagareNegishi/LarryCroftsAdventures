@@ -15,10 +15,13 @@ import javax.swing.JPanel;
 /**
  * A dialog that displays a message when the game is paused.
  * It is semi-transparent and blocks the game window.
+ *
+ * @author Nagare Negishi
+ * @studentID 300653779
  */
 public class PauseDialog extends JDialog {
     private static final long serialVersionUID = 1L;
-    private final double WIDTH_PERCENTAGE; // how much of the parent it want to cover
+    private final double WIDTH_PERCENTAGE; // how much of the parent it will cover
     
 
     /**
@@ -60,6 +63,10 @@ public class PauseDialog extends JDialog {
         setFocusableWindowState(false); // do not allow focus
     }
 
+    /**
+     * Show the dialog and center it relative to the parent.
+     * @param visible
+     */
     @Override
     public void setVisible(boolean visible) {
         if (visible) {
