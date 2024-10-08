@@ -131,12 +131,6 @@ class App extends JFrame{
         sidePanel.setPauseButtonText("Pause");
       }
       case "save" -> saveGame();
-      /**
-       *  Currently never called. I would like different buttons for levels and saves
-       *  but if we cannot, we could just use the single levels folder - AdamT
-       * 
-       * -> I believe loading from saved game is only requirement. need to be confirmed
-       */
       case "load" -> {
         checkModel(loadFile(Paths.savesDir));
         gameRun();
