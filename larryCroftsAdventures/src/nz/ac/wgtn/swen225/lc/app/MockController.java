@@ -10,31 +10,20 @@ import nz.ac.wgtn.swen225.lc.domain.GameStateController;
  * Initially created by Fuzz developer, and I asked him to move it to App package.
  * As App shouldn't allow other class to modify the controller,
  * but Fuzz need to test the game logic.
+ *
+ * @author Nagare Negishi
+ * @studentID 300653779
  */
 public class MockController extends Controller{
+	public GameStateController stateController;
 
-	/*
-	## this need to go as we only use GameStateController to instantiate the controller
-
-	public Chap chap;
-	public Maze maze;
-		this.chap = chap;
-		this.maze = maze;
-	}
-	public Chap getChap() {
-		return chap;
-	}
-	public Maze getMaze() {
-		return maze;
-	}
-	*/
-
-
-
-	public GameStateController update;
+	/**
+	 * Constructor for MockController class
+	 * @param stateController contains the methods defined in GameStateController class
+	 */
 	public MockController(GameStateController stateController){
 		super(stateController, createMockActionBindings());
-		update = stateController;
+		this.stateController = stateController;
 	}
 
 	/**
