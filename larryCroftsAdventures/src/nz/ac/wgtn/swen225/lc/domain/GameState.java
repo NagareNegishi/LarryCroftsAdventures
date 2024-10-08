@@ -1,15 +1,18 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
+import nz.ac.wgtn.swen225.lc.persistency.MockAppNotifier;
 
 /**
  * GameState class represents the state the game is currently in. This includes the current maze, Chap,
@@ -37,14 +40,18 @@ public class GameState{
 	private int timeLeft;
 	// List for enemies in the level
 	@JsonProperty
-	List<Actor> enemies;
+	private ArrayList<Actor> enemies;
 	// AppNotifier
+	@JsonProperty
+	@JsonSerialize(as = MockAppNotifier.class)
+	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
 	
-	public GameState(Maze maze, Chap chap, int totalTreasures) {
+	public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
 		
 		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
+		if(appNotifier.equals(null)) {throw new IllegalArgumentException("App notifier is null");}
 		
 		this.maze = maze;
 		this.chap = chap;
@@ -52,6 +59,8 @@ public class GameState{
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = new HashMap<>();
 		this.timeLeft = 60; // 60 seconds by default
+		this.appNotifier = appNotifier;
+		this.enemies = new ArrayList<Actor>();
 
 		assert this.totalTreasures == totalTreasures;
 		assert keysCollected.isEmpty() == true;
@@ -73,11 +82,13 @@ public class GameState{
 					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
 					@JsonProperty("timeLeft") int timeLeft,
 					@JsonProperty("appNotifier") AppNotifier appNotifier,
-					@JsonProperty("enemies")List<Actor> enemies) {
+					@JsonProperty("enemies")ArrayList<Actor> enemies) {
 		
 		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0 || timeLeft < 0) {throw new IllegalArgumentException("Total treasures and time left must be greater than 0");}
 		if(keysCollected == null) {throw new IllegalArgumentException("KeysCollected list is null");}
+		if(enemies == null) {throw new IllegalArgumentException("List of enemies is null");}
+		if(appNotifier.equals(null)) {throw new IllegalArgumentException("App notifier is null");}
 		
 		this.maze = maze;
 		this.chap = chap;
@@ -86,7 +97,7 @@ public class GameState{
 		this.keysCollected = keysCollected;
 		this.timeLeft =timeLeft;
 		this.appNotifier = appNotifier;
-		this.enemies = enemies;
+		this.enemies = (ArrayList<Actor>) enemies;
 		assert this.totalTreasures == totalTreasures;
 		assert this.timeLeft == timeLeft;
 	}
@@ -189,6 +200,10 @@ public class GameState{
 			}
 		}
 	} */
+	
+	public void moveActor() {
+		enemies.forEach(a -> a.move(maze));
+	}
 		
 	public boolean checkForMatchingKey(String doorColour) {
 		return chap.inventory().stream()

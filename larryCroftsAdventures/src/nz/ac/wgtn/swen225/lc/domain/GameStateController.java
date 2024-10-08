@@ -53,6 +53,8 @@ public class GameStateController{
 	}
 	
 	public void moveChap(Direction direction) {gameState.moveChap(direction);}
+	public void moveActor() {gameState.enemies.forEach(a -> a.move(maze));}
+	
 	@JsonIgnore
 	public List<Item> getChapInventory(){return gameState.getChap().inventory();}
 	public Map<Key,String> getKeysCollected(){return gameState.keysCollected();}
@@ -68,7 +70,7 @@ public class GameStateController{
 	public void setTime(int time) {gameState.setTime(time);}
 
 	public Tile getTileAtChapPosition() { return maze.getTile(chap.getRow(), chap.getCol());}	 
-
+	public GameState getGameState() {return gameState;}
 	/*
 	// debugging method for returning the tiles around Chap REMOVE
 	public String chapSurroundings() {

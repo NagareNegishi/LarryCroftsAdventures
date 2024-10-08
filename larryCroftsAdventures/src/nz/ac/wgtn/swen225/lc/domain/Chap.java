@@ -22,7 +22,7 @@ public class Chap {
 	private int row;
 	private int col;
 	@JsonProperty
-	private List<Item> inventory;
+	private ArrayList<Item> inventory;
 	
 	/* public Chap(int startRow, int startCol) {
 		if(startRow < 0 || startCol < 0) {throw new IllegalArgumentException("Chap must be in bounds of the maze");}
@@ -49,12 +49,14 @@ public class Chap {
 		this.inventory = inventory;
 		
 		assert this.row == startRow && this.col == startCol;
-		assert this.inventory.size() == 0;
+		
+		// This line breaks de-serialisation of chap - AdamT
+		//assert this.inventory.size() == 0;
 	}
 	
 	public int getRow() {return row;}
 	public int getCol() {return col;}
-	public List<Item> inventory(){return inventory;}
+	public ArrayList<Item> inventory(){return inventory;}
 	
 	// helper method to move chap anywhere in the maze, good for debugging. Also used for teleport tile logic.
 	public void moveTo(int newRow, int newCol, Maze maze) {
