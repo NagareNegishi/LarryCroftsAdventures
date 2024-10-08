@@ -1,6 +1,5 @@
 package nz.ac.wgtn.swen225.lc.app;
 
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.util.function.Consumer;
@@ -66,7 +65,7 @@ public class RecorderPanel extends JPanel {
      */
     private void initializeComponents(ActionListener listener, Consumer<Integer> sliderConsumer) {
         stepButton = ComponentFactory.createButton("Step", "step", listener);
-        backButton = ComponentFactory.createButton("Step Back", "back", listener);
+        backButton = ComponentFactory.createButton("Back", "back", listener);
         autoReplayToggle = ComponentFactory.createToggleButton("Auto Replay", "autoReplay",
             e -> {listener.actionPerformed(e);
                 autoMode();
@@ -82,7 +81,10 @@ public class RecorderPanel extends JPanel {
      * Add the components to the panel.
      */
     private void addComponents() {
-        JPanel stepPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel stepPanel = new JPanel(new GridLayout(2, 2));
+        stepPanel.add(new JLabel("Step:"));
+        // fill panel here
+        stepPanel.add(new JLabel(""));
         stepPanel.add(backButton);
         stepPanel.add(stepButton);
         add(stepPanel);

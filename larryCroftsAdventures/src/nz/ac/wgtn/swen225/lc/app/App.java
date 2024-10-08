@@ -493,10 +493,10 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
     gameInfoPanel.setTreasures(treasuresLeft);
 
     GameState gamestate = model.getGameState();
-    //gamestate.setAppNotifier(notifier);
+    gamestate.setAppNotifier(notifier);
     controller = new Controller(model, actionBindings);
 
-    recorder = new Recorder((rc)-> { 
+    recorder = new Recorder((rc)-> {
       gameInfoPanel.setTime(rc.updatedTime());
       model = rc.updatedGame();
       renderer.gameConsumer(model.getGameState());
@@ -514,7 +514,9 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
       assert SwingUtilities.isEventDispatchThread();
 
       if (state == AppState.PLAY) {
-        model.moveActor();
+        System.out.println(model.getChap().getCol() + ":" + model.getChap().getRow());
+
+        //model.moveActor();
         //recorder.ping();
 
         /**
