@@ -49,19 +49,26 @@ class App extends JFrame{
 
   Runnable closePhase= ()->{};
   private Map<String, Runnable> actionBindings =  new HashMap<>(); // need to be passed to controller
+  private Map<String, Action> actions = new HashMap<>(); // contains actions for buttons
   private GameStateController model;
   private AppNotifier notifier = getAppNotifier(); // need to be passed to model
   private Controller controller;
-  //private JPanel renderer;
   private Renderer renderer;
   private Recorder recorder;
-  public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY}
+  private enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY}
   private AppState state = AppState.NEWGAME;
 
   private static int width = 800;
   private static int height = 400;
   private static final int MAX_LEVEL = 2; //its not pretty... but i need to check loadNextLevel failure
-
+  
+  /**
+   * Functional interface for actions
+   * Used to store actions in a map and showcase the use of strategy pattern
+   */
+  private interface Action{
+    void execute();
+  }
 
   App(){
     setTitle("Larry Croft's Adventures");
@@ -71,6 +78,7 @@ class App extends JFrame{
     initializeModel();
     initializeUI();
     initializeActionBindings();
+    initializeActions();
     initializeController();
     initializeGameTimer(); //must be after controller??
 
@@ -100,6 +108,9 @@ class App extends JFrame{
     }
   }
 
+  /**
+   * Initialize the UI for the game.
+   */
   private void initializeUI() {
     // Dialogs to pause the game
     GameDialogs.initializeDialogs(this);
@@ -108,8 +119,8 @@ class App extends JFrame{
     gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
     add(gameInfoPanel, BorderLayout.EAST);
     // Side panel for menu/recorder UI
-    sidePanel = new SidePanel(width/8, height, e -> handleMenuAction(e),
-    e -> handleRecorderAction(e), slider -> handleSliderChange(slider));
+    sidePanel = new SidePanel(width/8, height, e -> handleAction(e),
+    e -> handleAction(e), slider -> handleSliderChange(slider));
     add(sidePanel, BorderLayout.WEST);
     // Center panel for game rendering
     renderer = new Renderer();
@@ -117,53 +128,51 @@ class App extends JFrame{
     GameDialogs.START.show();
 }
 
-/**
- * Handle menu actions
- * @param actionCommand
- */
-  private void handleMenuAction(String actionCommand) {
-    switch(actionCommand){
-      case "pause" -> {
-        pauseGame();
-        sidePanel.setPauseButtonText("Unpause");
-      }
-      case "unpause" -> {
-        unpauseGame();
-        sidePanel.setPauseButtonText("Pause");
-      }
-      case "save" -> saveGame();
-      case "load" -> {
-        checkModel(loadFile(Paths.savesDir));
-        gameRun();
-      }
-      case "help" -> showHelp(MenuPanel.HELP);
-      case "exit" -> exitGameWithoutSaving();
-      case "toggle" -> {
-        sidePanel.togglePanel();
-        stopGame();
-      }
-    }
-    assert false: "Unknown action command: " + actionCommand;
+  /**
+   * Initialize the actions for buttons in the UI
+   */
+  private void initializeActions(){
+    actions.put("pause", () -> {
+      pauseGame();
+      sidePanel.setPauseButtonText("Unpause");
+    });
+    actions.put("unpause", () -> {
+      unpauseGame();
+      sidePanel.setPauseButtonText("Pause");
+    });
+    actions.put("save", this::saveGame);
+    actions.put("load", () -> {
+      checkModel(loadFile(Paths.savesDir));
+      gameRun();
+    });
+    actions.put("help", () -> showHelp(MenuPanel.HELP));
+    actions.put("exit", this::exitGameWithoutSaving);
+    actions.put("toggleMenu", () -> {
+      sidePanel.togglePanel();
+      stopGame();
+    });
+    actions.put("step", () -> recorder.nextStep());
+    actions.put("back", () -> recorder.previousStep());
+    actions.put("autoReplay", () -> recorder.autoReplay());
+    actions.put("loadRecording", () -> recorder.loadRecording());
+    actions.put("saveRecording", () -> recorder.saveRecording());
+    actions.put("helpRecorder", () -> showHelp(RecorderPanel.HELP));
+    actions.put("toggleRecorder", () -> {
+      sidePanel.togglePanel();
+      unpauseGame();
+    });
   }
 
   /**
-   * connect to recorder method when recorder is implemented
+   * Handle the action command from the buttons in the UI
+   * @param actionCommand
    */
-  private void handleRecorderAction(String actionCommand){
-    switch(actionCommand){
-      case "step" -> recorder.nextStep();
-      case "back" -> recorder.previousStep();
-      case "autoReplay" -> recorder.autoReplay();
-      case "loadRecording" -> recorder.loadRecording();
-      case "saveRecording" -> recorder.saveRecording();
-      case "help" -> showHelp(RecorderPanel.HELP);
-      case "toggle" -> {
-        sidePanel.togglePanel();
-        unpauseGame();
-      }
-    }
-    assert false: "Unknown action command: " + actionCommand;
+  private void handleAction(String actionCommand) {
+    actions.getOrDefault(actionCommand, () -> {
+      throw new IllegalArgumentException("Unknown action command: " + actionCommand);
+    }).execute();
   }
+
 
   /**
    * Method to handle the change in the slider value in the recorder panel
@@ -544,6 +553,10 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
     gameInfoPanel.setKeys(keysCollectednum);
     gameInfoPanel.setTreasures(treasuresLeft);
   }
+
+
+
+
 
 }
 

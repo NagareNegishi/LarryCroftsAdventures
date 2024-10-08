@@ -73,8 +73,8 @@ public class RecorderPanel extends JPanel {
         speedControl = ComponentFactory.createSlider(1, 5, 3, sliderConsumer);
         loadRecordingButton = ComponentFactory.createButton(GameDialogs.format("Load Recording"), "loadRecording", listener);
         saveRecordingButton = ComponentFactory.createButton(GameDialogs.format("Save Recording"), "saveRecording", listener);
-        helpButton = ComponentFactory.createButton("Help", "help", listener);
-        toggleButton = ComponentFactory.createButton("Show Menu", "toggle", listener);
+        helpButton = ComponentFactory.createButton("Help", "helpRecorder", listener);
+        toggleButton = ComponentFactory.createButton("Show Menu", "toggleRecorder", listener);
     }
 
     /**
