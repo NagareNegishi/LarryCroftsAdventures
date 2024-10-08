@@ -40,8 +40,7 @@ public class GameState{
 	@JsonProperty
 	private int timeLeft;
 	// List for enemies in the level
-	@JsonProperty
-	private ArrayList<Actor> enemies;
+	@JsonProperty ArrayList<Actor> enemies;
 	// AppNotifier
 	@JsonProperty
 	@JsonSerialize(as = MockAppNotifier.class)

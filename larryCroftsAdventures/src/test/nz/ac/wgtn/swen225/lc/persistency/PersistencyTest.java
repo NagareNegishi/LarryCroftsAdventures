@@ -287,4 +287,66 @@ public class PersistencyTest {
     	MockAppNotifier notifD = notifO.get();
     }
     
+    @Test
+    public void roomTest() {
+    	
+    	
+    	
+    }
+    
+    @Test
+    public void saveNullField() {
+    	
+    	
+    }
+    
+    @Test
+    public void keyColourTest() {
+    	Maze maze = Maze.createLevel1();
+				
+		Chap chap = new Chap(13, 9, new ArrayList<Item>());
+		Key keyBlue =  new Key("Blue");
+		Key keyRed = new Key("Red");
+		chap.pickUpItem(keyRed);
+		chap.pickUpItem(keyBlue);
+		
+		GameState gs = new GameState(maze, chap, 2, new MockAppNotifier());
+		maze.printMaze();
+		System.out.println("");
+		GameStateController gsc = new GameStateController(gs);
+    	gsc.moveChap(Direction.Right);
+    	gsc.moveChap(Direction.Right);
+    	
+    	assert chap.getRow() != 9 || chap.getCol() != 13;
+    	maze.printMaze();
+    }
+    
+    @Test
+    public void keySerial() {
+    	Key key = new Key("red");
+    	assert saveObj("keyTest", key);
+    	Optional<Key> keyO = LoadFile.loadObj("keyTest", Key.class);
+    	assert keyO.isPresent();
+    	Key keyD = keyO.get();
+    	assert keyD.colour().equals("red");
+    }
+    
+    @Test
+    public void keyInventoryTest() {
+    	Maze maze = Maze.createLevel1();
+		Chap chap = new Chap(13, 9, new ArrayList<Item>());
+		Key keyBlue =  new Key("Blue");
+		Key keyRed = new Key("Red");
+		chap.pickUpItem(keyRed);
+		chap.pickUpItem(keyBlue);
+    	assert chap.inventory().contains(keyRed);
+    	
+    	assert saveObj("inventoryTest", chap);
+    	Optional<Chap> chapO = LoadFile.loadObj("inventoryTest", Chap.class);
+    	assert chapO.isPresent();
+    	Chap chapD = chapO.get();
+    	((Key)chapD.inventory().get(0)).colour().equals("Blue");
+    	
+    	
+    }
 }
