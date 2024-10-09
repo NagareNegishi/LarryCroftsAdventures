@@ -27,12 +27,13 @@ public class MenuPanel extends JPanel{
     "Collect keys to unlock doors.\n" +
     "Avoid enemies.\n" +
     "Press Ctrl + X to exit without saving.\n" +
-    "Press Ctrl + S to save the game.\n" +
+    "Press Ctrl + S to exit with saving the game.\n" +
     "Press Ctrl + R to resume a saved game.\n" +
     "Press Ctrl + 1 to start a new game at level 1.\n" +
     "Press Ctrl + 2 to start a new game at level 2.\n" +
     "Press Space to pause the game.\n" +
-    "Press Esc to resume the game.\n";
+    "Press Esc to resume the game.\n" +
+    "Note: all key inputs are unavailable during the recorder mode.\n";
 
     /**
      * Create a new MenuPanel with the given ActionListener.

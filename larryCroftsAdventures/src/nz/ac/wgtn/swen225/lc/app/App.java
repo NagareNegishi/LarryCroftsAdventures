@@ -55,8 +55,8 @@ class App extends JFrame{
   private Controller controller;
   private Renderer renderer;
   private Recorder recorder;
-  private enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY}
-  private AppState state = AppState.NEWGAME;
+  private enum AppState {PLAY, PAUSED, GAMEOVER, VICTORY}
+  private AppState state = AppState.PAUSED;
 
   private static int width = 800;
   private static int height = 400;
@@ -91,6 +91,8 @@ class App extends JFrame{
         gameTimer.stop();
       }
     });
+    setLevel(model);
+    stopGame();
   }
 
   /**
@@ -149,6 +151,8 @@ class App extends JFrame{
     actions.put("exit", this::exitGameWithoutSaving);
     actions.put("toggleMenu", () -> {
       sidePanel.togglePanel();
+      controller.setRecorderMode(true);
+      GameDialogs.hideAll(); //# 1
       stopGame();
     });
     actions.put("step", () -> recorder.nextStep());
@@ -159,6 +163,7 @@ class App extends JFrame{
     actions.put("helpRecorder", () -> showHelp(RecorderPanel.HELP));
     actions.put("toggleRecorder", () -> {
       sidePanel.togglePanel();
+      controller.setRecorderMode(false);
       unpauseGame();
     });
   }
@@ -209,7 +214,7 @@ class App extends JFrame{
    * Initialize the controller for the game
    */
   private void initializeController() {
-    controller = new Controller(model, actionBindings); //initialize with level 1
+    controller = new Controller(model, actionBindings, MAX_TIME); //initialize with level 1
     addKeyListener(controller);
     setFocusable(true);//could be remove??
   }
@@ -294,11 +299,8 @@ class App extends JFrame{
     boolean unpause = switch (state) {
       case PLAY -> false; // Already playing
       case PAUSED -> true;
-      case NEWGAME -> {
-        setLevel(model);
-        yield true;}
       case GAMEOVER -> {
-      timeLeft = MAX_TIME;
+      //timeLeft = MAX_TIME;
       checkModel(LoadFile.loadLevel("level" + currentLevel));
       yield true;
       }
@@ -376,6 +378,7 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
    * Save the game to a file in the saves directory.
    */
   private void saveGame() {
+    model.setTime(timeLeft);
     JFileChooser fileChooser = customFileChooser(Paths.savesDir, "Save Game", "JSON files");
     int userSelection = fileChooser.showSaveDialog(this); // show dialog and wait user input
     if (userSelection == JFileChooser.APPROVE_OPTION) { // if user picked a file
@@ -496,6 +499,7 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
     resetGame();
 
     model = level;
+    timeLeft = model.getTime();
     treasuresLeft = model.getTotalTreasures();
     keysCollectednum = model.getKeysCollected().size();
     keysCollected = new HashSet<>(model.getKeysCollected().values());
@@ -504,13 +508,16 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
 
     GameState gamestate = model.getGameState();
     gamestate.setAppNotifier(notifier);
-    controller = new Controller(model, actionBindings);
+    controller = new Controller(model, actionBindings, timeLeft);
 
     recorder = new Recorder((rc)-> {
-      gameInfoPanel.setTime(rc.updatedTime());
+      timeLeft = rc.updatedTime();
       model = rc.updatedGame();
+      gameInfoPanel.setTime(timeLeft);
+      initializeGameTimer();
       controller.setGameStateController(model);
       renderer.gameConsumer(model.getGameState());
+      updateGameInfo(model);
     });
     controller.setRecorder(recorder);
 
@@ -545,7 +552,9 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
 
 
   /**
-   * this is soooo unpretty solution definitely need to be changed
+   * Update the game info panel with the current keys and treasures left.
+   * Used by recorder to update the game info.
+   * @param level model of the game (GameStateController)
    */
   private void updateGameInfo(GameStateController level) {
     keysCollectednum = level.getKeysCollected().size();
