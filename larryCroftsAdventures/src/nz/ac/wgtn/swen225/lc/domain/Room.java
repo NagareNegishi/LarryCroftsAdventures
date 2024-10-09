@@ -134,6 +134,7 @@ public class Room {
 	        }
 	    }
 	
+		
 		for(LockedDoor door : lockedDoors) {
 			mazeTiles[door.row()][door.col()] = new LockedDoorTile(door.colour(), true);
 		}

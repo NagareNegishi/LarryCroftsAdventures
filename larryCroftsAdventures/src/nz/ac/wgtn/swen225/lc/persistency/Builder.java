@@ -43,10 +43,10 @@ public class Builder {
 		Tile[][] tiles = new Tile[rows][cols];
 		
 		// Fill tiles with walls
-		for(Tile[] row : tiles) {
-			for(Tile col : row) {
-				col = new WallTile();
-			}
+		for(int row = 0; row < tiles.length; row++) {
+		    for(int col = 0; col < tiles[row].length; col++) {
+		        tiles[row][col] = new WallTile();
+		    }
 		}
 		
 		for(Entry<Coord, Room> roomChunk : roomMap.entrySet()) {
@@ -73,17 +73,7 @@ public class Builder {
 		for(Entry<Coord, Tile> innerTile : room.innerTile.entrySet()) {
 			tiles[innerTile.getKey().row() + firstRow][innerTile.getKey().col() + firstCol] = innerTile.getValue();
 		}
-		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 }
 
