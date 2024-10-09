@@ -180,8 +180,14 @@ public class GameState{
             Item item = currentTile.getItem();
             chap.pickUpItem(item);
             switch (item) {
-            case Treasure treasure -> treasureCollected();
-            case Key key -> keysCollected.put(key, key.colour());
+            case Treasure treasure -> {
+				treasureCollected();
+				TreasurePickup(treasuresCollected); ////////////// Added by Nagi
+			}
+            case Key key -> {
+				keysCollected.put(key, key.colour());
+				KeyPickup(keysCollected.size()); ////////////// Added by Nagi
+			}
             default -> {}
         }
             currentTile.removeItem();

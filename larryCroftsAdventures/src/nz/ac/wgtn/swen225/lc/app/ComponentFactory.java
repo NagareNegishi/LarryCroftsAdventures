@@ -3,14 +3,17 @@ package nz.ac.wgtn.swen225.lc.app;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.function.Consumer;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  * Factory class for creating Swing components with common settings.
@@ -89,6 +92,35 @@ public class ComponentFactory {
         slider.addChangeListener(changeListener);
         return slider;
     }
+
+
+    /**
+     * Create custom file chooser with given directory, title and description
+     * User can not change the directory and can only select json files
+     * @param dir
+     * @param title
+     * @param description
+     * @return JFileChooser
+     */
+    public static JFileChooser customFileChooser(File dir, String title, String description) {
+    JFileChooser fileChooser = new JFileChooser(dir) {
+        /**
+         * Overriding setCurrentDirectory to prevent user from changing directory
+         */
+        @Override
+        public void setCurrentDirectory(File directory) {
+            super.setCurrentDirectory(dir);
+        }
+    };
+    fileChooser.setDialogTitle(title);
+    FileNameExtensionFilter filter = new FileNameExtensionFilter(description, "json");
+    fileChooser.setFileFilter(filter);
+    fileChooser.setAcceptAllFileFilterUsed(false);
+    fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    return fileChooser;
+    }
+
+
 
     private static void styleButton(AbstractButton button) {
         button.setBackground(BUTTON_BACKGROUND);
