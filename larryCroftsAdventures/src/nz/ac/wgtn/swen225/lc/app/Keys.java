@@ -30,6 +30,7 @@ import javax.swing.SwingUtilities;
 class Keys implements KeyListener {
     private final Map<KeyStroke,Runnable> actionsPressed= new HashMap<>();
     private boolean paused = false;
+    private boolean recorderMode = false;
     /*
      * Set of direction keys,
      * used to prevent the chap from moving while the game is paused.
@@ -61,7 +62,7 @@ class Keys implements KeyListener {
     public void keyPressed(KeyEvent e){
         assert SwingUtilities.isEventDispatchThread(); // thread safety check
         KeyStroke keyStroke = KeyStroke.getKeyStrokeForEvent(e);
-        if (!paused || !directionKeys.contains(keyStroke)) {
+        if (!recorderMode && (!paused || !directionKeys.contains(keyStroke))) {
             actionsPressed.getOrDefault(keyStroke, () -> {}).run();
         }
     }
@@ -71,6 +72,14 @@ class Keys implements KeyListener {
      */
     public void pause(boolean pause){
         paused = pause;
+    }
+
+    /**
+     * Set the recorder mode
+     * @param mode true if the recorder mode is on
+     */
+    public void setRecorderMode(boolean mode){
+        recorderMode = mode;
     }
 
     // unused methods

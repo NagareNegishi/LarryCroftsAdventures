@@ -22,7 +22,7 @@ public class MockController extends Controller{
 	 * @param stateController contains the methods defined in GameStateController class
 	 */
 	public MockController(GameStateController stateController){
-		super(stateController, createMockActionBindings());
+		super(stateController, createMockActionBindings(),60);
 		this.stateController = stateController;
 	}
 
