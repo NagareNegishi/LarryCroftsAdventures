@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 public class GameInfoPanel extends JPanel {
     private JLabel timeTextLabel;
     private JLabel timeLabel;
+    private JLabel recorderLabel;
     private JLabel levelLabel;
     private JLabel keysLabel;
     private JLabel treasuresLabel;
@@ -41,11 +42,14 @@ public class GameInfoPanel extends JPanel {
         timerPanel.add(timeTextLabel);
         timerPanel.add(timeLabel);
 
-        JPanel infoPanel = new JPanel(new GridLayout(3, 1));
+        JPanel infoPanel = new JPanel(new GridLayout(4, 1));
+        recorderLabel = new JLabel("Recorder mode");
+        recorderLabel.setForeground(Color.RED);
+        recorderLabel.setVisible(false);
         levelLabel = new JLabel("Level: 1");
         keysLabel = new JLabel("Keys: 0");
         treasuresLabel = new JLabel("Treasures left: 10");
-
+        infoPanel.add(recorderLabel);
         infoPanel.add(levelLabel);
         infoPanel.add(keysLabel);
         infoPanel.add(treasuresLabel);
@@ -108,5 +112,13 @@ public class GameInfoPanel extends JPanel {
             default -> Color.BLACK;
         };
         timeLabel.setForeground(color);
+    }
+
+    /**
+     * set the recorder mode label visible or invisible
+     * @param isRecorder
+     */
+    public void setRecorderMode(boolean isRecorder) {
+        recorderLabel.setVisible(isRecorder);
     }
 }

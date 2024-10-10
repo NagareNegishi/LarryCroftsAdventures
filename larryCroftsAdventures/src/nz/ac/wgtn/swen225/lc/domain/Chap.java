@@ -1,7 +1,6 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -121,7 +120,6 @@ public class Chap {
 	
 	public void pickUpItem(Item item) {
 		if(item.equals(null)) {throw new IllegalArgumentException("Cannot pick up item because it is null");}
-		//System.out.println("I picked up: " + item.description() + ";)");
 		if(item instanceof Key) {
 		inventory.add(item);
 		assert inventory.contains(item);

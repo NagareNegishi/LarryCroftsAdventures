@@ -79,7 +79,7 @@ class App extends JFrame{
     initializeActionBindings();
     initializeActions();
     initializeController();
-    initializeGameTimer(); //must be after controller??
+    initializeGameTimer();
 
     setPreferredSize(new Dimension(width, height));
     pack();
@@ -150,6 +150,7 @@ class App extends JFrame{
     actions.put("exit", () -> exitGame(false));
     actions.put("toggleMenu", () -> {
       sidePanel.togglePanel();
+      gameInfoPanel.setRecorderMode(true);
       controller.setRecorderMode(true);
       GameDialogs.hideAll();
       stopGame();
@@ -162,7 +163,9 @@ class App extends JFrame{
     actions.put("helpRecorder", () -> showHelp(RecorderPanel.HELP));
     actions.put("toggleRecorder", () -> {
       sidePanel.togglePanel();
+      //recorder.checkState();
       controller.setRecorderMode(false);
+      gameInfoPanel.setRecorderMode(false);
       unpauseGame();
       if (timeLeft == 0) gameOver();
     });
@@ -194,7 +197,7 @@ class App extends JFrame{
     actionBindings.put("exitAndSave", () -> exitGame(true));
     actionBindings.put("resumeSavedGame", () -> loadGame(Paths.savesDir,false));
     actionBindings.put("startNewGame1", () -> loadGame(Paths.level1, true));
-    actionBindings.put("startNewGame2", () -> loadGame(Paths.level1, true));/////////////////////// need to change to level2
+    actionBindings.put("startNewGame2", () -> loadGame(Paths.level2, true));
     actionBindings.put("pause", this::pauseGame);
     actionBindings.put("unpause", this::unpauseGame);
   }
@@ -369,15 +372,16 @@ class App extends JFrame{
    * If the next level is not found, the game is won.
    */
   private void loadNextLevel() {
-    int nextlevel = currentLevel++;
-    if (nextlevel > MAX_LEVEL) {
+    currentLevel++;
+    System.out.println("calling next level: " + currentLevel);/////////////////
+    if (currentLevel > MAX_LEVEL) {
       state = AppState.VICTORY;
       GameDialogs.VICTORY.show();
       return;
     }
     // This still works. I've converted everything else to Files, but not sure how to convert this atm -AdamT
     stopGame();
-    checkModel(LoadFile.loadLevel("level" + nextlevel));
+    checkModel(LoadFile.loadLevel("level" + currentLevel));
     gameRun();
   }
 
@@ -495,6 +499,7 @@ class App extends JFrame{
         loadNextLevel();
       }
       public void onGameLose(){
+        //recorder.onGameLose();
         gameOver();
         System.out.println("Game Over is called");
       }
@@ -504,8 +509,7 @@ class App extends JFrame{
         gameInfoPanel.setKeys(keysCollectednum);
       }
       public void onTreasurePickup(int treasureCount){
-        assert treasureCount >= 0: "treasureCount is negative";
-        treasuresLeft = treasureCount;
+        treasuresLeft--;
         gameInfoPanel.setTreasures(treasuresLeft);
       }
     };
