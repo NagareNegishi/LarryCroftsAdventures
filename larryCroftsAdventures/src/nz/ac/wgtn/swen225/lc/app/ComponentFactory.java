@@ -2,6 +2,8 @@ package nz.ac.wgtn.swen225.lc.app;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.function.Consumer;
@@ -9,6 +11,8 @@ import java.util.function.Consumer;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
@@ -16,8 +20,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
- * Factory class for creating Swing components with common settings.
- * It has 3 static methods to create JButton, JToggleButton, and JSlider.
+ * Factory class for creating Swing components with common/ custom settings.
+ * It has 5 static methods to create JButton, JToggleButton, JSlider, JLabel and JFileChooser.
+ * It also has methods to format the text.
  *
  * @author Nagare Negishi
  * @studentID 300653779
@@ -27,6 +32,8 @@ public class ComponentFactory {
     private static Color BUTTON_BACKGROUND = new Color(100, 100, 100);
     private static Color BUTTON_FOREGROUND = Color.YELLOW;
     private static Font BUTTON_FONT = new Font("Arial", Font.BOLD, 14);
+    private static final String prefix = "<html><div style='text-align: center;'>";
+    private static final String suffix = "</div></html>";
 
     /**
      * Create a JButton with the given text, action command and listener.
@@ -93,6 +100,57 @@ public class ComponentFactory {
         return slider;
     }
 
+    /**
+     * Custom JPanel with title and value pair.
+     */
+    static class infoPanel extends JPanel {
+        private JLabel titLabel;
+        private JLabel valueLabel;
+
+        /**
+         * constructor to create a panel with title and value pair
+         * @param title
+         */
+        public infoPanel(String title) {
+            //setLayout(new GridLayout(1, 2));
+            setLayout(new GridBagLayout());
+            titLabel = new JLabel(format(title), JLabel.CENTER);
+            valueLabel = new JLabel("", JLabel.CENTER);
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.weightx = 0.55;
+            add(titLabel, gbc);
+            gbc.weightx = 0.45;
+            add(valueLabel, gbc);
+        }
+
+        /**
+         * set the value of the label
+         * @param value
+         */
+        public void setValue(String value) {
+            valueLabel.setText(value);
+        }
+
+        /**
+         * update the font size of the labels
+         * @param size
+         */
+        public void updateFont(float size) {
+            titLabel.setFont(titLabel.getFont().deriveFont(size));
+            valueLabel.setFont(valueLabel.getFont().deriveFont(size));
+        }
+    }
+
+    /**
+     * Create a custom JPanel with title and value pair.
+     * @param title
+     * @return
+     */
+    public static infoPanel createInfoPanel(String title) {
+        return new infoPanel(title);
+    }
+
 
     /**
      * Create custom file chooser with given directory, title and description
@@ -144,5 +202,12 @@ public class ComponentFactory {
         BUTTON_FONT = font;
     }
 
-
+    /**
+     * Format the message to center align.
+     * @param message
+     * @return
+     */
+    public static String format(String message) {
+        return prefix + message + suffix;
+    }
 }

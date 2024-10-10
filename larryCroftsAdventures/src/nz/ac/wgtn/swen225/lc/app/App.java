@@ -2,6 +2,8 @@ package nz.ac.wgtn.swen225.lc.app;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -56,9 +58,13 @@ class App extends JFrame{
   private enum AppState {PLAY, PAUSED, GAMEOVER, VICTORY}
   private AppState state = AppState.PAUSED;
 
-  private static int width = 800;
-  private static int height = 400;
-  private static final int MAX_LEVEL = 2; //its not pretty... but i need to check loadNextLevel failure
+  private static final int width = 800;
+  private static final int height = 450;
+  private static final int maxWidth = 1920;
+  private static final int minWidth = 800;
+  private static final int minHeight = 450;
+  private static final double ratio = 16.0 / 9.0;
+  private static final int MAX_LEVEL = 2;
   private static boolean continueGame = false;
   
   /**
@@ -66,13 +72,23 @@ class App extends JFrame{
    * Used to store actions in a map and showcase the use of strategy pattern
    */
   private interface Action{
+    /**
+     * Execute the action
+     */
     void execute();
   }
 
+  /**
+   * Constructor for the game application.
+   */
   App(){
     setTitle("Larry Croft's Adventures");
     assert SwingUtilities.isEventDispatchThread();
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    setMinimumSize(new Dimension(minWidth, minHeight));
+    setPreferredSize(new Dimension(width, height));
+    setSize(width, height);
+    //setResizable(false); this is last resort
 
     initializeModel();
     initializeUI();
@@ -81,8 +97,25 @@ class App extends JFrame{
     initializeController();
     initializeGameTimer();
 
-    setPreferredSize(new Dimension(width, height));
+    // keep the ratio of the window 
+    addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentResized(ComponentEvent e) {
+        int wid = getWidth();
+        if (wid < minWidth || wid > maxWidth) {
+          wid = width;
+        }
+        int hei = getHeight();
+        int aim = (int) (wid / ratio);
+        if (hei != aim) {
+          setSize(wid, aim);
+        }
+
+        //gameInfoPanel.updateFont(wid/width);
+      }
+    });
     pack();
+    setLocationRelativeTo(null);
     setVisible(true);
     addWindowListener(new WindowAdapter(){
       public void windowClosed(WindowEvent e){ 
@@ -116,8 +149,6 @@ class App extends JFrame{
    * Initialize the UI for the game.
    */
   private void initializeUI() {
-    // Dialogs to pause the game
-    GameDialogs.initializeDialogs(this);
     // game info
     gameInfoPanel = new GameInfoPanel(width/8, height);
     gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
@@ -129,6 +160,8 @@ class App extends JFrame{
     // Center panel for game rendering
     renderer = new Renderer();
     add(renderer, BorderLayout.CENTER);
+    // Dialogs to pause the game
+    GameDialogs.initializeDialogs(this);
     GameDialogs.START.show();
 }
 
@@ -148,27 +181,14 @@ class App extends JFrame{
     actions.put("load", () -> loadGame(Paths.savesDir, false));
     actions.put("help", () -> showHelp(MenuPanel.HELP));
     actions.put("exit", () -> exitGame(false));
-    actions.put("toggleMenu", () -> {
-      sidePanel.togglePanel();
-      gameInfoPanel.setRecorderMode(true);
-      controller.setRecorderMode(true);
-      GameDialogs.hideAll();
-      stopGame();
-    });
+    actions.put("toggleMenu", () -> togglePanel(true));
     actions.put("step", () -> recorder.nextStep());
     actions.put("back", () -> recorder.previousStep());
     actions.put("autoReplay", () -> recorder.autoReplay());
     actions.put("loadRecording", () -> recorder.loadRecording());
     actions.put("saveRecording", () -> recorder.saveRecording());
     actions.put("helpRecorder", () -> showHelp(RecorderPanel.HELP));
-    actions.put("toggleRecorder", () -> {
-      sidePanel.togglePanel();
-      //recorder.checkState();
-      controller.setRecorderMode(false);
-      gameInfoPanel.setRecorderMode(false);
-      unpauseGame();
-      if (timeLeft == 0) gameOver();
-    });
+    actions.put("toggleRecorder", () -> togglePanel(false));
   }
 
   /**
@@ -187,6 +207,24 @@ class App extends JFrame{
    */
   private void handleSliderChange(int value){
     recorder.setPlaybackSpeed(value);
+  }
+
+  /**
+   * Toggle the side panel between menu and recorder mode.
+   * @param isRecorder whether to set the panel to recorder mode
+   */
+  private void togglePanel(boolean isRecorder){
+    sidePanel.togglePanel();
+    gameInfoPanel.setRecorderMode(isRecorder);
+    controller.setRecorderMode(isRecorder);
+    if (isRecorder) {
+      GameDialogs.hideAll();
+      stopGame();
+    } else {
+      unpauseGame();
+      //recorder.checkState();
+      if (timeLeft == 0) gameOver();
+    }
   }
 
   /**
@@ -372,15 +410,13 @@ class App extends JFrame{
    * If the next level is not found, the game is won.
    */
   private void loadNextLevel() {
+    stopGame();
     currentLevel++;
-    System.out.println("calling next level: " + currentLevel);/////////////////
     if (currentLevel > MAX_LEVEL) {
       state = AppState.VICTORY;
       GameDialogs.VICTORY.show();
       return;
     }
-    // This still works. I've converted everything else to Files, but not sure how to convert this atm -AdamT
-    stopGame();
     checkModel(LoadFile.loadLevel("level" + currentLevel));
     gameRun();
   }
@@ -494,22 +530,26 @@ class App extends JFrame{
    */
   private AppNotifier getAppNotifier(){
     return new AppNotifier(){
+      @Override
       public void onGameWin(){
-        stopGame();
         loadNextLevel();
       }
+      @Override
       public void onGameLose(){
         //recorder.onGameLose();
         gameOver();
         System.out.println("Game Over is called");
       }
+      @Override
       public void onKeyPickup(int keyCount){
         assert keyCount >= 0: "keyCount is negative";
         keysCollectednum = keyCount;
         gameInfoPanel.setKeys(keysCollectednum);
       }
+      @Override
       public void onTreasurePickup(int treasureCount){
         treasuresLeft--;
+        assert treasuresLeft >= 0: "treasuresLeft is negative";
         gameInfoPanel.setTreasures(treasuresLeft);
       }
     };

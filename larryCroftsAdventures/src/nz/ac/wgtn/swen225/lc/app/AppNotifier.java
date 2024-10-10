@@ -12,9 +12,28 @@ package nz.ac.wgtn.swen225.lc.app;
  */
 public interface AppNotifier {
 
+    /**
+     * Notify the App that the game has been won.
+     */
     void onGameWin();
+    /**
+     * Notify the App that the game has been lost.
+     */
     void onGameLose();
+    /**
+     * Notify the App that the chap has picked up a key.
+     * @param keyCount
+     */
     void onKeyPickup(int keyCount);
+    /**
+     * Notify the App that the chap has picked up a treasure.
+     * @param treasureCount the number of treasures picked up so far
+     *
+     * Note: treasureCount is not used in the current version of the game.
+     * The parameter was prepared to be flexible.
+     * Making it without the parameter make sense to App module,
+     * However it will require the change in other modules.
+     */
     void onTreasurePickup(int treasureCount);
 
     /**

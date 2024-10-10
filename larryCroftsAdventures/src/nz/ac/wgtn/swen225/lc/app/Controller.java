@@ -21,9 +21,9 @@ import nz.ac.wgtn.swen225.lc.recorder.Recorder;
  */
 class Controller extends Keys{
 
-    private int time;//testing purposes
+    private int time; // time for the recorder
     private Recorder recorder;
-    private GameStateController update;
+    private GameStateController update; // model of the game
 
     /**
      * Constructor for Controller class
@@ -89,7 +89,7 @@ class Controller extends Keys{
 
     /**
      * Set the GameStateController for the controller
-     * Currently not used.
+     * Currently not used.///////////////////////////////////////////////////////////////////////////////////////////////////
      * Can be used to update the controller without creating a new controller.
      * Depend on other modules, this method may or may not work.
      * @param gsc GameStateController

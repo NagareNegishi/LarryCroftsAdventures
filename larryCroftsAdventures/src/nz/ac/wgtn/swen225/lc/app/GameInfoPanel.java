@@ -1,13 +1,15 @@
 package nz.ac.wgtn.swen225.lc.app;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import nz.ac.wgtn.swen225.lc.app.ComponentFactory.infoPanel;
 
 /**
  * A panel that displays the game information, including the time, level, keys, and treasures.
@@ -19,9 +21,16 @@ public class GameInfoPanel extends JPanel {
     private JLabel timeTextLabel;
     private JLabel timeLabel;
     private JLabel recorderLabel;
-    private JLabel levelLabel;
-    private JLabel keysLabel;
-    private JLabel treasuresLabel;
+    private infoPanel levelPanel;
+    private infoPanel keysPanel;
+    private infoPanel treasuresPanel;
+    private static final float baseSize = 12.0f;
+    private static final float timeTextScale = 1.5f;
+    private static final float timeScale = 2.5f;
+    private static final float infoScale = 1.2f;
+    private float fontSize = baseSize;
+
+
     
     /**
      * Create a new GameInfoPanel with the given width and height.
@@ -29,34 +38,38 @@ public class GameInfoPanel extends JPanel {
      * @param height
      */
     public GameInfoPanel(int width, int height) {
-        setLayout(new BorderLayout(0,10));
+        
+        //setLayout(new BorderLayout(0,10));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setPreferredSize(new Dimension(width, height)); //repetitive?? app will call it later too
 
-        //*need better layout */
-        JPanel timerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        timerPanel.setPreferredSize(new Dimension(width, height/2));
-        timeTextLabel = new JLabel("Time:    ");
+
+        JPanel timerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        timerPanel.setPreferredSize(new Dimension(width, height/3));
+        timeTextLabel = new JLabel("Time:", JLabel.CENTER);
         timeTextLabel.setFont(getFont().deriveFont((float)width/4));
         timeLabel = new JLabel("60");
-        timeLabel.setFont(getFont().deriveFont((float)width/2));
+        timeLabel.setFont(getFont().deriveFont((float)(width/1.5)));
         timerPanel.add(timeTextLabel);
         timerPanel.add(timeLabel);
 
         JPanel infoPanel = new JPanel(new GridLayout(4, 1));
-        recorderLabel = new JLabel("Recorder mode");
+        infoPanel.setPreferredSize(new Dimension(width, height/3*2));
+        recorderLabel = new JLabel(ComponentFactory.format("Recorder<br>mode"), JLabel.CENTER);
         recorderLabel.setForeground(Color.RED);
         recorderLabel.setVisible(false);
-        levelLabel = new JLabel("Level: 1");
-        keysLabel = new JLabel("Keys: 0");
-        treasuresLabel = new JLabel("Treasures left: 10");
+        levelPanel = ComponentFactory.createInfoPanel("Level:");
+        keysPanel = ComponentFactory.createInfoPanel("Keys:");
+        treasuresPanel = ComponentFactory.createInfoPanel("Treasures<br>left:");
         infoPanel.add(recorderLabel);
-        infoPanel.add(levelLabel);
-        infoPanel.add(keysLabel);
-        infoPanel.add(treasuresLabel);
-        add(timerPanel,BorderLayout.NORTH);
-        add(infoPanel,BorderLayout.CENTER);
+        infoPanel.add(levelPanel);
+        infoPanel.add(keysPanel);
+        infoPanel.add(treasuresPanel);
+        add(timerPanel);
+        add(infoPanel);
 
     }
+
 
     /*
      * I am fully aware that the following setters can be one method that takes a string and an int
@@ -80,7 +93,7 @@ public class GameInfoPanel extends JPanel {
      */
     public void setLevel(int level) {
         assert level == 1 || level == 2 : "Invalid level";// hardcoding for this project
-        levelLabel.setText("Level: " + level);
+        levelPanel.setValue(String.valueOf(level));
     }
 
     /**
@@ -89,7 +102,7 @@ public class GameInfoPanel extends JPanel {
      */
     public void setKeys(int keys) {
         assert keys >= 0 : "Keys cannot be negative";
-        keysLabel.setText("Keys: " + keys);
+        keysPanel.setValue(String.valueOf(keys));
     }
 
     /**
@@ -98,7 +111,7 @@ public class GameInfoPanel extends JPanel {
      */
     public void setTreasures(int treasures) {
         assert treasures >= 0 : "Treasures cannot be negative";
-        treasuresLabel.setText("Treasures left: " + treasures);
+        treasuresPanel.setValue(String.valueOf(treasures));
     }
 
     /**
@@ -120,5 +133,17 @@ public class GameInfoPanel extends JPanel {
      */
     public void setRecorderMode(boolean isRecorder) {
         recorderLabel.setVisible(isRecorder);
+    }
+
+    public void updateFont(float scale) {
+        fontSize = baseSize * scale;
+        timeTextLabel.setFont(timeTextLabel.getFont().deriveFont(fontSize * timeTextScale));
+        timeLabel.setFont(timeLabel.getFont().deriveFont(fontSize * timeScale));
+        recorderLabel.setFont(recorderLabel.getFont().deriveFont(fontSize * infoScale));
+        
+        levelPanel.updateFont(fontSize * infoScale);
+        keysPanel.updateFont(fontSize * infoScale);
+        treasuresPanel.updateFont(fontSize * infoScale);
+
     }
 }
