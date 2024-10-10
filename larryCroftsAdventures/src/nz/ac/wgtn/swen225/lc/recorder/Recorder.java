@@ -149,6 +149,8 @@ public class Recorder {
 			events = eventMapper.readValue(rfc.recordingLoc,
 					eventMapper.getTypeFactory().constructCollectionType(List.class, ChapEvent.class));
 		});
+		updateReciever.accept(new RecordingChanges(firstLevelSupplier.get(), 
+				events.get(0).time()));
 	}
 
 	/**
