@@ -42,8 +42,8 @@ import javax.swing.JPanel;
 public class SidePanel extends JPanel {
     private MenuPanel menuPanel;
     private RecorderPanel recorderPanel;
-    private enum Type {MENU, RECORDER}
-    private Type current = Type.MENU;
+    private enum Mode {MENU, RECORDER}
+    private Mode current = Mode.MENU;
     
     /**
      * Create a new SidePanel with the given width, height, menu, recorder, and slider.
@@ -70,11 +70,11 @@ public class SidePanel extends JPanel {
         current = switch(current) {
             case MENU -> {
                 add(recorderPanel);
-                yield Type.RECORDER;
+                yield Mode.RECORDER;
             }
             case RECORDER -> {
                 add(menuPanel);
-                yield Type.MENU;
+                yield Mode.MENU;
             }
         };
         revalidate();
@@ -87,5 +87,9 @@ public class SidePanel extends JPanel {
      */
     public void setPauseButtonText(String text) {
         menuPanel.setPauseButton(text);
+    }
+
+    public boolean isRecorder() {
+        return current == Mode.RECORDER;
     }
 }

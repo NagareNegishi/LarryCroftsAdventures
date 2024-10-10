@@ -21,7 +21,7 @@ import nz.ac.wgtn.swen225.lc.recorder.Recorder;
  */
 class Controller extends Keys{
 
-    private int time = 0;//testing purposes
+    private int time;//testing purposes
     private Recorder recorder;
     private GameStateController update;
 
@@ -30,10 +30,12 @@ class Controller extends Keys{
      * @param StateController contains the methods defined in GameStateController class
      * @param actionBindings contains the methods defined in App class
      */
-    Controller(GameStateController StateController , Map<String, Runnable> actionBindings){
+    Controller(GameStateController StateController , Map<String, Runnable> actionBindings, int time){
         assert StateController != null: "StateController is null";
         assert actionBindings != null: "actionBindings is null";
+        assert time >= 0: "time is negative";
         update = StateController;
+        this.time = time;
         setAction(KeyEvent.VK_UP, 0,() -> {
             update.moveChap(Chap.Direction.Up);
             recorder.ping(Chap.Direction.Up, time);

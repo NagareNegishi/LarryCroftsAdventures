@@ -16,7 +16,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
@@ -44,24 +43,32 @@ class App extends JFrame{
   private int timeLeft = MAX_TIME;
   private int currentLevel = 1;
   private int keysCollectednum = 0;
-  private Set<String> keysCollected;
+  private Set<String> keysCollected = new HashSet<>();
   private int treasuresLeft;
 
   Runnable closePhase= ()->{};
   private Map<String, Runnable> actionBindings =  new HashMap<>(); // need to be passed to controller
+  private Map<String, Action> actions = new HashMap<>(); // contains actions for buttons
   private GameStateController model;
   private AppNotifier notifier = getAppNotifier(); // need to be passed to model
   private Controller controller;
-  //private JPanel renderer;
   private Renderer renderer;
   private Recorder recorder;
-  public enum AppState {PLAY, PAUSED, NEWGAME, GAMEOVER, VICTORY}
-  private AppState state = AppState.NEWGAME;
+  private enum AppState {PLAY, PAUSED, GAMEOVER, VICTORY}
+  private AppState state = AppState.PAUSED;
 
   private static int width = 800;
   private static int height = 400;
   private static final int MAX_LEVEL = 2; //its not pretty... but i need to check loadNextLevel failure
-
+  private static boolean continueGame = false;
+  
+  /**
+   * Functional interface for actions
+   * Used to store actions in a map and showcase the use of strategy pattern
+   */
+  private interface Action{
+    void execute();
+  }
 
   App(){
     setTitle("Larry Croft's Adventures");
@@ -71,6 +78,7 @@ class App extends JFrame{
     initializeModel();
     initializeUI();
     initializeActionBindings();
+    initializeActions();
     initializeController();
     initializeGameTimer(); //must be after controller??
 
@@ -79,89 +87,95 @@ class App extends JFrame{
     setVisible(true);
     addWindowListener(new WindowAdapter(){
       public void windowClosed(WindowEvent e){ 
-        closePhase.run();
-        gameTimer.stop();
+        exitGame(false);
       }
     });
+    setLevel(model);
+    stopGame();
   }
 
   /**
-   * Initialize the model for the game by loading the first level.
-   * You "can not" replace this method with checkModel(loadFile(Paths.level1))
+   * Initialize the model for the game by loading the first level or a saved game.
    */
   private void initializeModel(){
-    Optional<GameStateController> loadedGame = LoadFile.loadLevel(Paths.level1);
+    Optional<GameStateController> loadedGame = Optional.empty();
+    if (continueGame) {
+      loadedGame = LoadFile.loadSave(Paths.level1); //this will be special path 
+    } else {
+      loadedGame = LoadFile.loadLevel(Paths.level1);
+    }
     if (loadedGame.isPresent()) {
       model = loadedGame.get();
     } else {
       handleFileError("Failed to load game", "Load Error", 
       new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
-      this::loadGame);
+      () -> loadGame(Paths.levelsDir, false));
     }
   }
 
+  /**
+   * Initialize the UI for the game.
+   */
   private void initializeUI() {
+    // Dialogs to pause the game
+    GameDialogs.initializeDialogs(this);
     // game info
     gameInfoPanel = new GameInfoPanel(width/8, height);
     gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
     add(gameInfoPanel, BorderLayout.EAST);
     // Side panel for menu/recorder UI
-    sidePanel = new SidePanel(width/8, height, e -> handleMenuAction(e),
-    e -> handleRecorderAction(e), slider -> handleSliderChange(slider));
+    sidePanel = new SidePanel(width/8, height, e -> handleAction(e),
+    e -> handleAction(e), slider -> handleSliderChange(slider));
     add(sidePanel, BorderLayout.WEST);
     // Center panel for game rendering
     renderer = new Renderer();
     add(renderer, BorderLayout.CENTER);
-    GameDialogs.initializeDialogs(this);
     GameDialogs.START.show();
 }
 
-/**
- * Handle menu actions
- * @param actionCommand
- */
-  private void handleMenuAction(String actionCommand) {
-    switch(actionCommand){
-      case "pause" -> {
-        pauseGame();
-        sidePanel.setPauseButtonText("Unpause");
-      }
-      case "unpause" -> {
-        unpauseGame();
-        sidePanel.setPauseButtonText("Pause");
-      }
-      case "save" -> saveGame();
-      case "load" -> {
-        checkModel(loadFile(Paths.savesDir));
-        gameRun();
-      }
-      case "help" -> showHelp(MenuPanel.HELP);
-      case "exit" -> exitGameWithoutSaving();
-      case "toggle" -> {
-        sidePanel.togglePanel();
-        stopGame();
-      }
-    }
-    assert false: "Unknown action command: " + actionCommand;
+  /**
+   * Initialize the actions for buttons in the UI
+   */
+  private void initializeActions(){
+    actions.put("pause", () -> {
+      pauseGame();
+      sidePanel.setPauseButtonText("Unpause");
+    });
+    actions.put("unpause", () -> {
+      unpauseGame();
+      sidePanel.setPauseButtonText("Pause");
+    });
+    actions.put("save", this::saveGame);
+    actions.put("load", () -> loadGame(Paths.savesDir, false));
+    actions.put("help", () -> showHelp(MenuPanel.HELP));
+    actions.put("exit", () -> exitGame(false));
+    actions.put("toggleMenu", () -> {
+      sidePanel.togglePanel();
+      controller.setRecorderMode(true);
+      GameDialogs.hideAll(); //# 1
+      stopGame();
+    });
+    actions.put("step", () -> recorder.nextStep());
+    actions.put("back", () -> recorder.previousStep());
+    actions.put("autoReplay", () -> recorder.autoReplay());
+    actions.put("loadRecording", () -> recorder.loadRecording());
+    actions.put("saveRecording", () -> recorder.saveRecording());
+    actions.put("helpRecorder", () -> showHelp(RecorderPanel.HELP));
+    actions.put("toggleRecorder", () -> {
+      sidePanel.togglePanel();
+      controller.setRecorderMode(false);
+      unpauseGame();
+    });
   }
 
   /**
-   * connect to recorder method when recorder is implemented
+   * Handle the action command from the buttons in the UI
+   * @param actionCommand
    */
-  private void handleRecorderAction(String actionCommand){
-    switch(actionCommand){
-      case "step" -> recorder.nextStep();
-      case "back" -> recorder.previousStep();
-      case "autoReplay" -> recorder.autoReplay();
-      case "loadRecording" -> recorder.loadRecording();
-      case "saveRecording" -> recorder.saveRecording();
-      case "help" -> showHelp(RecorderPanel.HELP);
-      case "toggle" -> {
-        sidePanel.togglePanel();
-        unpauseGame();
-      }
-    }
-    assert false: "Unknown action command: " + actionCommand;
+  private void handleAction(String actionCommand) {
+    actions.getOrDefault(actionCommand, () -> {
+      throw new IllegalArgumentException("Unknown action command: " + actionCommand);
+    }).execute();
   }
 
   /**
@@ -176,21 +190,11 @@ class App extends JFrame{
    * Initialize the action bindings (Map of actions to Runnable) for the controller
    */
   private void initializeActionBindings() {
-    actionBindings.put("exitWithoutSaving", this::exitGameWithoutSaving);
-    actionBindings.put("exitAndSave", this::exitGameAndSave);
-    actionBindings.put("resumeSavedGame", this::loadGame);
-    actionBindings.put("startNewGame1", () -> {
-      //resetGame();
-      currentLevel = 1;
-      checkModel(LoadFile.loadLevel(Paths.level1));
-      gameRun();
-    });
-    actionBindings.put("startNewGame2", () -> {
-      //resetGame();
-      currentLevel = 2;
-      checkModel(LoadFile.loadLevel("level2"));
-      gameRun();
-    });
+    actionBindings.put("exitWithoutSaving", () -> exitGame(false));
+    actionBindings.put("exitAndSave", () -> exitGame(true));
+    actionBindings.put("resumeSavedGame", () -> loadGame(Paths.savesDir,false));
+    actionBindings.put("startNewGame1", () -> loadGame(Paths.level1, true));
+    actionBindings.put("startNewGame2", () -> loadGame(Paths.level1, true));/////////////////////// need to change to level2
     actionBindings.put("pause", this::pauseGame);
     actionBindings.put("unpause", this::unpauseGame);
   }
@@ -199,7 +203,7 @@ class App extends JFrame{
    * Initialize the controller for the game
    */
   private void initializeController() {
-    controller = new Controller(model, actionBindings); //initialize with level 1
+    controller = new Controller(model, actionBindings, MAX_TIME); //initialize with level 1
     addKeyListener(controller);
     setFocusable(true);//could be remove??
   }
@@ -219,35 +223,6 @@ class App extends JFrame{
       gameTimer.stop();
   }
 
-
-
-  /**
-   * Get the AppNotifier for the game.
-   * @return AppNotifier
-   */
-  private AppNotifier getAppNotifier(){
-    return new AppNotifier(){
-      public void onGameWin(){
-        stopGame();
-        loadNextLevel();
-      }
-      public void onGameLose(){
-        gameOver();
-        System.out.println("Game Over is called");
-      }
-      public void onKeyPickup(int keyCount){
-        assert keyCount >= 0: "keyCount is negative";
-        keysCollectednum = keyCount;
-        gameInfoPanel.setKeys(keysCollectednum);
-      }
-      public void onTreasurePickup(int treasureCount){
-        assert treasureCount >= 0: "treasureCount is negative";
-        treasuresLeft = treasureCount;
-        gameInfoPanel.setTreasures(treasuresLeft);
-      }
-    };
-  }
-
   /**
    * Stop the game without showing any dialog.
    */
@@ -256,16 +231,6 @@ class App extends JFrame{
     controller.pause(true);
     // renderer.setFocusable(false); i probably want it
     gameTimer.stop();
-  }
-
-  /**
-   * Reset the game to the initial state.
-   */
-  private void resetGame(){
-    stopGame();
-    timeLeft = MAX_TIME;
-    keysCollectednum = 0;
-    treasuresLeft = model.getTotalTreasures();
   }
 
   /**
@@ -284,16 +249,12 @@ class App extends JFrame{
     boolean unpause = switch (state) {
       case PLAY -> false; // Already playing
       case PAUSED -> true;
-      case NEWGAME -> {
-        setLevel(model);
-        yield true;}
       case GAMEOVER -> {
-      timeLeft = MAX_TIME;
       checkModel(LoadFile.loadLevel("level" + currentLevel));
       yield true;
       }
       case VICTORY -> {
-        currentLevel = 1; // reset level to 1
+        currentLevel = 1; // reset level to 1///////////////////this could go
         checkModel(LoadFile.loadLevel(Paths.level1));
         yield true;
       }
@@ -335,38 +296,15 @@ class App extends JFrame{
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-
-/**
- * Create custom file chooser with given directory, title and description
- * User can not change the directory and can only select json files
- * @param dir
- * @param title
- * @param description
- * @return JFileChooser
- */
-private JFileChooser customFileChooser(File dir, String title, String description) {
-  JFileChooser fileChooser = new JFileChooser(dir) {
-      /**
-       * Overriding setCurrentDirectory to prevent user from changing directory
-       */
-      @Override
-      public void setCurrentDirectory(File directory) {
-          super.setCurrentDirectory(getCurrentDirectory());
-      }
-  };
-  fileChooser.setDialogTitle(title);
-  FileNameExtensionFilter filter = new FileNameExtensionFilter(description, "json");
-  fileChooser.setFileFilter(filter);
-  fileChooser.setAcceptAllFileFilterUsed(false);
-  fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-  return fileChooser;
-}
-
   /**
    * Save the game to a file in the saves directory.
    */
   private void saveGame() {
-    JFileChooser fileChooser = customFileChooser(Paths.savesDir, "Save Game", "JSON files");
+    model.setTime(timeLeft);
+
+    /////set level too??///////////////////////////
+
+    JFileChooser fileChooser = ComponentFactory.customFileChooser(Paths.savesDir, "Save Game", "JSON files");
     int userSelection = fileChooser.showSaveDialog(this); // show dialog and wait user input
     if (userSelection == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File fileToSave = fileChooser.getSelectedFile();
@@ -388,7 +326,7 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
    * @param dir it should use File from Paths class in nz.ac.wgtn.swen225.lc.persistency.Paths
    */
   private Optional<GameStateController> loadFile(File dir) { // Added File parameter
-    JFileChooser fileChooser = customFileChooser(dir, "Load Game", "JSON Game files");
+    JFileChooser fileChooser = ComponentFactory.customFileChooser(dir, "Load Game", "JSON Game files");
     int picked = fileChooser.showOpenDialog(this);
     if (picked == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File file = fileChooser.getSelectedFile();
@@ -399,10 +337,19 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
   }
 
   /**
-   * currently simply Calling LoadFile()
+   * Load a game from the given directory.
+   * If quickLoad is true, load the file without showing the file chooser dialog.
+   * @param dir it should use File from Paths class in nz.ac.wgtn.swen225.lc.persistency.Paths
+   * @param quickLoad whether to load the file without showing the file chooser dialog
    */
-  private void loadGame(){//(int level, Runnable onWin, Runnable onLose) {
-    checkModel(loadFile(Paths.levelsDir));
+  private void loadGame(File dir, boolean quickLoad) {
+    stopGame();
+    if (quickLoad) {
+      checkModel(LoadFile.loadLevel(dir));
+    } else {
+      checkModel(loadFile(dir));
+    }
+    gameRun();
   }
 
   /**
@@ -413,7 +360,7 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
     opm.ifPresentOrElse(this::setLevel, ()->{
       handleFileError("Failed to load game", "Load Error", 
       new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
-      this::loadGame);
+      () -> loadGame(Paths.levelsDir, false));
     });
   }
 
@@ -429,7 +376,9 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
       return;
     }
     // This still works. I've converted everything else to Files, but not sure how to convert this atm -AdamT
+    stopGame();
     checkModel(LoadFile.loadLevel("level" + nextlevel));
+    gameRun();
   }
 
   /**
@@ -452,16 +401,23 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
           checkModel(LoadFile.loadLevel(Paths.level1)); // it should loop unless model is set
           GameDialogs.hideAll();
         }
-        case 2 -> exitGameWithoutSaving();
+        case 2 -> exitGame(false);
       }
   }
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
-   * Exit the game without saving
+   * Exit the game.
+   * @param save whether to save the game before exiting
    */
-  private void exitGameWithoutSaving() {
+  private void exitGame(boolean save) {
+    if (save) {
+      saveGame();////////////////////probably need to directly call special slot
+      continueGame = true;
+    } else {
+      continueGame = false;
+    }
     closePhase.run();
     gameTimer.stop();
     dispose(); // release resources
@@ -469,60 +425,44 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
   }
 
   /**
-   * Exit the game and save the game
-   */
-  private void exitGameAndSave() {
-    saveGame();
-    exitGameWithoutSaving();
-  }
-
-
-  /**
    * Set the model of the game, and all the necessary components for the game to run.
    * Once timer starts, the game will run.
    * @param level model of the game (GameStateController)
    */
   void setLevel(GameStateController level){
-    resetGame();
-
     model = level;
+    timeLeft = model.getTime();
     treasuresLeft = model.getTotalTreasures();
+    System.out.println("total treasures: " + treasuresLeft);/////////////////
     keysCollectednum = model.getKeysCollected().size();
-    keysCollected = new HashSet<>(model.getKeysCollected().values());
+    keysCollected.clear();
+    keysCollected.addAll(model.getKeysCollected().values());
     gameInfoPanel.setKeys(keysCollectednum);
     gameInfoPanel.setTreasures(treasuresLeft);
 
     GameState gamestate = model.getGameState();
     gamestate.setAppNotifier(notifier);
-    controller = new Controller(model, actionBindings);
+    controller = new Controller(model, actionBindings, timeLeft);
 
     recorder = new Recorder((rc)-> {
-      gameInfoPanel.setTime(rc.updatedTime());
+      timeLeft = rc.updatedTime();
       model = rc.updatedGame();
+      gameInfoPanel.setTime(timeLeft);
+      initializeGameTimer();
+      controller.setGameStateController(model);
       renderer.gameConsumer(model.getGameState());
+      updateGameInfo(model);
     });
     controller.setRecorder(recorder);
-
-/////////////////////////delete this part
-    System.out.println("recorder is set in setLevel");
-/////////////////////////////////
 
     renderer.gameConsumer(gamestate);
     renderer.addKeyListener(controller);
     renderer.setFocusable(true);
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
-
       if (state == AppState.PLAY) {
-        System.out.println(model.getChap().getCol() + ":" + model.getChap().getRow());
-
         //model.moveActor();
         //recorder.ping();
-
-        /**
-         * its not pretty solution, but i can take keys/ treasure info from the model and update the gameInfoPanel here
-         */
-        updateGameInfo(model); // this need to be gone
         renderer.updateCanvas();
       }
     });
@@ -532,9 +472,10 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
     timer.start();
   }
 
-
   /**
-   * this is soooo unpretty solution definitely need to be changed
+   * Update the game info panel with the current keys and treasures left.
+   * Used by recorder to update the game info.
+   * @param level model of the game (GameStateController)
    */
   private void updateGameInfo(GameStateController level) {
     keysCollectednum = level.getKeysCollected().size();
@@ -543,4 +484,47 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
     gameInfoPanel.setTreasures(treasuresLeft);
   }
 
+  /**
+   * Get the AppNotifier for the game.
+   * @return AppNotifier
+   */
+  private AppNotifier getAppNotifier(){
+    return new AppNotifier(){
+      public void onGameWin(){
+        stopGame();
+        loadNextLevel();
+      }
+      public void onGameLose(){
+        gameOver();
+        System.out.println("Game Over is called");
+      }
+      public void onKeyPickup(int keyCount){
+        assert keyCount >= 0: "keyCount is negative";
+        keysCollectednum = keyCount;
+        gameInfoPanel.setKeys(keysCollectednum);
+      }
+      public void onTreasurePickup(int treasureCount){
+        assert treasureCount >= 0: "treasureCount is negative";
+        treasuresLeft = treasureCount;
+        gameInfoPanel.setTreasures(treasuresLeft);
+      }
+    };
+  }
+
 }
+
+/**
+ * better if we let the player to pick up where they left off
+ *
+ * recorder = new Recorder((rc)-> {
+        
+      timeLeft = rc.updatedTime();
+      model = rc.updatedGame();
+      gameInfoPanel.setTime(timeLeft);
+      initializeGameTimer();
+      controller.setGameStateController(model);
+      renderer.gameConsumer(model.getGameState());
+      
+    });
+
+ */
