@@ -3,9 +3,11 @@ package nz.ac.wgtn.swen225.lc.persistency;
 import java.util.HashMap;
 import java.util.Map;
 
+import nz.ac.wgtn.swen225.lc.domain.TeleportTile;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
 import nz.ac.wgtn.swen225.lc.domain.WallTile;
 import nz.ac.wgtn.swen225.lc.domain.WaterTile;
+
 
 class Room {
 	// Entry points to room
@@ -68,6 +70,32 @@ class WaterRoom extends Room {
 		super.innerTile.put(new Coord(1, 2), new WaterTile());
 		super.innerTile.put(new Coord(2, 1), new WaterTile());
 		super.innerTile.put(new Coord(3, 1), new WaterTile());
-		super.innerTile.put(new Coord(4, 2), new WaterTile());
+		super.innerTile.put(new Coord(3, 2), new WaterTile());
 	}
+}
+
+/**
+ * Room with poratl in centre
+ */
+class PortalRoom extends Room {
+	PortalRoom(){
+		super.innerTile.put(this.centre, new TeleportTile());
+	}
+	
+	public boolean pairPortal(Room other) {
+		if(other instanceof PortalRoom) {
+			TeleportTile tele = ((TeleportTile) innerTile.get(centre));
+			TeleportTile otherT = (TeleportTile) other.innerTile.get(centre);
+			tele.setPartner(otherT);
+			otherT.setPartner(tele);
+			return true;
+		}
+		return false;
+	}
+	
+}
+
+class EnemyRoom extends Room{
+	
+	
 }

@@ -1,7 +1,9 @@
 package nz.ac.wgtn.swen225.lc.persistency;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
+import nz.ac.wgtn.swen225.lc.domain.Actor;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.FreeTile;
 import nz.ac.wgtn.swen225.lc.domain.GameState;
@@ -41,16 +43,24 @@ public class level2 {
 		leftRoom.setTile(leftRoom.centre, redTile);
 		
 		Builder build = new Builder();
-		build.addRoom(new Coord(0, 0), leftRoom);
-		build.addRoom(new Coord(0, 1), chapRoom);
-		build.addRoom(new Coord(0, 2), waterRoom);
+		build.addRoom(new Coord(1, 0), leftRoom);
+		build.addRoom(new Coord(1, 1), chapRoom);
+		build.addRoom(new Coord(1, 2), waterRoom);
+		
+//		PortalRoom portal1 = new PortalRoom();
+//		PortalRoom portal2 = new PortalRoom();
+//		portal1.pairPortal(portal2);
+//		build.addRoom(new Coord(0, 1), portal1);
+//		build.addRoom(new Coord(2, 1), leftRoom);
 		
 		Maze maze = build.build();
 		maze.printMaze();
 		
+		ArrayList<Actor> enemies = new ArrayList<Actor>();
+		enemies.add(new Actor(8, 8));
 		
-		Chap chap = new Chap(3, 10, new ArrayList<Item>());
-		GameState gs = new GameState(maze, chap, 2, new MockAppNotifier());
+		Chap chap = new Chap(10, 10, new ArrayList<Item>());
+		GameState gs = new GameState(maze, chap, 0, new HashMap<Key, String>() , 60, new MockAppNotifier(), enemies);
 		GameStateController gsc = new GameStateController(gs);
 		
 		boolean saved = SaveFile.saveGame("level2", gsc);

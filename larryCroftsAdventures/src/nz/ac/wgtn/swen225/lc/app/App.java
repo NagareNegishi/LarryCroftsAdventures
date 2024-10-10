@@ -517,6 +517,8 @@ private JFileChooser customFileChooser(File dir, String title, String descriptio
         System.out.println(model.getChap().getCol() + ":" + model.getChap().getRow());
 
         //model.moveActor();
+        // Added to test level2
+        //gamestate.enemies.forEach(e -> System.out.println("E row: " +e.getRow() + " E col: "+ e.getCol()));
         //recorder.ping();
 
         /**

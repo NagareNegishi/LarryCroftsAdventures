@@ -1,5 +1,8 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Actor class representing a moving entity for Level 2 of the game, an Actor moves in a square pattern and
  * if an Actor comes into contact with Chap, the game is over and the level will restart.
@@ -8,14 +11,19 @@ package nz.ac.wgtn.swen225.lc.domain;
  * 
  */
 
+
 public class Actor {
 
+	@JsonProperty
 	private int row;
+	@JsonProperty
 	private int col;
 	private Direction currentDirection;
 	private int steps;
 	
-	public Actor(int startRow, int startCol) {
+	@JsonCreator
+	public Actor(@JsonProperty("row") int startRow,
+				@JsonProperty("col") int startCol) {
 		if(startRow < 0 || startCol < 0) {throw new IllegalArgumentException("Actor must be in bounds of the maze");}
 		
 		this.row = startRow;
