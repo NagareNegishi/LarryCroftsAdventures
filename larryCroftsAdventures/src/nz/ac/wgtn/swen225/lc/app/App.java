@@ -39,8 +39,7 @@ class App extends JFrame{
   private SidePanel sidePanel;
 
   private Timer gameTimer;
-  private static final int MAX_TIME = 60;
-  private int timeLeft = MAX_TIME;
+  private int timeLeft;
   private int currentLevel = 1;
   private int keysCollectednum = 0;
   private Set<String> keysCollected = new HashSet<>();
@@ -100,7 +99,7 @@ class App extends JFrame{
   private void initializeModel(){
     Optional<GameStateController> loadedGame = Optional.empty();
     if (continueGame) {
-      loadedGame = LoadFile.loadSave(Paths.level1); //this will be special path 
+      loadedGame = LoadFile.loadSave(Paths.saveAndQuit);
     } else {
       loadedGame = LoadFile.loadLevel(Paths.level1);
     }
@@ -152,7 +151,7 @@ class App extends JFrame{
     actions.put("toggleMenu", () -> {
       sidePanel.togglePanel();
       controller.setRecorderMode(true);
-      GameDialogs.hideAll(); //# 1
+      GameDialogs.hideAll();
       stopGame();
     });
     actions.put("step", () -> recorder.nextStep());
@@ -165,6 +164,7 @@ class App extends JFrame{
       sidePanel.togglePanel();
       controller.setRecorderMode(false);
       unpauseGame();
+      if (timeLeft == 0) gameOver();
     });
   }
 
@@ -203,7 +203,7 @@ class App extends JFrame{
    * Initialize the controller for the game
    */
   private void initializeController() {
-    controller = new Controller(model, actionBindings, MAX_TIME); //initialize with level 1
+    controller = new Controller(model, actionBindings, model.getTime()); //initialize with level 1
     addKeyListener(controller);
     setFocusable(true);//could be remove??
   }
@@ -413,7 +413,7 @@ class App extends JFrame{
    */
   private void exitGame(boolean save) {
     if (save) {
-      saveGame();////////////////////probably need to directly call special slot
+      SaveFile.saveGame("saveAndQuit", model);
       continueGame = true;
     } else {
       continueGame = false;
@@ -461,8 +461,8 @@ class App extends JFrame{
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
       if (state == AppState.PLAY) {
-        //model.moveActor();
-        //recorder.ping();
+        model.moveActor();
+        recorder.ping(timeLeft);
         renderer.updateCanvas();
       }
     });
