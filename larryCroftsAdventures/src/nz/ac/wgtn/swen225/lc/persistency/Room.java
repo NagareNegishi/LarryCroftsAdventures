@@ -14,10 +14,10 @@ class Room {
 //    public Tile left = new WallTile();
 //    public Tile right = new WallTile();
     
-    public final Coord top = new Coord(2, -1);
-    public final Coord bot = new Coord(2, 5);
-    public final Coord left = new Coord(-1, 2);
-    public final Coord right = new Coord(5, 2);
+    public final Coord left = new Coord(2, -1); // original top
+    public final Coord right = new Coord(2, 5);
+    public final Coord top = new Coord(-1, 2);
+    public final Coord bot = new Coord(5, 2);
     
     public final Coord centre = new Coord(2, 2);
     

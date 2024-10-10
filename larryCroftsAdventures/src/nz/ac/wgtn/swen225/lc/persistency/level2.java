@@ -56,5 +56,4 @@ public class level2 {
 		boolean saved = SaveFile.saveGame("level2", gsc);
 		
 	}
-	
 }
