@@ -11,6 +11,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  * A dialog that displays a message when the game is paused.
@@ -21,21 +22,25 @@ import javax.swing.JPanel;
  */
 public class PauseDialog extends JDialog {
     private static final long serialVersionUID = 1L;
-    private final double WIDTH_PERCENTAGE; // how much of the parent it will cover
+    private JFrame parent;
+    private JPanel renderer;
+    private JPanel content;
     
 
     /**
-     * Create a new PauseDialog with the given parent, text, background color, text color, and ratio.
+     * Create a new PauseDialog with the given parent, renderer, text, background color, and text color.
      * @param parent
+     * @param renderer
      * @param text
      * @param backgroundColor
      * @param textColor
-     * @param ratio
      */
-    public PauseDialog(JFrame parent, String text, Color backgroundColor, Color textColor, double ratio) {
+    public PauseDialog(JFrame parent, JPanel renderer, String text, Color backgroundColor, Color textColor) {
         // JDialog takes 3 parameters, JFrame as parent, String as title and boolean as modal(it will block other windows)
         super(parent, "Game Paused", false);
-        WIDTH_PERCENTAGE = ratio;
+        
+        this.parent = parent;
+        this.renderer = renderer;
         initializeUI(text, backgroundColor, textColor);
         addParentResizeListener(parent); // listen to parent's resize event
     }
@@ -49,18 +54,16 @@ public class PauseDialog extends JDialog {
     private void initializeUI(String text, Color backgroundColor, Color textColor) {
         setUndecorated(true); // remove title bar
         setBackground(new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 150)); // semi-transparent
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setOpaque(false); // make it transparent
+        content = new JPanel(new GridBagLayout());
+        content.setOpaque(false); // make it transparent
 
-        JLabel label = new JLabel(text, JLabel.CENTER);
+        JLabel label = new JLabel(ComponentFactory.format(text, false), JLabel.CENTER);
         label.setFont(new Font("Arial", Font.BOLD, 50));
         label.setForeground(textColor);
-        panel.add(label);
-        setContentPane(panel);// takeover the dialog
-
-        setResizable(false);
+        content.add(label);
+        setContentPane(content);// takeover the dialog
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // do nothing on close
-        setFocusableWindowState(false); // do not allow focus
+        //setFocusableWindowState(false); // do not allow focus
     }
 
     /**
@@ -70,7 +73,7 @@ public class PauseDialog extends JDialog {
     @Override
     public void setVisible(boolean visible) {
         if (visible) {
-            setLocationRelativeTo(getParent());
+            updateSizeAndPosition();
         }
         super.setVisible(visible);
     }
@@ -99,11 +102,12 @@ public class PauseDialog extends JDialog {
      * Update the size and position of the dialog
      */
     private void updateSizeAndPosition() {
-        JFrame parent = (JFrame) getParent();
-        int parentWidth = parent.getWidth();
-        int parentHeight = parent.getHeight();
-        int dialogWidth = (int) (parentWidth * WIDTH_PERCENTAGE);
-        setSize(dialogWidth, parentHeight);
-        setLocationRelativeTo(parent);
+        SwingUtilities.invokeLater(() -> {
+            setLocation(renderer.getLocationOnScreen().x, renderer.getLocationOnScreen().y);
+            setSize(renderer.getWidth(), renderer.getHeight());
+            content.setSize(renderer.getWidth(), renderer.getHeight());
+            content.revalidate();
+            content.repaint();
+        });
     }
 }

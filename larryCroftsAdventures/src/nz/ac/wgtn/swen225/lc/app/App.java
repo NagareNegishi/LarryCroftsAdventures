@@ -2,8 +2,6 @@ package nz.ac.wgtn.swen225.lc.app;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -59,11 +57,7 @@ class App extends JFrame{
   private AppState state = AppState.PAUSED;
 
   private static final int width = 800;
-  private static final int height = 450;
-  private static final int maxWidth = 1920;
-  private static final int minWidth = 800;
-  private static final int minHeight = 450;
-  private static final double ratio = 16.0 / 9.0;
+  private static final int height = 400;
   private static final int MAX_LEVEL = 2;
   private static boolean continueGame = false;
   
@@ -85,35 +79,18 @@ class App extends JFrame{
     setTitle("Larry Croft's Adventures");
     assert SwingUtilities.isEventDispatchThread();
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    setMinimumSize(new Dimension(minWidth, minHeight));
-    setPreferredSize(new Dimension(width, height));
-    setSize(width, height);
-    //setResizable(false); this is last resort
-
+    SwingUtilities.invokeLater(() -> {
+      setMinimumSize(new Dimension(width, height));
+      setPreferredSize(new Dimension(width, height));
+      setSize(width, height);
+      validate();
+    });
     initializeModel();
     initializeUI();
     initializeActionBindings();
     initializeActions();
     initializeController();
     initializeGameTimer();
-
-    // keep the ratio of the window 
-    addComponentListener(new ComponentAdapter() {
-      @Override
-      public void componentResized(ComponentEvent e) {
-        int wid = getWidth();
-        if (wid < minWidth || wid > maxWidth) {
-          wid = width;
-        }
-        int hei = getHeight();
-        int aim = (int) (wid / ratio);
-        if (hei != aim) {
-          setSize(wid, aim);
-        }
-
-        //gameInfoPanel.updateFont(wid/width);
-      }
-    });
     pack();
     setLocationRelativeTo(null);
     setVisible(true);
@@ -153,15 +130,17 @@ class App extends JFrame{
     gameInfoPanel = new GameInfoPanel(width/8, height);
     gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
     add(gameInfoPanel, BorderLayout.EAST);
+    gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
     // Side panel for menu/recorder UI
     sidePanel = new SidePanel(width/8, height, e -> handleAction(e),
     e -> handleAction(e), slider -> handleSliderChange(slider));
+    sidePanel.setPreferredSize(new Dimension(width/8, height));
     add(sidePanel, BorderLayout.WEST);
     // Center panel for game rendering
     renderer = new Renderer();
     add(renderer, BorderLayout.CENTER);
     // Dialogs to pause the game
-    GameDialogs.initializeDialogs(this);
+    GameDialogs.initializeDialogs(this, renderer);
     GameDialogs.START.show();
 }
 

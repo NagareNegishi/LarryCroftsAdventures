@@ -104,7 +104,7 @@ public class ComponentFactory {
      * Custom JPanel with title and value pair.
      */
     static class infoPanel extends JPanel {
-        private JLabel titLabel;
+        private JLabel titleLabel;
         private JLabel valueLabel;
 
         /**
@@ -112,15 +112,19 @@ public class ComponentFactory {
          * @param title
          */
         public infoPanel(String title) {
-            //setLayout(new GridLayout(1, 2));
             setLayout(new GridBagLayout());
-            titLabel = new JLabel(format(title), JLabel.CENTER);
+            titleLabel = new JLabel(format(title,true), JLabel.CENTER);
             valueLabel = new JLabel("", JLabel.CENTER);
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.fill = GridBagConstraints.BOTH;
-            gbc.weightx = 0.55;
-            add(titLabel, gbc);
-            gbc.weightx = 0.45;
+            gbc.gridx = 0;
+            gbc.weightx = 1;
+
+            gbc.gridy = 0;
+            gbc.weighty = 0.1;
+            add(titleLabel, gbc);
+            gbc.gridy = 1;
+            gbc.weighty = 0.9;
             add(valueLabel, gbc);
         }
 
@@ -136,9 +140,9 @@ public class ComponentFactory {
          * update the font size of the labels
          * @param size
          */
-        public void updateFont(float size) {
-            titLabel.setFont(titLabel.getFont().deriveFont(size));
-            valueLabel.setFont(valueLabel.getFont().deriveFont(size));
+        public void updateFont(float title, float value) {
+            titleLabel.setFont(titleLabel.getFont().deriveFont(title));
+            valueLabel.setFont(valueLabel.getFont().deriveFont(value));
         }
     }
 
@@ -207,7 +211,13 @@ public class ComponentFactory {
      * @param message
      * @return
      */
-    public static String format(String message) {
+    public static String format(String message, boolean underline) {
+        if(underline) {
+            message = underline(message);
+        }
         return prefix + message + suffix;
+    }
+    public static String underline(String message) {
+        return "<u>" + message + "</u>";
     }
 }

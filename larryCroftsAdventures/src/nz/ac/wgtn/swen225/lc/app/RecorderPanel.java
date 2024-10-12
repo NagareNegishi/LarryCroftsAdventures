@@ -66,13 +66,13 @@ public class RecorderPanel extends JPanel {
     private void initializeComponents(ActionListener listener, Consumer<Integer> sliderConsumer) {
         stepButton = ComponentFactory.createButton("\u23E9", "step", listener);
         backButton = ComponentFactory.createButton("\u23EA", "back", listener);
-        autoReplayToggle = ComponentFactory.createToggleButton(ComponentFactory.format("Auto Replay"), "autoReplay",
+        autoReplayToggle = ComponentFactory.createToggleButton(ComponentFactory.format("Auto Replay",false), "autoReplay",
             e -> {listener.actionPerformed(e);
                 autoMode();
         });
         speedControl = ComponentFactory.createSlider(1, 5, 3, sliderConsumer);
-        loadRecordingButton = ComponentFactory.createButton(ComponentFactory.format("Load Recording"), "loadRecording", listener);
-        saveRecordingButton = ComponentFactory.createButton(ComponentFactory.format("Save Recording"), "saveRecording", listener);
+        loadRecordingButton = ComponentFactory.createButton(ComponentFactory.format("Load Recording",false), "loadRecording", listener);
+        saveRecordingButton = ComponentFactory.createButton(ComponentFactory.format("Save Recording",false), "saveRecording", listener);
         helpButton = ComponentFactory.createButton("Help", "helpRecorder", listener);
         toggleButton = ComponentFactory.createButton("Show Menu", "toggleRecorder", listener);
     }

@@ -1,10 +1,11 @@
 package nz.ac.wgtn.swen225.lc.app;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,9 +26,11 @@ public class GameInfoPanel extends JPanel {
     private infoPanel keysPanel;
     private infoPanel treasuresPanel;
     private static final float baseSize = 12.0f;
-    private static final float timeTextScale = 1.5f;
-    private static final float timeScale = 2.5f;
-    private static final float infoScale = 1.2f;
+    private static final float timeTextScale = 2.0f;
+    private static final float timeScale = 5.0f;
+    private static final float recorderScale = 1.6f;
+    private static final float infoTitleScale = 1.1f;
+    private static final float infoValueScale = 2.0f;
     private float fontSize = baseSize;
 
 
@@ -38,29 +41,30 @@ public class GameInfoPanel extends JPanel {
      * @param height
      */
     public GameInfoPanel(int width, int height) {
-        
-        //setLayout(new BorderLayout(0,10));
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setPreferredSize(new Dimension(width, height)); //repetitive?? app will call it later too
 
-
-        JPanel timerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        timerPanel.setPreferredSize(new Dimension(width, height/3));
+        JPanel timerPanel = new JPanel();
+        timerPanel.setLayout(new BoxLayout(timerPanel, BoxLayout.Y_AXIS));
+        timerPanel.setPreferredSize(new Dimension(width, height/4));
         timeTextLabel = new JLabel("Time:", JLabel.CENTER);
         timeTextLabel.setFont(getFont().deriveFont((float)width/4));
+        timeTextLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         timeLabel = new JLabel("60");
-        timeLabel.setFont(getFont().deriveFont((float)(width/1.5)));
+        timeLabel.setFont(getFont().deriveFont((float)(width/1.6)));
+        timeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        timerPanel.add(Box.createVerticalGlue()); // stretch the panel to the top
         timerPanel.add(timeTextLabel);
         timerPanel.add(timeLabel);
+        timerPanel.add(Box.createVerticalGlue()); // stretch the panel to the bottom
 
         JPanel infoPanel = new JPanel(new GridLayout(4, 1));
-        infoPanel.setPreferredSize(new Dimension(width, height/3*2));
-        recorderLabel = new JLabel(ComponentFactory.format("Recorder<br>mode"), JLabel.CENTER);
+        infoPanel.setPreferredSize(new Dimension(width, height/4*3));
+        recorderLabel = new JLabel(ComponentFactory.format("Recorder<br>mode",false), JLabel.CENTER);
         recorderLabel.setForeground(Color.RED);
         recorderLabel.setVisible(false);
-        levelPanel = ComponentFactory.createInfoPanel("Level:");
-        keysPanel = ComponentFactory.createInfoPanel("Keys:");
-        treasuresPanel = ComponentFactory.createInfoPanel("Treasures<br>left:");
+        levelPanel = ComponentFactory.createInfoPanel("Level");
+        keysPanel = ComponentFactory.createInfoPanel("Keys");
+        treasuresPanel = ComponentFactory.createInfoPanel("Treasures Left");
         infoPanel.add(recorderLabel);
         infoPanel.add(levelPanel);
         infoPanel.add(keysPanel);
@@ -139,11 +143,11 @@ public class GameInfoPanel extends JPanel {
         fontSize = baseSize * scale;
         timeTextLabel.setFont(timeTextLabel.getFont().deriveFont(fontSize * timeTextScale));
         timeLabel.setFont(timeLabel.getFont().deriveFont(fontSize * timeScale));
-        recorderLabel.setFont(recorderLabel.getFont().deriveFont(fontSize * infoScale));
+        recorderLabel.setFont(recorderLabel.getFont().deriveFont(fontSize * recorderScale));
         
-        levelPanel.updateFont(fontSize * infoScale);
-        keysPanel.updateFont(fontSize * infoScale);
-        treasuresPanel.updateFont(fontSize * infoScale);
+        levelPanel.updateFont(fontSize * infoTitleScale, fontSize * infoValueScale);
+        keysPanel.updateFont(fontSize * infoTitleScale, fontSize * infoValueScale);
+        treasuresPanel.updateFont(fontSize * infoTitleScale, fontSize * infoValueScale);
 
     }
 }
