@@ -182,30 +182,6 @@ public class ComponentFactory {
     return fileChooser;
     }
 
-
-
-    private static void styleButton(AbstractButton button) {
-        button.setBackground(BUTTON_BACKGROUND);
-        button.setForeground(BUTTON_FOREGROUND);
-        button.setFont(BUTTON_FONT);
-        //button.setFocusPainted(false);
-        //button.setBorderPainted(false);
-        //button.setOpaque(true);
-        button.setFocusable(false);
-    }
-
-    public static void setButtonBackground(Color color) {
-        BUTTON_BACKGROUND = color;
-    }
-
-    public static void setButtonForeground(Color color) {
-        BUTTON_FOREGROUND = color;
-    }
-
-    public static void setButtonFont(Font font) {
-        BUTTON_FONT = font;
-    }
-
     /**
      * Format the message to center align.
      * @param message
@@ -220,4 +196,51 @@ public class ComponentFactory {
     public static String underline(String message) {
         return "<u>" + message + "</u>";
     }
+
+
+    /*
+     * Note:
+     * Methods below are not used in the current version of the game,
+     * but can be used to style the buttons.
+     */
+    /**
+     * Style the button with custom settings.
+     * @param button
+     */
+    private static void styleButton(AbstractButton button) {
+        button.setBackground(BUTTON_BACKGROUND);
+        button.setForeground(BUTTON_FOREGROUND);
+        button.setFont(BUTTON_FONT);
+        //button.setFocusPainted(false);
+        //button.setBorderPainted(false);
+        //button.setOpaque(true);
+        button.setFocusable(false);
+    }
+
+    /**
+     * Set the background color of the buttons.
+     * @param color
+     */
+    public static void setButtonBackground(Color color) {
+        BUTTON_BACKGROUND = color;
+    }
+
+    /**
+     * Set the foreground color of the buttons.
+     * @param color
+     */
+    public static void setButtonForeground(Color color) {
+        BUTTON_FOREGROUND = color;
+    }
+
+    /**
+     * Set the font of the buttons.
+     * @param font
+     */
+    public static void setButtonFont(Font font) {
+        BUTTON_FONT = font;
+    }
+
+
+
 }

@@ -15,16 +15,17 @@ import javax.swing.SwingUtilities;
 
 /**
  * A dialog that displays a message when the game is paused.
- * It is semi-transparent and blocks the game window.
+ * It is semi-transparent and blocks the game window (renderer).
  *
  * @author Nagare Negishi
  * @studentID 300653779
  */
 public class PauseDialog extends JDialog {
     private static final long serialVersionUID = 1L;
-    private JFrame parent;
     private JPanel renderer;
     private JPanel content;
+    private JLabel label;
+    private static final int fontRatio = 8;
     
 
     /**
@@ -38,8 +39,6 @@ public class PauseDialog extends JDialog {
     public PauseDialog(JFrame parent, JPanel renderer, String text, Color backgroundColor, Color textColor) {
         // JDialog takes 3 parameters, JFrame as parent, String as title and boolean as modal(it will block other windows)
         super(parent, "Game Paused", false);
-        
-        this.parent = parent;
         this.renderer = renderer;
         initializeUI(text, backgroundColor, textColor);
         addParentResizeListener(parent); // listen to parent's resize event
@@ -57,13 +56,13 @@ public class PauseDialog extends JDialog {
         content = new JPanel(new GridBagLayout());
         content.setOpaque(false); // make it transparent
 
-        JLabel label = new JLabel(ComponentFactory.format(text, false), JLabel.CENTER);
+        label = new JLabel(ComponentFactory.format(text, false), JLabel.CENTER);
         label.setFont(new Font("Arial", Font.BOLD, 50));
         label.setForeground(textColor);
         content.add(label);
         setContentPane(content);// takeover the dialog
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // do nothing on close
-        //setFocusableWindowState(false); // do not allow focus
+        setFocusableWindowState(false); // do not allow focus on the dialog
     }
 
     /**
@@ -105,9 +104,18 @@ public class PauseDialog extends JDialog {
         SwingUtilities.invokeLater(() -> {
             setLocation(renderer.getLocationOnScreen().x, renderer.getLocationOnScreen().y);
             setSize(renderer.getWidth(), renderer.getHeight());
-            content.setSize(renderer.getWidth(), renderer.getHeight());
-            content.revalidate();
-            content.repaint();
+            updateFontSize();
+            revalidate();
+            repaint();
         });
+    }
+
+    /**
+     * Update the font size based on the size of the dialog
+     */
+    private void updateFontSize() {
+        int size = Math.min(getWidth(), getHeight()) / fontRatio;
+        Font newFont = label.getFont().deriveFont((float)size);
+        label.setFont(newFont);
     }
 }

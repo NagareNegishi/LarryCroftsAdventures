@@ -4,9 +4,11 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
-import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -25,16 +27,14 @@ public class GameInfoPanel extends JPanel {
     private infoPanel levelPanel;
     private infoPanel keysPanel;
     private infoPanel treasuresPanel;
-    private static final float baseSize = 12.0f;
-    private static final float timeTextScale = 2.0f;
-    private static final float timeScale = 5.0f;
+    private static final int baseRatio = 10;
+    private static final float timeTextScale = 2.5f;
+    private static final float timeScale = 6.5f;
     private static final float recorderScale = 1.6f;
-    private static final float infoTitleScale = 1.1f;
+    private static final float infoTitleScale = 1.2f;
     private static final float infoValueScale = 2.0f;
-    private float fontSize = baseSize;
+    private float fontSize;
 
-
-    
     /**
      * Create a new GameInfoPanel with the given width and height.
      * @param width
@@ -52,10 +52,8 @@ public class GameInfoPanel extends JPanel {
         timeLabel = new JLabel("60");
         timeLabel.setFont(getFont().deriveFont((float)(width/1.6)));
         timeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        timerPanel.add(Box.createVerticalGlue()); // stretch the panel to the top
         timerPanel.add(timeTextLabel);
         timerPanel.add(timeLabel);
-        timerPanel.add(Box.createVerticalGlue()); // stretch the panel to the bottom
 
         JPanel infoPanel = new JPanel(new GridLayout(4, 1));
         infoPanel.setPreferredSize(new Dimension(width, height/4*3));
@@ -71,15 +69,7 @@ public class GameInfoPanel extends JPanel {
         infoPanel.add(treasuresPanel);
         add(timerPanel);
         add(infoPanel);
-
     }
-
-
-    /*
-     * I am fully aware that the following setters can be one method that takes a string and an int
-     * However, those methods are called by other modules,
-     * and readability is more important when you collaborate with others.
-     */
 
     /**
      * set the time on the timer label, and update the color of the timer
@@ -139,15 +129,29 @@ public class GameInfoPanel extends JPanel {
         recorderLabel.setVisible(isRecorder);
     }
 
-    public void updateFont(float scale) {
-        fontSize = baseSize * scale;
+    /**
+     * add a resize listener to the parent frame
+     * @param parent
+     */
+    public void addParentResizeListener(JFrame parent) {
+        parent.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                updateFont();
+            }
+        });
+    }
+
+    /**
+     * update the font size of the labels
+     */
+    public void updateFont() {
+        fontSize = getWidth() / baseRatio;
         timeTextLabel.setFont(timeTextLabel.getFont().deriveFont(fontSize * timeTextScale));
         timeLabel.setFont(timeLabel.getFont().deriveFont(fontSize * timeScale));
         recorderLabel.setFont(recorderLabel.getFont().deriveFont(fontSize * recorderScale));
-        
         levelPanel.updateFont(fontSize * infoTitleScale, fontSize * infoValueScale);
         keysPanel.updateFont(fontSize * infoTitleScale, fontSize * infoValueScale);
         treasuresPanel.updateFont(fontSize * infoTitleScale, fontSize * infoValueScale);
-
     }
 }

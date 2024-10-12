@@ -129,8 +129,8 @@ class App extends JFrame{
     // game info
     gameInfoPanel = new GameInfoPanel(width/8, height);
     gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
+    gameInfoPanel.addParentResizeListener(this);
     add(gameInfoPanel, BorderLayout.EAST);
-    gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
     // Side panel for menu/recorder UI
     sidePanel = new SidePanel(width/8, height, e -> handleAction(e),
     e -> handleAction(e), slider -> handleSliderChange(slider));
