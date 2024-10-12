@@ -1,7 +1,6 @@
 package nz.ac.wgtn.swen225.lc.renderer;
 
 import javax.sound.sampled.*;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -120,35 +119,5 @@ public enum AudioP {
         return clip != null && clip.isRunning();
     }
 
-    /**
-     * Basically a copy and paste from Img
-     */
-    static class DirectoryStructure {
-        public static String of(Path startPath) {
-            try (var paths = Files.walk(startPath)) {
-                return paths
-                        .filter(pi -> !pi.equals(startPath))
-                        .map(pi -> startPath.relativize(pi))
-                        .mapMulti(DirectoryStructure::formatEntry)
-                        .collect(Collectors.joining());
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to read directory structure.", e);
-            }
-        }
-
-        private static void formatEntry(Path rel, Consumer<String> consumer) {
-            int depth = rel.getNameCount() - 1;
-            consumer.accept("--|".repeat(depth));
-            consumer.accept(rel.getFileName().toString());
-            consumer.accept("  //Path.of(\"");
-            consumer.accept(formatPath(rel));
-            consumer.accept("\")\n");
-        }
-
-        private static String formatPath(Path rel) {
-            return StreamSupport.stream(rel.spliterator(), false)
-                    .map(Path::toString)
-                    .collect(Collectors.joining("\", \""));
-        }
-    }
+   
 }

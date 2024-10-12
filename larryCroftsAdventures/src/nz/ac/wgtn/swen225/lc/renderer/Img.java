@@ -6,10 +6,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 import javax.imageio.ImageIO;
 
 /**
@@ -17,8 +13,9 @@ import javax.imageio.ImageIO;
  * It's important to note that if the Enum's name as a file doesn't exist in the imgs folder
  * it WILL break
  * 
- * eg. if we want a Kourie Img, we will NEED Kourie.png to be present, otherwise, the program won't run
+ * eg. if we want a "Kourie" Img, we will NEED Kourie.png to be present, otherwise, the program won't run
  * 
+ * This could defintly be optimized later
  *  
  * @author Marwan Mohamed
  * @studentID 300653693
@@ -68,46 +65,4 @@ public enum Img {
         }
     }
 
-
-
-
-/**
- * For Directory Structure, alot of it was "inspired" from Assigment 1.
- * But I did analyze it and gave my comments on what thiese parts actually do
- * To whoever originally wrote this, (Probably Marco on a good evening)
- * This is really cool code to read
- * Though, it's probably possible to read just the code to fix itself if it does find the image
- * why not just fix the image path whilst we're at it, buuuut. It's defintly on me as a
- * developer to have my pathing done right the first time so let's leave it as is =D
- * 
- */ 
-
-class DirectoryStructure {
-    public static String of(Path startPath) {
-        try (var paths = Files.walk(startPath)) {//look into all the files
-            return paths
-                .filter(pi -> !pi.equals(startPath))
-                .map(pi -> startPath.relativize(pi))
-                .mapMulti(DirectoryStructure::formatEntry)
-                .collect(Collectors.joining());
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    private static void formatEntry(Path rel, Consumer<String> consumer) {
-        int depth = rel.getNameCount() - 1;
-        consumer.accept("--|".repeat(depth));
-        consumer.accept(rel.getFileName().toString());
-        consumer.accept("  //Path.of(\"");
-        consumer.accept(formatPath(rel));
-        consumer.accept("\")\n");
-    }
-
-    private static String formatPath(Path rel) {
-        return StreamSupport.stream(rel.spliterator(), false)
-            .map(Path::toString)
-            .collect(Collectors.joining("\", \""));
-    }
-}
 }

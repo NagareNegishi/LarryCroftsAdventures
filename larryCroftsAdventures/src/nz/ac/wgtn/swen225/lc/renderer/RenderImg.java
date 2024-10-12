@@ -67,5 +67,11 @@ public class RenderImg {
  
     }
     
+    public void drawBg(Graphics g) {
+    	//draws the img provided across the whole screen
+    	
+    	
+    }
+    
     
 }
