@@ -18,7 +18,7 @@ public interface Loader {
 	 * @return Optional<GameStateControllerInterface> 
 	 * @throws IOException
 	 */
-	public static Optional<GameStateControllerInterface> loadLevel(String level) throws IOException {
+	public static Optional<GameStateController> loadLevel(String level) throws IOException {
 		throw new IOException("Default method");
 	}
 	
@@ -29,7 +29,7 @@ public interface Loader {
 	 * @param fileName
 	 * @return
 	 */
-	public static Optional<GameStateControllerInterface> loadSave(String fileName) throws IOException {
+	public static Optional<GameStateController> loadSave(String fileName) throws IOException {
 		throw new IOException("Default method");
 	}
 }

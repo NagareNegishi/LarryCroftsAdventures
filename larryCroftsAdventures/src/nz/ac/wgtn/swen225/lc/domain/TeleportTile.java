@@ -1,6 +1,10 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
-//Tile for level 2....
+
+/**
+ * @author fergusbenj1 300656321
+ */
+
 public class TeleportTile extends Tile{
 	
 	private TeleportTile partner;

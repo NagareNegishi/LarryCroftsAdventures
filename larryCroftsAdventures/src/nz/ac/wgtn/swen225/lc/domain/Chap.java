@@ -7,22 +7,31 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Chap class represents the main playable character of the game, Chap is able to move throughout the levels,
+ * pick up items and open doors.
+ * The main goal is to reach the end of the level and proceed further into the game.
+ * 
+ * @author fergusbenj1 300656321
+ * 
+ */
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Chap {
 	
 	private int row;
 	private int col;
 	@JsonProperty
-	private List<Item> inventory;
+	private ArrayList<Item> inventory;
 	
-	public Chap(int startRow, int startCol) {
+	/* public Chap(int startRow, int startCol) {
 		if(startRow < 0 || startCol < 0) {throw new IllegalArgumentException("Chap must be in bounds of the maze");}
 		this.row = startRow;
 		this.col = startCol;
 		this.inventory = new ArrayList<>();
 		assert this.row == startRow && this.col == startCol;
 		assert this.inventory.size() == 0;
-		}
+		} */
 	
 	/**
 	 * Constructor specifically for Jackson reconstruction
@@ -34,18 +43,22 @@ public class Chap {
 	public Chap(@JsonProperty("startRow") int startRow,
 				@JsonProperty("startCol") int startCol,
 				@JsonProperty("inventory") ArrayList<Item> inventory) {
+		if(startRow < 0 || startCol < 0) {throw new IllegalArgumentException("Chap must be in bounds of the maze");}
 		this.row = startRow;
 		this.col = startCol;
 		this.inventory = inventory;
+		
+		assert this.row == startRow && this.col == startCol;
+		
+		// This line breaks de-serialisation of chap - AdamT
+		//assert this.inventory.size() == 0;
 	}
 	
 	public int getRow() {return row;}
 	public int getCol() {return col;}
+	public ArrayList<Item> inventory(){return inventory;}
 	
-	// debugging method for position of Chap
-	public String getPosition() {return "Chap is at row: " + row + ", column: " + col;}
-	
-	// helper method to move chap anywhere in the maze, good for debugging
+	// helper method to move chap anywhere in the maze, good for debugging. Also used for teleport tile logic.
 	public void moveTo(int newRow, int newCol, Maze maze) {
 		if(!maze.validMove(newRow, newCol)) {throw new IllegalArgumentException("Invalid move");}
 		this.row = newRow;
@@ -53,8 +66,11 @@ public class Chap {
 		assert this.row == newRow && this.col == newCol : "Move failed";
 	}
 	
+	// moves chap in a given direction if it is a valid move in the maze
 	public void move(Direction direction, Maze maze) {
-		if(maze.equals(null) || direction.equals(null)) {throw new IllegalArgumentException("Maze or Direction is null cannot move Chap");}
+		if(maze.equals(null) || direction.equals(null)) {
+			throw new IllegalArgumentException("Maze or Direction is null cannot move Chap");
+			}
 	   
 		int newRow = this.row;
 	    int newCol = this.col;
@@ -111,14 +127,4 @@ public class Chap {
 		assert inventory.contains(item);
 		}
 	}	
-	
-	public List<Item> inventory(){return inventory;}
-	
-	// helpful method for laying out chaps inventory
-	public void inventoryDescription() {
-		System.out.println("Chap's inventory contains: "); 
-		inventory.forEach(s -> System.out.println(s.description()));
-		}
-	
-	
 }

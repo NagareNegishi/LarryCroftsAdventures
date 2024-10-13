@@ -14,9 +14,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
+import nz.ac.wgtn.swen225.lc.persistency.Paths;
 
 /**
  * Class used by the App module to generate a Recorder object.
@@ -27,7 +29,7 @@ public class Recorder {
 	private ObjectMapper eventMapper = new ObjectMapper();
 
 	// Holds Chap's recorded movements and when they happened.
-	private List<DirectionEvent> events = new ArrayList<>();
+	private List<Event> events = new ArrayList<>();
 
 	// Limit to prevent memory issues 
 	// Probably not an issue unless trying to stress test game :/
@@ -51,16 +53,24 @@ public class Recorder {
 	// An object to receive changes for App
 	private Consumer<RecordingChanges> updateReciever;
 
+	private interface Event{
+		int time();
+		default void run(GameStateController gsc) {gsc.moveActor();}
+	}
 	/**
 	 * Wraps an actor's movement into an object to read at a later point.
 	 * 
 	 * @param direction The direction actor is moving.
 	 * @param time      Time when user inputed to move actor.
 	 */
-	private record DirectionEvent(Direction direction, int time) {
-		public DirectionEvent {
-			assert direction != null : "DirectionEvent can't have null direction!";
-			assert time >= 0 : "DirectionEvent's time cannot be below 0";
+	private record ChapEvent(Direction direction, int time) implements Event{
+		public ChapEvent {
+			assert direction != null : "ChapEvent can't have null direction!";
+			assert time >= 0 : "ChapEvent's time cannot be below 0";
+		}
+		@Override 
+		public void run(GameStateController gsc) {
+			gsc.moveChap(direction);
 		}
 	}
 
@@ -73,7 +83,7 @@ public class Recorder {
 	public record RecordingChanges(GameStateController updatedGame, int updatedTime) {
 		public RecordingChanges {
 			assert updatedGame != null : "RecordingChanges can't have null GameStateController!";
-			assert updatedTime >= 0 : "DirectionEvent's time cannot be below 0";
+			assert updatedTime >= 0 : "ChapEvent's time cannot be below 0";
 		}
 	}
 
@@ -93,9 +103,9 @@ public class Recorder {
 		this.updateReciever = updateReciever;
 		firstLevelSupplier = () -> {
 			//assert LoadFile.loadSave("level1").isPresent()
-			assert LoadFile.loadLevel("level1").isPresent()
+			assert LoadFile.loadLevel(Paths.level1).isPresent()
 					: "Exception occured when attempting to load first level for recorder!";
-			return LoadFile.loadLevel("level1").get();
+			return LoadFile.loadLevel(Paths.level1).get();
 			//return LoadFile.loadSave("level1").get();
 		};
 		recordingGame = firstLevelSupplier.get();
@@ -131,18 +141,21 @@ public class Recorder {
 
 	/**
 	 * Used by App module.
-	 * Reads JSON file, interpreting data into a list of DirectionEvent objects.
+	 * Reads JSON file, interpreting data into a list of ChapEvent objects.
 	 */
 	public void loadRecording() {
+		currentEventIndex = -1;
 		handleRecording("load", rfc -> {
 			events = eventMapper.readValue(rfc.recordingLoc,
-					eventMapper.getTypeFactory().constructCollectionType(List.class, DirectionEvent.class));
+					eventMapper.getTypeFactory().constructCollectionType(List.class, ChapEvent.class));
 		});
+		updateReciever.accept(new RecordingChanges(firstLevelSupplier.get(), 
+				events.get(0).time()));
 	}
 
 	/**
 	 * Used by App module.
-	 * Writes JSON file, by serializing a list of DirectionEvent objects.
+	 * Writes JSON file, by serializing a list of ChapEvent objects.
 	 */
 	public void saveRecording() {
 		handleRecording("save", rfc -> {
@@ -157,11 +170,19 @@ public class Recorder {
 	 * @param currentTime Time when user inputed to move chap.
 	 */
 	public void ping(Direction direction, int currentTime) {
-		assert events != null : "Recorder events storage is null!";
-		if(events.size() == EventsLimit) return;
-		events.add(new DirectionEvent(direction, currentTime));
+	    ping(currentTime);
+	    events.set(events.size() - 1, new ChapEvent(direction, currentTime));
 	}
-
+	public void ping(int currentTime) {
+	    assert events != null : "Recorder events storage is null!";
+	    if(events.size() == EventsLimit) return;
+	    if(currentEventIndex != events.size() - 1) {
+	    	events = new ArrayList<>(events.subList(0, currentEventIndex + 1));
+	    }
+	    events.add(()->{return currentTime;});
+	    currentEventIndex++;
+	    
+	}
 	/**
 	 * Used by App module to just set the automatic replay speed.
 	 * 
@@ -178,38 +199,34 @@ public class Recorder {
 	 */
 	public void previousStep() {
 
-		assert !events.isEmpty() : "Recording is empty!";
-		recordingGame = firstLevelSupplier.get();
+		if(events.isEmpty() || recordingGame == null) {return;}
 		if (currentEventIndex <= 0) {
 			updateReciever.accept(new RecordingChanges(recordingGame, events.get(0).time()));
 			return;
 		}
 
-		currentEventIndex--;
-
-		for (int i = 0; i <= currentEventIndex; i++) {
-			DirectionEvent curEvent = events.get(i);
-			recordingGame.moveChap(curEvent.direction());
-		}
-		updateReciever.accept(new RecordingChanges(recordingGame, events.get(currentEventIndex).time()));
+		step(currentEventIndex - 1);
 	}
 
 	/**
 	 * Used by App module to manually step the recording forward by one event.
 	 */
 	public void nextStep() {
-		assert recordingGame != null : "Recording doesn't have level to reference!";
-		assert !events.isEmpty() : "Recording is empty!";
-		if (currentEventIndex >= events.size() - 1) {
-			updateReciever.accept(new RecordingChanges(recordingGame, events.get(events.size() - 1).time()));
-			return;
-		}
-		currentEventIndex = Math.min(currentEventIndex + 1, events.size() - 1);
-		DirectionEvent curEvent = events.get(currentEventIndex);
-		recordingGame.moveChap(curEvent.direction());
-		updateReciever.accept(new RecordingChanges(recordingGame, curEvent.time()));
+		System.out.print(currentEventIndex + "EEEEEEEEEEE");
+		if(events.isEmpty() || recordingGame == null) {return;}
+		step(Math.min(currentEventIndex + 1, events.size() - 1));
 	}
-
+	
+	private void step(int newCurrentIndex) {
+		currentEventIndex = newCurrentIndex;
+		recordingGame = firstLevelSupplier.get();
+		for (int i = 0; i <= currentEventIndex; i++) {
+			events.get(i).run(recordingGame);
+			
+		}
+		updateReciever.accept(new RecordingChanges(recordingGame, events.get(currentEventIndex).time()));
+	}
+	
 	/**
 	 * Used by App module to automatically step forward recording.
 	 * Can be toggled on and off.
@@ -238,8 +255,8 @@ public class Recorder {
 	 * 
 	 * @return Chap's position in game model recording can view.
 	 */
-	public String getChapPosition() {
-		return recordingGame.getChapPosition();
+	public Chap getChap() {
+		return recordingGame.getChap();
 	}
 }
 

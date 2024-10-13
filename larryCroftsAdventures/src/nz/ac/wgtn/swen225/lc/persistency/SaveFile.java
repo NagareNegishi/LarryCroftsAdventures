@@ -11,10 +11,15 @@ import nz.ac.wgtn.swen225.lc.domain.*;
 import java.io.File;
 import java.io.IOException;
 
-// TODO
-public class SaveFile implements Saver{
 
-    public static boolean saveGame(String fileName, GameStateControllerInterface gameControl){
+public class SaveFile implements Saver{
+	/**
+	 * Saves GameStateController as .json file in /saves directory
+	 * @param fileName : String, filename of new .json 
+	 * @param gameControl : GameStateController, model of game state
+	 * @return boolean, True if successfully saved
+	 */
+    public static boolean saveGame(String fileName, GameStateController gameControl){
 
         assert gameControl != null;
         assert fileName != null && !fileName.isEmpty();
@@ -39,9 +44,9 @@ public class SaveFile implements Saver{
      * @param <T>,  Generic object to serialise
      * @param fileName
      * @param obj
-     * @return
+     * @return boolean: true if successful
      */
-    public static <T> boolean saveObj(String fileName, T obj) {
+    protected static <T> boolean saveObj(String fileName, T obj) {
     	assert obj != null;
     	assert !fileName.isEmpty();
     	

@@ -7,11 +7,12 @@ import java.util.function.Consumer;
 import javax.swing.JPanel;
 
 /**
+ * SidePanel class manages the display of MenuPanel and RecorderPanel.
+ * To avoid having too many buttons on the screen at once, only one panel is displayed at a time.
+ *
  * Note: After many refactor to make the code in App short,
  * This class became a little bit hard to understand at first glance.
  * So, here is a brief explanation of the class.
- *
- * SidePanel class manages the display of MenuPanel and RecorderPanel.
  *
  *  Action Listeners:
  *    - Jbutton need action listener
@@ -34,12 +35,15 @@ import javax.swing.JPanel;
  *  Using Consumers:
  *    - However, this class can't call methods in App directly.
  *    - So, I'm using Consumer to pass the action command to App.
+ *
+ * @author Nagare Negishi
+ * @studentID 300653779
  */
 public class SidePanel extends JPanel {
     private MenuPanel menuPanel;
     private RecorderPanel recorderPanel;
-    private enum Type {MENU, RECORDER}
-    private Type current = Type.MENU;
+    private enum Mode {MENU, RECORDER}
+    private Mode current = Mode.MENU;
     
     /**
      * Create a new SidePanel with the given width, height, menu, recorder, and slider.
@@ -66,11 +70,11 @@ public class SidePanel extends JPanel {
         current = switch(current) {
             case MENU -> {
                 add(recorderPanel);
-                yield Type.RECORDER;
+                yield Mode.RECORDER;
             }
             case RECORDER -> {
                 add(menuPanel);
-                yield Type.MENU;
+                yield Mode.MENU;
             }
         };
         revalidate();
@@ -83,5 +87,9 @@ public class SidePanel extends JPanel {
      */
     public void setPauseButtonText(String text) {
         menuPanel.setPauseButton(text);
+    }
+
+    public boolean isRecorder() {
+        return current == Mode.RECORDER;
     }
 }
