@@ -19,7 +19,7 @@ public class Paths {
 	
 	
 	// Not created yet 
-	//public static final File level2 = new File(levelsDir, "level2.json");
+	public static final File level2 = new File(levelsDir, "level2.json");
 	
 	
 	public static final String levelPath = "levels/";

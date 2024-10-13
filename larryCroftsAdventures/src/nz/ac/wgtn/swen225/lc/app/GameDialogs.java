@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.stream.Stream;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 /**
  * GameDialogs enum class that contains all the dialogs that can be shown in the game.
@@ -15,52 +16,50 @@ import javax.swing.JFrame;
  * @studentID 300653779
  */
 public enum GameDialogs {
-    PAUSE(format("Game is paused"), Color.BLACK, new Color(150, 150, 0), 0.75),
-    START(format("New Game<br>Press 'Esc' to start"), Color.BLUE, Color.YELLOW, 0.75),
-    GAMEOVER(format("Game Over<br>'Esc' to retry"), Color.RED, Color.BLACK, 0.75),
-    VICTORY(format("Victory<br>'Esc' to play again"), Color.GREEN, Color.ORANGE, 0.75);
+    PAUSE(ComponentFactory.format("Game is paused",false), Color.BLACK, new Color(150, 150, 0)),
+    START(ComponentFactory.format("New Game<br>Press 'Esc' to start",false), Color.BLUE, Color.YELLOW),
+    GAMEOVER(ComponentFactory.format("Game Over<br>'Esc' to retry",false), Color.RED, Color.BLACK),
+    VICTORY(ComponentFactory.format("Victory<br>'Esc' to play again",false), Color.GREEN, Color.ORANGE);
 
     
 
 
     PauseDialog dialog;
     String message;
-    Color textColor;
     Color backgroundColor;
-    double opacity;
-    private static final String prefix = "<html><div style='text-align: center;'>";
-    private static final String suffix = "</div></html>";
+    Color textColor;
+
 
     /**
      * Create a new GameDialogs with the given message, text color, background color, and opacity.
      * User must call InitializeDialog(JFrame parent) to initialize the dialog.
      * @param message
-     * @param textColor
      * @param backgroundColor
-     * @param opacity
+     * @param textColor
      */
-    GameDialogs(String message, Color textColor, Color backgroundColor, double opacity) {
+    GameDialogs(String message, Color backgroundColor, Color textColor) {
         this.message = message;
         this.textColor = textColor;
         this.backgroundColor = backgroundColor;
-        this.opacity = opacity;
     }
 
     /**
      * Initialize the dialog with the given parent.
      * Only this class can call this method.
      * @param parent the parent JFrame
+     * @param renderer the renderer JPanel
      */
-    private void initializeDialog(JFrame parent) {
-        dialog = new PauseDialog(parent, message, textColor, backgroundColor, opacity);
+    private void initializeDialog(JFrame parent, JPanel renderer) {
+        dialog = new PauseDialog(parent, renderer, message, backgroundColor, textColor);
     }
 
     /**
      * Initialize all dialogs with the given parent.
      * @param parent the parent JFrame
+     * @param renderer the renderer JPanel
      */
-    public static void initializeDialogs(JFrame parent) {
-        Stream.of(GameDialogs.values()).forEach(type -> type.initializeDialog(parent));
+    public static void initializeDialogs(JFrame parent, JPanel renderer) {
+        Stream.of(GameDialogs.values()).forEach(type -> type.initializeDialog(parent, renderer));
     }
 
     /**
@@ -86,12 +85,5 @@ public enum GameDialogs {
         Stream.of(GameDialogs.values()).forEach(type -> type.hide());
         }
 
-    /**
-     * Format the message to center align.
-     * @param message
-     * @return
-     */
-    public static String format(String message) {
-        return prefix + message + suffix;
-    }
+
 }
