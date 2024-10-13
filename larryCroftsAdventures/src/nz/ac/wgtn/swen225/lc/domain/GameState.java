@@ -2,15 +2,17 @@ package nz.ac.wgtn.swen225.lc.domain;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
+import nz.ac.wgtn.swen225.lc.persistency.MockAppNotifier;
 
 /**
  * GameState class represents the state the game is currently in. This includes the current maze, Chap,
@@ -37,9 +39,11 @@ public class GameState{
 	@JsonProperty
 	private int timeLeft;
 	// List for enemies in the level
-	@JsonProperty
-	ArrayList<Actor> enemies;
+	@JsonProperty ArrayList<Actor> enemies;
 	// AppNotifier
+	@JsonProperty
+	@JsonSerialize(as = MockAppNotifier.class)
+	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
 	
 	public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
@@ -55,6 +59,7 @@ public class GameState{
 		this.keysCollected = new HashMap<>();
 		this.timeLeft = 60; // 60 seconds by default
 		this.appNotifier = appNotifier;
+		this.enemies = new ArrayList<Actor>();
 
 		assert this.totalTreasures == totalTreasures;
 		assert keysCollected.isEmpty() == true;
@@ -91,7 +96,7 @@ public class GameState{
 		this.keysCollected = keysCollected;
 		this.timeLeft =timeLeft;
 		this.appNotifier = appNotifier;
-		this.enemies = enemies;
+		this.enemies = (ArrayList<Actor>) enemies;
 		assert this.totalTreasures == totalTreasures;
 		assert this.timeLeft == timeLeft;
 	}
@@ -157,7 +162,8 @@ public class GameState{
         	Lose();
         }
         case TeleportTile tile ->{
-        	chap.moveTo(tile.partner().row(),tile.partner().col(), maze);
+        	chap.moveTo(tile.teleportRow(),tile.teleportCol(), maze);
+        	return;
         }
         default -> {
             
@@ -175,8 +181,14 @@ public class GameState{
             Item item = currentTile.getItem();
             chap.pickUpItem(item);
             switch (item) {
-            case Treasure treasure -> treasureCollected();
-            case Key key -> keysCollected.put(key, key.colour());
+            case Treasure treasure -> {
+				treasureCollected();
+				TreasurePickup(treasuresCollected); ////////////// Added by Nagi
+			}
+            case Key key -> {
+				keysCollected.put(key, key.colour());
+				KeyPickup(keysCollected.size()); ////////////// Added by Nagi
+			}
             default -> {}
         }
             currentTile.removeItem();
@@ -197,6 +209,11 @@ public class GameState{
 	
 	public void moveActor() {
 		enemies.forEach(a -> a.move(maze));
+		for(Actor a : enemies) {
+			if(a.getRow() == chap.getRow() && a.getCol() == chap.getCol()) {
+				Lose();
+			}
+		}
 	}
 		
 	public boolean checkForMatchingKey(String doorColour) {

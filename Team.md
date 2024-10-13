@@ -17,7 +17,7 @@ team.md located in the root folder of the repository that contains a table)
 | Module     | Team Member Name | Team Member GitLab Account |
 |------------|------------------|----------------------------|
 | Domain     | Ben Ferguson     | fergusbenj1                |
-| App        | Nagare Negishi   | negishnaga                 |
+| App        | Nagare Negishi   | negishnaga / negimakushi   |
 | Renderer   | Marwan Mohamed   | mohamemarw1                |
 | Persistency| Adam Tither      | titheradam                 |
 | Recorder   | Joshua Neylan    | neylanjosh                 |

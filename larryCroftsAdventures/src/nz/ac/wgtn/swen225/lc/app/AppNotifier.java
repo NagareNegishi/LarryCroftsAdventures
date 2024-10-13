@@ -1,11 +1,14 @@
 package nz.ac.wgtn.swen225.lc.app;
 
 /**
- * Domain need to be able to notify the app of certain events,
+ * Domain need to be able to notify App certain events,
  * such as the game being won or lost.
  * when chap picked up the key/ treasure.
- * This interface should be a feild in the model.
- * Do the model can use it to notify the app.
+ *
+ *
+ *
+ * @author Nagare Negishi
+ * @studentID 300653779
  */
 public interface AppNotifier {
 
