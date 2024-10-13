@@ -75,13 +75,8 @@ public class GameState{
 					@JsonProperty("totalTreasures") int totalTreasures,
 					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
 					@JsonProperty("timeLeft") int timeLeft,
-<<<<<<< larryCroftsAdventures/src/nz/ac/wgtn/swen225/lc/domain/GameState.java
-					AppNotifier appNotifier,
-					ArrayList<Actor> enemies){
-=======
 					@JsonProperty("appNotifier") AppNotifier appNotifier,
-					@JsonProperty("enemies")List<Actor> enemies) {
->>>>>>> larryCroftsAdventures/src/nz/ac/wgtn/swen225/lc/domain/GameState.java
+					@JsonProperty("enemies")ArrayList<Actor> enemies) {
 		
 		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0 || timeLeft < 0) {throw new IllegalArgumentException("Total treasures and time left must be greater than 0");}
@@ -170,7 +165,7 @@ public class GameState{
     }
 	    chap.move(direction, maze);
 	    // checks for an item and enemy everytime Chap moves to a tile
-	   // checkForEnemy();
+	    checkForEnemy();
 	    checkForItem();
 	}
 
@@ -189,7 +184,7 @@ public class GameState{
         }
 	}
 	
-	/*public void checkForEnemy() {
+	public void checkForEnemy() {
 		int row = chap.getRow();
 		int col = chap.getCol();
 		
@@ -198,7 +193,7 @@ public class GameState{
 				Lose();
 			}
 		}
-	} */
+	} 
 	
 	public void moveActor() {
 		enemies.forEach(a -> a.move(maze));

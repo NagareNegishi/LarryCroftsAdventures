@@ -14,8 +14,10 @@ public class TeleportTile extends Tile{
 	public TeleportTile() {}
 
 	public TeleportTile partner() {return partner;}
+	
 	public void row(int row) {this.row = row;}
 	public void col(int col) {this.col = col;}
+	
 	public int row() {return row;}
 	public int col() {return col;}
 	
