@@ -3,35 +3,8 @@ package nz.ac.wgtn.swen225.lc.renderer;
 
 import java.awt.Color;
 
-/**
- * This is the class that handles all the rendering logic, 
- * 
- * @author Marwan Mohamed
- * @studentID 300653693
- * 
- */
-
-
-/**to get things started, I should have a way to identify the names or the images i'm going to load
- * I should make a canvas thing to start, on launch
- * then, i can have an update method.
- * 
- * there are a few ways to make this efficient, generally speaking, using enums for singlton is the best
- * there should be a loop, to draw everything around the player, with them being centered
- * for now, I can hardcode values in, but it's much better to use the img's uniform width of sorts
- * 
- * I should assume that Jpanel will run things well on the GPU for now.
- * for now, let's get a jPanel going with a canvas to draw on, then an image
- * after which. let's see the image move whenever there's some sort of update happening
- * 
- */
-
-
-
-import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Point;
+import java.util.List;
 
 import nz.ac.wgtn.swen225.lc.domain.*;
 
@@ -56,7 +29,7 @@ public class Renderer extends JPanel {
 
     
 	private static final long serialVersionUID = 1L;
-	private final int FPS = 60; // 60 frames per second
+	private final int FPS = 2; // 60 frames per second
     private final int frameTime = 1000 / FPS; // time per frame in milliseconds
     
     private int playerX;
@@ -65,20 +38,50 @@ public class Renderer extends JPanel {
     
     private Graphics g;
     
-    //Fields for the images
-    final RenderImg Chap1 = new RenderImg(Img.chap);
-    final RenderImg Chap2 = new RenderImg(Img.Kourie);
-    //more fields for diffrent images for a simple animation
+    //I can most definitely improve this
+    final RenderImg Chap1 = new RenderImg(Img.chap1);
+    final RenderImg Chap2 = new RenderImg(Img.chap2);
     
-    final RenderImg LockedDoor = new RenderImg(Img.LockedDoor_blue);
+    final AnimatedImage chap = new AnimatedImage(List.of(Chap1, Chap2));
+    
+    final RenderImg w1 = new RenderImg(Img.Water1);
+    final RenderImg w2 = new RenderImg(Img.Water2);
+    final RenderImg w3 = new RenderImg(Img.Water3);
+    final RenderImg w4 = new RenderImg(Img.Water4);
+    final RenderImg w5 = new RenderImg(Img.Water5);
+    final RenderImg w6 = new RenderImg(Img.Water6);
+    final RenderImg w7 = new RenderImg(Img.Water7);
+    
+    final AnimatedImage water = new AnimatedImage(List.of(w1,w2,w3,w4,w5,w6,w7));
+    
+    final RenderImg Actor1 = new RenderImg(Img.Actor);
+    final RenderImg Actor2 = new RenderImg(Img.Actor); //Actor is meant to have one more image
+    final AnimatedImage Actor = new AnimatedImage(List.of(Actor1,Actor2));
+    
     final RenderImg Wall = new RenderImg(Img.Wall_Tile);
     final RenderImg FreeTile = new RenderImg(Img.FreeTile);
     final RenderImg Treasure = new RenderImg(Img.Treasure);
     final RenderImg Blue_key = new RenderImg(Img.Blue_key);
+    final RenderImg Red_key = new RenderImg(Img.Red_key);
+    final RenderImg Exit = new RenderImg(Img.Stairs);
+    final RenderImg info = new RenderImg(Img.InfoTile);
+    final RenderImg Blue_LockedDoor = new RenderImg(Img.LockedDoor_blue);
+    //Make a red Locked door
+    //make open versions of those doors
     
-    final RenderImg Actor1 = new RenderImg(Img.Actor);
+    //This is a temp for a background image
+    final RenderImg bg = new RenderImg(Img.intro);
+    
     
     final int imgSize;
+    
+    
+    private int offsetX;
+	private int offsetY;
+	private int screenCenterX;
+	private int screenCenterY;
+	private int maxCol;
+	private int maxRow;
     
     /**
      * Renderer constuctor inilizes a Timer to update every frame.
@@ -122,6 +125,21 @@ public class Renderer extends JPanel {
         
         this.g = g;
         
+        //Background Logic
+        water.drawBg(g, this.getSize());
+        
+        
+    	screenCenterX = getWidth() / 2; // Center of the screen horizontally
+        screenCenterY = getHeight() / 2; // Center of the screen vertically
+
+    	offsetX = screenCenterX - (playerX);  // Offset for X
+        offsetY = screenCenterY - (playerY);  // Offset for Y
+    	
+        //Can move this somewhere else
+    	maxCol = game.getMaze().getCols(); //Max Col for maze
+    	maxRow = game.getMaze().getRows(); //max Row for maze
+        
+        
         
         playerY = game.getChap().getRow() * imgSize;
         playerX = game.getChap().getCol() * imgSize;
@@ -129,8 +147,24 @@ public class Renderer extends JPanel {
         
         drawTiles();
       //Draws Chap at the center of the screen after drawing all the tiles
-        Chap1.drawImg(g, getWidth() / 2, getHeight()/2); 
+        chap.draw(g, getWidth() / 2, getHeight()/2); 
         
+
+
+    }
+    
+    private void drawActors(List<Object> actors) {
+//    	
+//    	for (Object actor : actors) {
+//    		col = actor.getcol();
+//    		row = actor.getRow();
+//    		int currentX = col * imgSize + offsetX;
+//			int currentY = row * imgSize + offsetY;
+//    		
+//			Actor.draw(g, currentX, currentY);
+//    	}
+    	
+    	
     }
     
     
@@ -147,16 +181,6 @@ public class Renderer extends JPanel {
     	//Extra Offset, the current iteration doesn't quite need it
     	int offset = 0;
     	
-    	int screenCenterX = getWidth() / 2; // Center of the screen horizontally
-        int screenCenterY = getHeight() / 2; // Center of the screen vertically
-
-    	int offsetX = screenCenterX - (playerX);  // Offset for X
-        int offsetY = screenCenterY - (playerY);  // Offset for Y
-    	
-    	int maxCol = game.getMaze().getCols(); //Max Col for maze
-    	int maxRow = game.getMaze().getRows(); //max Row for maze
-    	
-    	
     	for (int row = 0; row < maxRow; row++) {
     		for(int col = 0; col < maxCol; col++) {
     			
@@ -169,15 +193,9 @@ public class Renderer extends JPanel {
                 
                 //look if the tile has an item
                 if(t.hasItem()) {
-          
                 	drawItem(t.getItem(),currentX, currentY);}
-            
-                
     		}
-    	
-    		
     	}
-    	
     }
     
     private void drawTile(Tile i, int x, int y) {
@@ -188,21 +206,32 @@ public class Renderer extends JPanel {
 
     	else if (i instanceof LockedDoorTile) {
     		FreeTile.drawImg(g, x, y);
-    		LockedDoor.drawImg(g,x,y);
+    		
+    		String col = ((LockedDoorTile) i).colour();
+    		if(col == "Blue") {
+    			Blue_LockedDoor.drawImg(g, x, y);
+    		}else if(col == "Red") {
+    			//Red_key.drawImg(g, x, y);
+    		}
+    		
+    		
+    		
     	}
     	
     	else if (i instanceof WallTile){
     		Wall.drawImg(g,x,y);
     	}
     	
-    	else if (i instanceof ExitLockTile) {//I'm not sure what this one is
-    		g.setColor(Color.BLACK);
-    		g.fillRect(x, y, imgSize, imgSize);
+//    	else if(i instanceof TP) {
+//    		tp.drawImg(g,x,y);
+//    	}
+    	
+    	else if (i instanceof ExitLockTile) {
+    		Exit.drawImg(g, x, y);
     	}
     	
-    	else if (i instanceof InfoFieldTile) {//I'm not sure what this one is either
-    		g.setColor(Color.MAGENTA);
-    		g.drawRect(x, y, imgSize, imgSize);
+    	else if (i instanceof InfoFieldTile) {
+    		info.drawImg(g, x, y);
     	}    	
     	
     }
@@ -210,15 +239,19 @@ public class Renderer extends JPanel {
     /**
      * draws the item set on the current Tile
      * 
-     * @param Item in the current tile
+     * @param Item i and x and y
      */
     private void drawItem(Item i, int x, int y) {
     	
-    	//run a helper method to find what's on here and draw it}
+    	
     
         	if(i instanceof Key) {
-        		//draw key
-        		Blue_key.drawImg(g, x, y);
+        		String col = ((Key) i).colour();
+        		if(col == "Blue") {
+        			Blue_key.drawImg(g, x, y);
+        		}else if(col == "Red") {
+        			Red_key.drawImg(g, x, y);
+        		}
         		
         	}
         	
@@ -226,12 +259,7 @@ public class Renderer extends JPanel {
 	        	Treasure.drawImg(g, x, y);
         		
         	}
-        	
-
-        	
         }
-    
-    
     
 }
     	

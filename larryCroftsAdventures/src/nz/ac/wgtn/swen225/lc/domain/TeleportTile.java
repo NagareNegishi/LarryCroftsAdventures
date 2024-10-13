@@ -9,29 +9,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 
 public class TeleportTile extends Tile{
-	private TeleportTile partner;
-	@JsonProperty
+
+	
+	//private TeleportTile partner;
 	private int row;
 	@JsonProperty
 	private int col;
+	private int teleportRow;
+	private int teleportCol;
 	
-	public TeleportTile() {}
-	
-	public TeleportTile(@JsonProperty("row") int row,
-						@JsonProperty("col") int col) {
-		this.partner = ;
+	public TeleportTile(int row, int col, int teleportToRow, int teleportToCol) {
 		this.row = row;
 		this.col = col;
-		
+		this.teleportRow = teleportToRow;
+		this.teleportCol = teleportToCol;
 	}
 	
-	public TeleportTile partner() {return partner;}
+
 	public void row(int row) {this.row = row;}
 	public void col(int col) {this.col = col;}
+	
+	public int teleportRow() {return teleportRow;}
+	public int teleportCol() {return teleportCol;}
+	
 	public int row() {return row;}
 	public int col() {return col;}
 	
-	public void setPartner(TeleportTile partner) {this.partner = partner;}
+	//public void setPartner(TeleportTile partner) {this.partner = partner;}
 	
 	@Override
 	public boolean canMoveTo() {return true;}

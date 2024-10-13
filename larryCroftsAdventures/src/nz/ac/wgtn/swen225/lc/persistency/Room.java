@@ -3,6 +3,7 @@ package nz.ac.wgtn.swen225.lc.persistency;
 import java.util.HashMap;
 import java.util.Map;
 
+import nz.ac.wgtn.swen225.lc.domain.Exit;
 import nz.ac.wgtn.swen225.lc.domain.ExitLockTile;
 import nz.ac.wgtn.swen225.lc.domain.TeleportTile;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
@@ -104,7 +105,16 @@ class EnemyRoom extends Room{
 
 class ExitRoom extends Room{
 	ExitRoom(){
-		super.innerTile.put(centre, new ExitLockTile());
+		super.innerTile.put(new Coord(1,1), new WallTile());
+		super.innerTile.put(new Coord(2,1), new WallTile());
+		super.innerTile.put(new Coord(3,1), new WallTile());
+		super.innerTile.put(new Coord(1,2), new WallTile());
+		super.innerTile.put(new Coord(3,2), new WallTile());
+		super.innerTile.put(new Coord(1,3), new WallTile());
+		super.innerTile.put(new Coord(3,3), new WallTile());
+		
+		super.innerTile.put(this.centre, new Exit());
+		super.innerTile.put(new Coord(2,3), new ExitLockTile());
 	}
 	
 }

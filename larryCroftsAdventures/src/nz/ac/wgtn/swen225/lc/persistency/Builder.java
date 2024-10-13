@@ -79,7 +79,6 @@ public class Builder {
 			tiles[innerTile.getKey().row() + firstRow][innerTile.getKey().col() + firstCol] = innerTile.getValue();
 		}
 	}
-	
 }
 
 

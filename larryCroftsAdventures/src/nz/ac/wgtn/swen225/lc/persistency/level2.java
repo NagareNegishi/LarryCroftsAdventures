@@ -42,10 +42,15 @@ public class level2 {
 		Room leftRoom = new Room();
 		leftRoom.setTile(leftRoom.centre, redTile);
 		
+		Room exitRoom = new ExitRoom();
+		exitRoom.setTile(exitRoom.top, new FreeTile());
+		
+		
 		Builder build = new Builder();
 		build.addRoom(new Coord(1, 0), leftRoom);
 		build.addRoom(new Coord(1, 1), chapRoom);
 		build.addRoom(new Coord(1, 2), waterRoom);
+		build.addRoom(new Coord(2, 1), exitRoom);
 		
 //		PortalRoom portal1 = new PortalRoom();
 //		PortalRoom portal2 = new PortalRoom();
