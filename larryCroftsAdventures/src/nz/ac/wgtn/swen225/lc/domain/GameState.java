@@ -170,6 +170,7 @@ public class GameState{
         }
     }
 	    chap.move(direction, maze);
+	    
 	    // checks for an item and enemy everytime Chap moves to a tile
 	    checkForEnemy();
 	    checkForItem();
