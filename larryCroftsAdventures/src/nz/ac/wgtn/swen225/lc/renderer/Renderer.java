@@ -66,6 +66,7 @@ public class Renderer extends JPanel {
     final RenderImg Exit = new RenderImg(Img.Stairs);
     final RenderImg info = new RenderImg(Img.InfoTile);
     final RenderImg Blue_LockedDoor = new RenderImg(Img.LockedDoor_blue);
+    final RenderImg Red_LockedDoor = new RenderImg(Img.LockedDoor_red);
     //Make a red Locked door
     //make open versions of those doors
     
@@ -126,7 +127,8 @@ public class Renderer extends JPanel {
         this.g = g;
         
         //Background Logic
-        water.drawBg(g, this.getSize());
+        //It's literally this
+        //water.drawBg(g, this.getSize());
         
         
     	screenCenterX = getWidth() / 2; // Center of the screen horizontally
@@ -147,22 +149,23 @@ public class Renderer extends JPanel {
         
         drawTiles();
       //Draws Chap at the center of the screen after drawing all the tiles
+        drawActors(null);
         chap.draw(g, getWidth() / 2, getHeight()/2); 
         
 
 
     }
     
-    private void drawActors(List<Object> actors) {
-//    	
-//    	for (Object actor : actors) {
-//    		col = actor.getcol();
-//    		row = actor.getRow();
-//    		int currentX = col * imgSize + offsetX;
-//			int currentY = row * imgSize + offsetY;
-//    		
-//			Actor.draw(g, currentX, currentY);
-//    	}
+    private void drawActors(List<Actor> actors) {
+   	
+    	for (Actor actor : actors) {
+    		int col = actor.getCol();
+    		int row = actor.getRow();
+    		int currentX = col * imgSize + offsetX;
+			int currentY = row * imgSize + offsetY;
+    		
+			Actor.draw(g, currentX, currentY);
+    	}
     	
     	
     }
@@ -208,10 +211,11 @@ public class Renderer extends JPanel {
     		FreeTile.drawImg(g, x, y);
     		
     		String col = ((LockedDoorTile) i).colour();
-    		if(col == "Blue") {
+    		if(col.equals("Blue")) {
+    			System.out.println(col);
     			Blue_LockedDoor.drawImg(g, x, y);
-    		}else if(col == "Red") {
-    			//Red_key.drawImg(g, x, y);
+    		}else if(col.equals("Red")) {
+    			Red_LockedDoor.drawImg(g, x, y);
     		}
     		
     		
@@ -222,9 +226,13 @@ public class Renderer extends JPanel {
     		Wall.drawImg(g,x,y);
     	}
     	
-//    	else if(i instanceof TP) {
+//    	else if(i instanceof TeleportTile) {
 //    		tp.drawImg(g,x,y);
 //    	}
+    	
+    	else if(i instanceof WaterTile) {
+    		water.draw(g, x, y);
+    	}
     	
     	else if (i instanceof ExitLockTile) {
     		Exit.drawImg(g, x, y);
@@ -243,13 +251,12 @@ public class Renderer extends JPanel {
      */
     private void drawItem(Item i, int x, int y) {
     	
-    	
-    
         	if(i instanceof Key) {
         		String col = ((Key) i).colour();
-        		if(col == "Blue") {
+        		if(col.equals("Blue")) {
+        			System.out.println(col);
         			Blue_key.drawImg(g, x, y);
-        		}else if(col == "Red") {
+        		}else if(col.equals("Red")) {
         			Red_key.drawImg(g, x, y);
         		}
         		
