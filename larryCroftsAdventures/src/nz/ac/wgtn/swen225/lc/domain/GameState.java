@@ -187,6 +187,7 @@ public class GameState{
             case Key key -> {
 				keysCollected.put(key, key.colour());
 				KeyPickup(keysCollected.size()); ////////////// Added by Nagi
+				//KeyPickup(key.colour()); ////////////// Added by Nagi            replace with the above line
 			}
             default -> {}
         }
@@ -240,6 +241,13 @@ public class GameState{
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onKeyPickup(keyCount);
 	}
+
+	/////////////////////////////////////replace with the above method
+	/*public void KeyPickup(String keyName){
+		assert appNotifier != null: "AppNotifier is null";
+		appNotifier.onKeyPickup(keyName);
+	}*/
+	/////////////////////////////////////
 
 	public void TreasurePickup(int treasureCount){
 		assert appNotifier != null: "AppNotifier is null";

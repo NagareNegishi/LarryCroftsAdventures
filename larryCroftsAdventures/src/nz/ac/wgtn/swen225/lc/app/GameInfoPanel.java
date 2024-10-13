@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -98,6 +99,36 @@ public class GameInfoPanel extends JPanel {
         assert keys >= 0 : "Keys cannot be negative";
         keysPanel.setValue(String.valueOf(keys));
     }
+
+/////////////////////////////////////////////////////////
+    public void setKeys(Set<String> keys) {
+        StringBuilder coloredKeys = new StringBuilder("<html>");
+        keys.forEach(k -> {
+
+            String color = getColorForKey(k);
+            
+            // Append each key with its color
+            coloredKeys.append("<span style='color: ")
+            .append(color)
+            .append("'> ◆ </span> ");
+        });
+        coloredKeys.append("</html>");
+
+        keysPanel.setValue(coloredKeys.toString());
+
+    }
+
+    private String getColorForKey(String key) {
+        return switch (key){//.toLowerCase()) {
+            case "1" -> "red";
+            case "2" -> "blue";
+            case "3" -> "gold";
+            case "green" -> "green";
+            default -> "black";
+        };
+    }
+
+/////////////////////////////////////////////////////////
 
     /**
      * set the treasures on the treasures label

@@ -7,8 +7,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
-import nz.ac.wgtn.swen225.lc.domain.Chap;
-import nz.ac.wgtn.swen225.lc.domain.Item;
 
 public class MockAppNotifier implements AppNotifier, Serializable{
 
@@ -46,6 +44,14 @@ public class MockAppNotifier implements AppNotifier, Serializable{
 		// TODO Auto-generated method stub
 		
 	}
+
+	///////////////////////////////////// replace with int keyCount
+	/*@Override
+	public void onKeyPickup(String keyName) {
+		// TODO Auto-generated method stub
+		
+	}*/
+	/////////////////////////////////////
 
 	@Override
 	public void onTreasurePickup(int treasureCount) {

@@ -460,6 +460,11 @@ class App extends JFrame{
     gameInfoPanel.setTreasures(treasuresLeft);
 
     GameState gamestate = model.getGameState();
+////////////////////////////////////////////////
+    currentLevel = gamestate.getCurrentLevel();
+    gameInfoPanel.setLevel(currentLevel);
+//////////////////////////////////////////////
+
     gamestate.setAppNotifier(notifier);
     controller = new Controller(model, actionBindings, timeLeft);
 
@@ -522,9 +527,19 @@ class App extends JFrame{
       @Override
       public void onKeyPickup(int keyCount){
         assert keyCount >= 0: "keyCount is negative";
-        keysCollectednum = keyCount;
-        gameInfoPanel.setKeys(keysCollectednum);
+        //keysCollectednum = keyCount;
+        //gameInfoPanel.setKeys(keysCollectednum);
+        keysCollected.add(String.valueOf(keyCount));
+        gameInfoPanel.setKeys(keysCollected);
       }
+/////////////////////////////////
+      /*@Override
+      public void onKeyPickup(String keyName){
+        keysCollected.add(keyName);
+        //gameInfoPanel.setKeys(keysCollected);
+        System.out.println("keyName: " + keyName);
+      }*/
+///////////////////////////////////
       @Override
       public void onTreasurePickup(int treasureCount){
         treasuresLeft--;

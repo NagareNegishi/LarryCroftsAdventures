@@ -25,6 +25,12 @@ public interface AppNotifier {
      * @param keyCount
      */
     void onKeyPickup(int keyCount);
+
+
+   //void onKeyPickup(String keyName);
+
+
+
     /**
      * Notify the App that the chap has picked up a treasure.
      * @param treasureCount the number of treasures picked up so far
