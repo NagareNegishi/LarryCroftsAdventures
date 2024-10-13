@@ -37,8 +37,8 @@ public class Fuzz {
 		//create the level
 		GameStateController level = LoadFile.loadLevel("level1").orElseThrow(IllegalArgumentException::new);
 		MockController mockController = new MockController(level);
-		Chap chap = mockController.update.getChap();
-		Maze maze = mockController.update.getMaze();
+		Chap chap = mockController.stateController.getChap();
+		Maze maze = mockController.stateController.getMaze();
 		
 		List<Exception> exceptions = new ArrayList<Exception>();
 		//timer, currently set to 3000ms or 3 seconds
@@ -47,7 +47,7 @@ public class Fuzz {
 		long duration = 3000;
 		
 		//add the current tile as a base
-		visitedTiles.add(mockController.update.getTileAtChapPosition());
+		visitedTiles.add(mockController.stateController.getTileAtChapPosition());
 		
 		//iterate until timer reached
 		while(System.currentTimeMillis() - startTime < duration) {
@@ -75,8 +75,8 @@ public class Fuzz {
 				Chap.Direction moveDirection = notVisitedDirections.get(random.nextInt(notVisitedDirections.size()));
 				try {
 					chap.move(moveDirection, maze);
-					visitedTiles.add(mockController.update.getTileAtChapPosition());
-					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
+					visitedTiles.add(mockController.stateController.getTileAtChapPosition());
+					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getRow() + "," + chap.getCol());
 				} catch (IllegalArgumentException e) {
 					visitedTiles.add(reverse.get(moveDirection));
 					System.out.println(e);
@@ -92,7 +92,7 @@ public class Fuzz {
 						).get(random.nextInt(4));
 				try {
 					chap.move(moveDirection, maze);
-					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
+					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getRow() + "," + chap.getCol());
 				} catch (IllegalArgumentException e) {
 					System.out.println(e);
 				} catch (Exception e) {
