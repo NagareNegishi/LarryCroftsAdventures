@@ -64,6 +64,7 @@ public class GameStateController{
 	 
 	public Maze getMaze() {return gameState.getMaze();}
 	public Chap getChap() {return gameState.getChap();}
+	public List<Actor> getActors(){return gameState.enemies;}
 	
 	// Added by Adam
 	public int getTime() {return gameState.getTime();}
