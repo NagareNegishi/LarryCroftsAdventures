@@ -28,6 +28,11 @@ public class Builder {
 		if(botRight.col() < coord.col()) { botRight = new Coord(botRight.row(), coord.col()); }
 	}
 	
+	
+	/**
+	 * Builds maze specified in this Builder
+	 * @return domain.Maze for use in domain.GameState
+	 */
 	public Maze build() {
 		int chunkRows = botRight.row();
 		System.out.println("chunkRow: " + chunkRows);
