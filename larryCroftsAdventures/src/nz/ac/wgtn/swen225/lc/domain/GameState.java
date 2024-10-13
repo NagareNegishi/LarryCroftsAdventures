@@ -162,7 +162,8 @@ public class GameState{
         	Lose();
         }
         case TeleportTile tile ->{
-        	chap.moveTo(tile.partner().row(),tile.partner().col(), maze);
+        	chap.moveTo(tile.teleportRow(),tile.teleportCol(), maze);
+        	return;
         }
         default -> {
             
@@ -170,7 +171,7 @@ public class GameState{
     }
 	    chap.move(direction, maze);
 	    // checks for an item and enemy everytime Chap moves to a tile
-	   // checkForEnemy();
+	    checkForEnemy();
 	    checkForItem();
 	}
 
@@ -196,7 +197,7 @@ public class GameState{
         }
 	}
 	
-	/*public void checkForEnemy() {
+	public void checkForEnemy() {
 		int row = chap.getRow();
 		int col = chap.getCol();
 		
@@ -205,10 +206,15 @@ public class GameState{
 				Lose();
 			}
 		}
-	} */
+	} 
 	
 	public void moveActor() {
 		enemies.forEach(a -> a.move(maze));
+		for(Actor a : enemies) {
+			if(a.getRow() == chap.getRow() && a.getCol() == chap.getCol()) {
+				Lose();
+			}
+		}
 	}
 		
 	public boolean checkForMatchingKey(String doorColour) {
