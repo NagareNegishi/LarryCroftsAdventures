@@ -45,6 +45,12 @@ public class GameState{
 	@JsonSerialize(as = MockAppNotifier.class)
 	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
+
+
+
+	public int Level;//////////////////////////////////make me json property too :)
+
+
 	
 	public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
 		
@@ -113,15 +119,7 @@ public class GameState{
 	public void setTime(int time) {this.timeLeft = time;}
 
 	///////////////////////////////////////////////////////
-	// if we want to store the time at the save/load we probably need it for level too
-	// remove if it not needed
-	public int currentLevel;
-	public int getCurrentLevel() {
-		return currentLevel;
-	}
-	public void setCurrentLevel(int currentLevel) {
-		this.currentLevel = currentLevel;
-	}
+	public int getLevel() { return Level;}
 	///////////////////////////////////////////////////////////////
 
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions

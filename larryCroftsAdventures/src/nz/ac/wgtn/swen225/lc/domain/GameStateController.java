@@ -3,12 +3,10 @@ package nz.ac.wgtn.swen225.lc.domain;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
 /**
@@ -61,13 +59,17 @@ public class GameStateController{
 	public int getTotalTreasures() {return gameState.totalTreasures();}
 	public int getTreasuresCollected() {return gameState.getTreasuresCollected();}
 	public boolean isAllTreasureCollected() {return gameState.allTreasureCollected();}
-	 
+	
 	public Maze getMaze() {return gameState.getMaze();}
 	public Chap getChap() {return gameState.getChap();}
 	
 	// Added by Adam
 	public int getTime() {return gameState.getTime();}
 	public void setTime(int time) {gameState.setTime(time);}
+
+	//////////////////////////////
+	public int getLevel() { return gameState.getLevel();}
+	//////////////////////////////
 
 	public Tile getTileAtChapPosition() { return maze.getTile(chap.getRow(), chap.getCol());}	 
 	public GameState getGameState() {return gameState;}

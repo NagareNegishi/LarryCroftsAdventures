@@ -23,6 +23,7 @@ import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.Paths;
 import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder;
+import nz.ac.wgtn.swen225.lc.renderer.AudioP;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
 /**
@@ -464,7 +465,7 @@ class App extends JFrame{
 
     GameState gamestate = model.getGameState();
 ////////////////////////////////////////////////
-    currentLevel = gamestate.getCurrentLevel();
+    currentLevel = gamestate.getLevel();
     //if(currentLevel == 0) currentLevel = 1;
     gameInfoPanel.setLevel(currentLevel);
 //////////////////////////////////////////////
@@ -530,6 +531,9 @@ class App extends JFrame{
       public void onGameLose(){
         //recorder.onGameLose();
         gameOver();
+
+        AudioP.death.play();
+
         System.out.println("Game Over is called");
       }
       @Override
@@ -553,6 +557,7 @@ class App extends JFrame{
         treasuresLeft--;
         assert treasuresLeft >= 0: "treasuresLeft is negative";
         gameInfoPanel.setTreasures(treasuresLeft);
+        AudioP.TreasureCollected.play();
       }
     };
   }
