@@ -44,6 +44,9 @@ class App extends JFrame{
   private int keysCollectednum = 0;
   private Set<String> keysCollected = new HashSet<>();
   private int treasuresLeft;
+  private int pingcount = 0;
+  private static final int PINGMAX = 10;
+
 
   Runnable closePhase= ()->{};
   private Map<String, Runnable> actionBindings =  new HashMap<>(); // need to be passed to controller
@@ -462,6 +465,7 @@ class App extends JFrame{
     GameState gamestate = model.getGameState();
 ////////////////////////////////////////////////
     currentLevel = gamestate.getCurrentLevel();
+    //if(currentLevel == 0) currentLevel = 1;
     gameInfoPanel.setLevel(currentLevel);
 //////////////////////////////////////////////
 
@@ -485,8 +489,12 @@ class App extends JFrame{
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
       if (state == AppState.PLAY) {
-        model.moveActor();
-        recorder.ping(timeLeft);
+        pingcount++;
+        if (pingcount == PINGMAX) {
+          model.moveActor();
+          recorder.ping(timeLeft);
+          pingcount = 0;
+        }
         renderer.updateCanvas();
       }
     });
