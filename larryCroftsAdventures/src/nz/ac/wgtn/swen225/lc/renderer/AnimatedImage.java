@@ -1,5 +1,6 @@
 package nz.ac.wgtn.swen225.lc.renderer;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.List;
 
@@ -36,9 +37,10 @@ public class AnimatedImage {
     /**
      * This is specifically for backgrounds
      */
-    public void drawBackground(Graphics g, int x, int y) {
-    	
-    	
+    public void drawBg(Graphics g,Dimension dimension) {
+    	RenderImg currentImage = check();
+    	currentImage.drawBg(g, dimension); 
+    
     }
     
     private RenderImg check() {

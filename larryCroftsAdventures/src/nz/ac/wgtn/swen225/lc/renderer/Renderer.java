@@ -57,7 +57,7 @@ public class Renderer extends JPanel {
 
     
 	private static final long serialVersionUID = 1L;
-	private final int FPS = 60; // 60 frames per second
+	private final int FPS = 2; // 60 frames per second
     private final int frameTime = 1000 / FPS; // time per frame in milliseconds
     
     private int playerX;
@@ -66,21 +66,40 @@ public class Renderer extends JPanel {
     
     private Graphics g;
     
-    //Fields for the images
-    final RenderImg Chap1 = new RenderImg(Img.chap);
-    final RenderImg Chap2 = new RenderImg(Img.Kourie);
-    //more fields for diffrent images for a simple animation
-    final AnimatedImages chap = new AnimatedImages(List.of(Chap1, Chap2));
+    //I can most definitely improve this
+    final RenderImg Chap1 = new RenderImg(Img.chap1);
+    final RenderImg Chap2 = new RenderImg(Img.chap2);
     
-    final RenderImg LockedDoor = new RenderImg(Img.LockedDoor_blue);
+    final AnimatedImage chap = new AnimatedImage(List.of(Chap1, Chap2));
+    
+    final RenderImg w1 = new RenderImg(Img.Water1);
+    final RenderImg w2 = new RenderImg(Img.Water2);
+    final RenderImg w3 = new RenderImg(Img.Water3);
+    final RenderImg w4 = new RenderImg(Img.Water4);
+    final RenderImg w5 = new RenderImg(Img.Water5);
+    final RenderImg w6 = new RenderImg(Img.Water6);
+    final RenderImg w7 = new RenderImg(Img.Water7);
+    
+    final AnimatedImage water = new AnimatedImage(List.of(w1,w2,w3,w4,w5,w6,w7));
+    
+    final RenderImg Actor1 = new RenderImg(Img.Actor);
+    final RenderImg Actor2 = new RenderImg(Img.Actor); //Actor is meant to have one more image
+    final AnimatedImage Actor = new AnimatedImage(List.of(Actor1,Actor2));
+    
     final RenderImg Wall = new RenderImg(Img.Wall_Tile);
     final RenderImg FreeTile = new RenderImg(Img.FreeTile);
     final RenderImg Treasure = new RenderImg(Img.Treasure);
     final RenderImg Blue_key = new RenderImg(Img.Blue_key);
+    final RenderImg Red_key = new RenderImg(Img.Red_key);
+    final RenderImg Exit = new RenderImg(Img.Stairs);
+    final RenderImg info = new RenderImg(Img.InfoTile);
+    final RenderImg Blue_LockedDoor = new RenderImg(Img.LockedDoor_blue);
+    //Make a red Locked door
+    //make open versions of those doors
     
-    final RenderImg Actor1 = new RenderImg(Img.Actor);
-    final RenderImg Actor2 = new RenderImg(Img.Actor);
-    final AnimatedImages Actor = new AnimatedImages(List.of(Actor1,Actor2));
+    //This is a temp for a background image
+    final RenderImg bg = new RenderImg(Img.intro);
+    
     
     final int imgSize;
     
@@ -133,6 +152,9 @@ public class Renderer extends JPanel {
         if(game == null) {return;}//in case the game is not set, display nothing
         
         this.g = g;
+        
+        //Background Logic
+        water.drawBg(g, this.getSize());
         
         
     	screenCenterX = getWidth() / 2; // Center of the screen horizontally
@@ -212,7 +234,16 @@ public class Renderer extends JPanel {
 
     	else if (i instanceof LockedDoorTile) {
     		FreeTile.drawImg(g, x, y);
-    		LockedDoor.drawImg(g,x,y);
+    		
+    		String col = ((LockedDoorTile) i).colour();
+    		if(col == "Blue") {
+    			Blue_LockedDoor.drawImg(g, x, y);
+    		}else if(col == "Red") {
+    			//Red_key.drawImg(g, x, y);
+    		}
+    		
+    		
+    		
     	}
     	
     	else if (i instanceof WallTile){
@@ -223,14 +254,12 @@ public class Renderer extends JPanel {
 //    		tp.drawImg(g,x,y);
 //    	}
     	
-    	else if (i instanceof ExitLockTile) {//I'm not sure what this one is
-    		g.setColor(Color.BLACK);
-    		g.fillRect(x, y, imgSize, imgSize);
+    	else if (i instanceof ExitLockTile) {
+    		Exit.drawImg(g, x, y);
     	}
     	
-    	else if (i instanceof InfoFieldTile) {//I'm not sure what this one is either
-    		g.setColor(Color.MAGENTA);
-    		g.drawRect(x, y, imgSize, imgSize);
+    	else if (i instanceof InfoFieldTile) {
+    		info.drawImg(g, x, y);
     	}    	
     	
     }
@@ -242,11 +271,15 @@ public class Renderer extends JPanel {
      */
     private void drawItem(Item i, int x, int y) {
     	
-    	//run a helper method to find what's on here and draw it}
+    	
     
         	if(i instanceof Key) {
-        		//draw key
-        		Blue_key.drawImg(g, x, y);
+        		String col = ((Key) i).colour();
+        		if(col == "Blue") {
+        			Blue_key.drawImg(g, x, y);
+        		}else if(col == "Red") {
+        			Red_key.drawImg(g, x, y);
+        		}
         		
         	}
         	

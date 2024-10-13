@@ -6,6 +6,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.imageio.ImageIO;
 
 /**
@@ -29,16 +32,23 @@ public enum Img {
 	FreeTile,
 	LockedDoor_blue,
     Wall_Tile,
-    Treasure,
-    Blue_key,
-    chap,
+    InfoTile,
+    Stairs,
+    
+    Treasure, // can likely make this an animation of sorts
+    intro, //this is temp for intro, it will be it's own animated bg
+    Red_key,Blue_key,
+    chap1,chap2,
     Actor,
+    Water1,Water2,Water3,Water4,Water5,Water6,Water7,
     Kourie; //Kourie is a test object, don't mind him.
+	
     public final BufferedImage image;
     
     Img() {
         this.image = loadImage(this.name());
     }
+    
 
 
     private static Path startPath() {
@@ -47,7 +57,7 @@ public enum Img {
         return path;
     }
 
-    private static BufferedImage loadImage(String name) {
+    protected static BufferedImage loadImage(String name) {
         Path p = startPath().resolve(name + ".png");
         System.out.println("Loading image from: " + p.toString());
         assert Files.exists(p) : "Image " + name + " not found. Visible files are:\n" 
@@ -55,7 +65,7 @@ public enum Img {
         try {
             BufferedImage img = ImageIO.read(p.toFile());
 
-            // forcing image transparency, but still doesn't work
+            // forcing image transparency, 
             BufferedImage imgWithAlpha = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
             imgWithAlpha.getGraphics().drawImage(img, 0, 0, null);
             
@@ -64,5 +74,8 @@ public enum Img {
             throw new UncheckedIOException(e);
         }
     }
+    
+    
+    
 
 }
