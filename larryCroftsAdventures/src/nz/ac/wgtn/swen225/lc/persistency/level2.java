@@ -43,7 +43,10 @@ public class level2 {
 		leftRoom.setTile(leftRoom.centre, redTile);
 		
 		Room exitRoom = new ExitRoom();
+		// To be removed one portals added
 		exitRoom.setTile(exitRoom.top, new FreeTile());
+		
+		
 		
 		
 		Builder build = new Builder();
