@@ -490,19 +490,13 @@ class App extends JFrame{
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
       if (state == AppState.PLAY) {
-<<<<<<< HEAD
-        //model.moveActor();
-        // Added to test level2
-        //gamestate.enemies.forEach(e -> System.out.println("E row: " +e.getRow() + " E col: "+ e.getCol()));
-        //recorder.ping();
-=======
+
         pingcount++;
         if (pingcount == PINGMAX) {
           model.moveActor();
           recorder.ping(timeLeft);
           pingcount = 0;
         }
->>>>>>> f666450d62143e763d5909d293ca687e4992fbfc
         renderer.updateCanvas();
       }
     });

@@ -14,6 +14,7 @@ import nz.ac.wgtn.swen225.lc.domain.KeyTile;
 import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
+import nz.ac.wgtn.swen225.lc.domain.TreasureTile;
 import nz.ac.wgtn.swen225.lc.persistency.Room.Direction;
 
 
@@ -27,6 +28,8 @@ public class level2 {
 		Room chapRoom = new Room();
 		//chapRoom.setTile(Direction.Right, new LockedDoorTile("Red")); // Locked door to right
 		chapRoom.setTile(chapRoom.right, new LockedDoorTile("Red")); // Locked door to right
+		chapRoom.setTile(new Coord(1,1), new TreasureTile());
+		
 
 		Key redKey = new Key("Red");
 		KeyTile redTile = new KeyTile(redKey);
@@ -38,13 +41,14 @@ public class level2 {
 		
 		Room waterRoom = new WaterRoom();
 		waterRoom.setTile(waterRoom.centre, blueTile);
+		waterRoom.setTile(new Coord(4,4), new TreasureTile());
 		
 		Room leftRoom = new Room();
 		leftRoom.setTile(leftRoom.centre, redTile);
 		
 		Room exitRoom = new ExitRoom();
 		// To be removed one portals added
-		exitRoom.setTile(exitRoom.top, new FreeTile());
+		//exitRoom.setTile(exitRoom.top, new FreeTile());
 		
 		
 		
@@ -54,6 +58,17 @@ public class level2 {
 		build.addRoom(new Coord(1, 1), chapRoom);
 		build.addRoom(new Coord(1, 2), waterRoom);
 		build.addRoom(new Coord(2, 1), exitRoom);
+		
+		
+		// ************** CURRENTLY WORING ************************
+		Coord entryPortal = new Coord(0, 1);
+		Coord destPortal = new Coord(2, 2);
+		PortalRoom portal1 = new PortalRoom(entryPortal, destPortal);
+		PortalRoom portal2 = new PortalRoom(destPortal, entryPortal);
+		portal2.setTile(portal2.left, new FreeTile());
+		
+		build.addRoom(entryPortal, portal1);
+		build.addRoom(destPortal, portal2);
 		
 //		PortalRoom portal1 = new PortalRoom();
 //		PortalRoom portal2 = new PortalRoom();
@@ -68,7 +83,7 @@ public class level2 {
 		enemies.add(new Actor(8, 8));
 		
 		Chap chap = new Chap(10, 10, new ArrayList<Item>());
-		GameState gs = new GameState(maze, chap, 0, new HashMap<Key, String>() , 60, new MockAppNotifier(), enemies);
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>() , 60, new MockAppNotifier(), enemies);
 		GameStateController gsc = new GameStateController(gs);
 		
 		boolean saved = SaveFile.saveGame("level2", gsc);

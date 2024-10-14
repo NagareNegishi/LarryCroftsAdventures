@@ -1,5 +1,6 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,13 +13,21 @@ public class TeleportTile extends Tile{
 
 	
 	//private TeleportTile partner;
+	@JsonProperty
 	private int row;
 	@JsonProperty
 	private int col;
+	@JsonProperty
 	private int teleportRow;
+	@JsonProperty
 	private int teleportCol;
 	
-	public TeleportTile(int row, int col, int teleportToRow, int teleportToCol) {
+	
+	@JsonCreator
+	public TeleportTile(@JsonProperty("row") int row,
+						@JsonProperty("col") int col,
+						@JsonProperty("teleportToRow") int teleportToRow,
+						@JsonProperty("teleportToCol")int teleportToCol) {
 		this.row = row;
 		this.col = col;
 		this.teleportRow = teleportToRow;

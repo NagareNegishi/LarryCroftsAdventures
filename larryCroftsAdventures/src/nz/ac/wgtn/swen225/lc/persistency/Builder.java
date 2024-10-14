@@ -79,6 +79,22 @@ public class Builder {
 			tiles[innerTile.getKey().row() + firstRow][innerTile.getKey().col() + firstCol] = innerTile.getValue();
 		}
 	}
+	
+	/**
+	 * Gives absolute coord of tile within maze
+	 * @param roomLoc
+	 * @param insideLoc
+	 * @return
+	 */
+	protected static Coord mazeLocation(Coord roomLoc, Coord insideLoc ) {
+		int roomRow = (roomLoc.row() * (roomSize+1)) + 1;
+		int roomCol = (roomLoc.col() * (roomSize+1) + 1);
+		
+		int row = roomRow + insideLoc.row();
+		int col = roomCol + insideLoc.col();
+		
+		return new Coord(row, col);
+	}
 }
 
 

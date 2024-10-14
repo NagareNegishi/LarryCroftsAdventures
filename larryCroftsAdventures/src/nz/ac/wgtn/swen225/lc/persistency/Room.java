@@ -77,25 +77,41 @@ class WaterRoom extends Room {
 }
 
 /**
- * Room with poratl in centre
+ * 
  */
 class PortalRoom extends Room {
-	PortalRoom(){
-		super.innerTile.put(this.centre, new TeleportTile());
+	
+	/**
+	 * 
+	 * @param self, Coord of room within maze
+	 * @param dest, Coord of room within maze
+	 */
+	PortalRoom(Coord self, Coord dest){
+		
+		self = Builder.mazeLocation(self, this.centre);
+		dest = Builder.mazeLocation(dest, this.centre);
+		
+		super.innerTile.put(this.centre, new TeleportTile(self.row(), self.col(), dest.row(), dest.col()));
 	}
 	
 	public boolean pairPortal(Room other) {
 		if(other instanceof PortalRoom) {
 			TeleportTile tele = ((TeleportTile) innerTile.get(centre));
 			TeleportTile otherT = (TeleportTile) other.innerTile.get(centre);
-			tele.setPartner(otherT);
-			otherT.setPartner(tele);
+			//tele.setPartner(otherT);
+			//otherT.setPartner(tele);
+			
+			
+			
 			return true;
 		}
 		return false;
 	}
 	
 }
+
+
+
 
 class EnemyRoom extends Room{
 	
