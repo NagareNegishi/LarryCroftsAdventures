@@ -201,13 +201,14 @@ class App extends JFrame{
     gameInfoPanel.setRecorderMode(isRecorder);
     controller.setRecorderMode(isRecorder);
     if (isRecorder) {
-      GameDialogs.hideAll();
-      stopGame();
-    } else {
-      unpauseGame();
-      //recorder.checkState();
-      if (timeLeft == 0) gameOver();
-    }
+        recorder.nextStep();
+        GameDialogs.hideAll();
+        stopGame();
+      } else {
+        state = AppState.PLAY;
+        gameRun();
+        if (timeLeft == 0) gameOver();
+      }
   }
 
   /**
@@ -473,15 +474,15 @@ class App extends JFrame{
     gamestate.setAppNotifier(notifier);
     controller = new Controller(model, actionBindings, timeLeft);
 
-    recorder = new Recorder((rc)-> {
-      timeLeft = rc.updatedTime();
-      model = rc.updatedGame();
-      gameInfoPanel.setTime(timeLeft);
-      initializeGameTimer();
-      controller.setGameStateController(model);
-      renderer.gameConsumer(model.getGameState());
-      updateGameInfo(model);
-    });
+	recorder = new Recorder(currentLevel, (rc)-> {
+	  timeLeft = rc.updatedTime();
+	  model = rc.updatedGame();
+	  model.getGameState().setAppNotifier(notifier);
+	  gameInfoPanel.setTime(timeLeft);
+	  controller.setGameStateController(model);
+	  renderer.gameConsumer(model.getGameState());
+	  updateGameInfo(model);
+	});
     controller.setRecorder(recorder);
 
     renderer.gameConsumer(gamestate);
@@ -496,8 +497,8 @@ class App extends JFrame{
           recorder.ping(timeLeft);
           pingcount = 0;
         }
-        renderer.updateCanvas();
       }
+      renderer.updateCanvas();
     });
     closePhase.run();//close phase before adding any element of the new phase
     closePhase = ()->{ timer.stop();};
@@ -529,7 +530,7 @@ class App extends JFrame{
       }
       @Override
       public void onGameLose(){
-        //recorder.onGameLose();
+        recorder.onGameLose();
         gameOver();
 
         AudioP.death.play();

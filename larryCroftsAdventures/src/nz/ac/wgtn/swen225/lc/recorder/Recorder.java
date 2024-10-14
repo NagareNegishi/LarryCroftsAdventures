@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -24,7 +25,7 @@ import nz.ac.wgtn.swen225.lc.persistency.Paths;
  * Class used by the App module to generate a Recorder object.
  */
 public class Recorder {
-
+	private Map<Integer, File> levelPaths = Map.of(0, Paths.level1, 1, Paths.level2);
 	// Serializes/de-serializes objects.
 	private ObjectMapper eventMapper = new ObjectMapper();
 
@@ -55,7 +56,9 @@ public class Recorder {
 
 	private interface Event{
 		int time();
-		default void run(GameStateController gsc) {gsc.moveActor();}
+		default void run(GameStateController gsc) {
+			gsc.moveActor();
+		}
 	}
 	/**
 	 * Wraps an actor's movement into an object to read at a later point.
@@ -98,14 +101,13 @@ public class Recorder {
 	/**
 	 * Constructor intended to be used by App for creating recorder object.
 	 */
-	public Recorder(Consumer<RecordingChanges> updateReciever) {
+	public Recorder(int currentLevel, Consumer<RecordingChanges> updateReciever) {
 		assert updateReciever != null : "Null update reciever given to record during construction!";
 		this.updateReciever = updateReciever;
 		firstLevelSupplier = () -> {
-			//assert LoadFile.loadSave("level1").isPresent()
-			assert LoadFile.loadLevel(Paths.level1).isPresent()
+			assert LoadFile.loadLevel(levelPaths.get(currentLevel)).isPresent()
 					: "Exception occured when attempting to load first level for recorder!";
-			return LoadFile.loadLevel(Paths.level1).get();
+			return LoadFile.loadLevel(levelPaths.get(currentLevel)).get();
 			//return LoadFile.loadSave("level1").get();
 		};
 		recordingGame = firstLevelSupplier.get();
@@ -204,6 +206,10 @@ public class Recorder {
 			updateReciever.accept(new RecordingChanges(recordingGame, events.get(0).time()));
 			return;
 		}
+		while(currentEventIndex > 2 && !(events.get(currentEventIndex - 1) instanceof ChapEvent)) {
+			currentEventIndex--;
+			
+		}
 
 		step(currentEventIndex - 1);
 	}
@@ -212,8 +218,10 @@ public class Recorder {
 	 * Used by App module to manually step the recording forward by one event.
 	 */
 	public void nextStep() {
-		System.out.print(currentEventIndex + "EEEEEEEEEEE");
 		if(events.isEmpty() || recordingGame == null) {return;}
+		while(currentEventIndex < events.size() - 2 && !(events.get(currentEventIndex + 1) instanceof ChapEvent)) {
+			currentEventIndex++;
+		}
 		step(Math.min(currentEventIndex + 1, events.size() - 1));
 	}
 	
@@ -249,7 +257,19 @@ public class Recorder {
 
 		replayThread.start();
 	}
+	
+	public void onGameLose() {
+		
+		while(!(events.getLast() instanceof ChapEvent)){
+			events.removeLast();
+		currentEventIndex--;
+		}
+		events.removeLast();
+		currentEventIndex--;
+	}
+	
 
+	
 	/**
 	 * Intended for making testing easier.
 	 * 
@@ -258,6 +278,8 @@ public class Recorder {
 	public Chap getChap() {
 		return recordingGame.getChap();
 	}
+
+	
 }
 
 /**
