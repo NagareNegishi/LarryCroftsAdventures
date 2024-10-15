@@ -34,7 +34,6 @@ public class GameState{
 	private int totalTreasures;
 	@JsonProperty
 	private Map<Key, String> keysCollected;
-	private int currentLevel;
 	// Added by Adam
 	// seconds left for level
 	@JsonProperty
@@ -47,13 +46,7 @@ public class GameState{
 	@JsonSerialize(as = MockAppNotifier.class)
 	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
-
-
-
 	public int Level;//////////////////////////////////make me json property too :)
-
-
-	
 	private Direction chapDirection;
 	
 	/*public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
@@ -74,7 +67,6 @@ public class GameState{
 		assert this.totalTreasures == totalTreasures;
 		assert keysCollected.isEmpty() == true;
 	} */
-	
 	
 	/**
 	 * New constructor specifically for Jackson reconstruction
@@ -121,18 +113,10 @@ public class GameState{
 	// Added by Adam
 	public int getTime() {return timeLeft;}
 	public void setTime(int time) {this.timeLeft = time;}
-
-	///////////////////////////////////////////////////////
-
 	// if we want to store the time at the save/load we probably need it for level too
-	// remove if it not needed
-	public int getCurrentLevel() {return currentLevel;}
-	public void setCurrentLevel(int currentLevel) {this.currentLevel = currentLevel;}
-
 	public int getLevel() { return Level;}
-
-	///////////////////////////////////////////////////////////////
 	public Direction chapDirection() {return chapDirection;}
+	
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
 		this.chapDirection = direction;
@@ -175,9 +159,7 @@ public class GameState{
         	chap.moveTo(tile.teleportRow(),tile.teleportCol(), maze);
         	return;
         }
-        default -> {
-            
-        }
+        default -> {}
     }
 	    chap.move(direction, maze);
 	    
@@ -271,6 +253,7 @@ public class GameState{
 		appNotifier.onTreasurePickup(treasureCount);
 	}
 	
+	// creating a mock game state for testing basic logic and functionality
 	public static GameState mockGameState() {
 		return new GameState(Maze.createBasicMaze(5, 5), new Chap(2,2, new ArrayList<>()),1, new HashMap<Key,String>(), 0, new AppNotifier() {
 		@Override
