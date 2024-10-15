@@ -42,7 +42,7 @@ public class Renderer extends JPanel {
     final RenderImg Chap1 = new RenderImg(Img.chap1);
     final RenderImg Chap2 = new RenderImg(Img.chap2);
     
-    final AnimatedImage chap = new AnimatedImage(List.of(Chap1, Chap2));
+    final AnimatedImage chap = new AnimatedImage(List.of(Chap1, Chap2),2);
     
     final RenderImg w1 = new RenderImg(Img.Water1);
     final RenderImg w2 = new RenderImg(Img.Water2);
@@ -52,11 +52,11 @@ public class Renderer extends JPanel {
     final RenderImg w6 = new RenderImg(Img.Water6);
     final RenderImg w7 = new RenderImg(Img.Water7);
     
-    final AnimatedImage water = new AnimatedImage(List.of(w1,w2,w3,w4,w5,w6,w7));
+    final AnimatedImage water = new AnimatedImage(List.of(w1,w2,w3,w4,w5,w6,w7),1);
     
     final RenderImg Actor1 = new RenderImg(Img.Actor);
     final RenderImg Actor2 = new RenderImg(Img.Actor); //Actor is meant to have one more image
-    final AnimatedImage Actor = new AnimatedImage(List.of(Actor1,Actor2));
+    final AnimatedImage Actor = new AnimatedImage(List.of(Actor1,Actor2),2);
     
     final RenderImg Wall = new RenderImg(Img.Wall_Tile);
     final RenderImg FreeTile = new RenderImg(Img.FreeTile);
