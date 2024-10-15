@@ -1,7 +1,6 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -34,6 +33,7 @@ public class GameState{
 	private int totalTreasures;
 	@JsonProperty
 	private Map<Key, String> keysCollected;
+	private int currentLevel;
 	// Added by Adam
 	// seconds left for level
 	@JsonProperty
@@ -53,7 +53,9 @@ public class GameState{
 
 
 	
-	public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
+	private Direction chapDirection;
+	
+	/*public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
 		
 		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
@@ -70,7 +72,7 @@ public class GameState{
 
 		assert this.totalTreasures == totalTreasures;
 		assert keysCollected.isEmpty() == true;
-	}
+	} */
 	
 	
 	/**
@@ -120,9 +122,13 @@ public class GameState{
 	public void setTime(int time) {this.timeLeft = time;}
 	public int getLevel() { return level;}
 
-
+	///////////////////////////////////////////////////////
+	public int getLevel() { return Level;}
+	///////////////////////////////////////////////////////////////
+	public Direction chapDirection() {return chapDirection;}
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
+		this.chapDirection = direction;
 		if(direction.equals(null)) {throw new IllegalArgumentException("Cannot move because direction is null");}
 		
 		int newRow = chap.getRow() + direction.rowDirection();
