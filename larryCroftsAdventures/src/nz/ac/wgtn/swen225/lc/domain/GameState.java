@@ -1,7 +1,6 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -124,6 +123,7 @@ public class GameState{
 	// Added by Adam
 	public int getTime() {return timeLeft;}
 	public void setTime(int time) {this.timeLeft = time;}
+	public int getLevel() { return level;}
 
 	///////////////////////////////////////////////////////
 	public int getLevel() { return level;}
@@ -194,8 +194,7 @@ public class GameState{
 			}
             case Key key -> {
 				keysCollected.put(key, key.colour());
-				KeyPickup(keysCollected.size()); ////////////// Added by Nagi
-				//KeyPickup(key.colour()); ////////////// Added by Nagi            replace with the above line
+				KeyPickup(key.colour());
 			}
             default -> {}
         }
@@ -250,17 +249,11 @@ public class GameState{
 		System.out.println("Game Over is called in GameStateController");
 	}
 
-	public void KeyPickup(int keyCount){
-		assert appNotifier != null: "AppNotifier is null";
-		appNotifier.onKeyPickup(keyCount);
-	}
-
-	/////////////////////////////////////replace with the above method
-	/*public void KeyPickup(String keyName){
+public void KeyPickup(String keyName){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onKeyPickup(keyName);
-	}*/
-	/////////////////////////////////////
+	}
+
 
 	public void TreasurePickup(int treasureCount){
 		assert appNotifier != null: "AppNotifier is null";
