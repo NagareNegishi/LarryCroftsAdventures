@@ -270,6 +270,19 @@ public class GameState{
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onTreasurePickup(treasureCount);
 	}
+	
+	public static GameState mockGameState() {
+		return new GameState(Maze.createBasicMaze(5, 5), new Chap(2,2, new ArrayList<>()),1, new HashMap<Key,String>(), 0, new AppNotifier() {
+		@Override
+		public void onGameWin() {}
+		@Override
+	    public void onGameLose() {}
+		@Override
+	    public void onKeyPickup(int keyCount) {}
+		@Override
+	    public void onTreasurePickup(int treasureCount) {}
+	}, new ArrayList<Actor>());
+	}
 }
 
 
