@@ -1,6 +1,7 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -37,6 +38,7 @@ public class GameState{
 	// seconds left for level
 	@JsonProperty
 	private int timeLeft;
+	public Direction chapDirection;
 	// List for enemies in the level
 	@JsonProperty
 	public ArrayList<Actor> enemies;
@@ -45,18 +47,7 @@ public class GameState{
 	@JsonSerialize(as = MockAppNotifier.class)
 	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
-<<<<<<< HEAD
 	public int Level;//////////////////////////////////make me json property too :)
-=======
-
-
-	@JsonProperty
-	public int level;//////////////////////////////////make me json property too :)
-
-
-	
->>>>>>> 4d5ec6e604d0887bad98276610c662483c41e689
-	private Direction chapDirection;
 	
 	/*public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
 		
@@ -109,7 +100,7 @@ public class GameState{
 		this.timeLeft =timeLeft;
 		this.appNotifier = appNotifier;
 		this.enemies = (ArrayList<Actor>) enemies;
-		this.level = level;
+		this.Level = level;
 		assert this.totalTreasures == totalTreasures;
 		assert this.timeLeft == timeLeft;
 		
@@ -125,16 +116,9 @@ public class GameState{
 	// Added by Adam
 	public int getTime() {return timeLeft;}
 	public void setTime(int time) {this.timeLeft = time;}
-<<<<<<< HEAD
+
 	// if we want to store the time at the save/load we probably need it for level too
 	public int getLevel() { return Level;}
-=======
-	public int getLevel() { return level;}
-
-	///////////////////////////////////////////////////////
-	public int getLevel() { return level;}
-	///////////////////////////////////////////////////////////////
->>>>>>> 4d5ec6e604d0887bad98276610c662483c41e689
 	public Direction chapDirection() {return chapDirection;}
 	
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
@@ -221,12 +205,13 @@ public class GameState{
 	} 
 	
 	public void moveActor() {
-		enemies.forEach(a -> a.move(maze));
+		//enemies.forEach(a -> a.move(maze));
 		for(Actor a : enemies) {
 			if(a.getRow() == chap.getRow() && a.getCol() == chap.getCol()) {
 				Lose();
 			}
 		}
+		enemies.forEach(a -> a.move(maze));
 	}
 		
 	public boolean checkForMatchingKey(String doorColour) {
@@ -274,10 +259,10 @@ public void KeyPickup(String keyName){
 		@Override
 	    public void onGameLose() {}
 		@Override
-	    public void onKeyPickup(int keyCount) {}
+	    public void onKeyPickup(String keyName) {}
 		@Override
 	    public void onTreasurePickup(int treasureCount) {}
-	}, new ArrayList<Actor>());
+	}, new ArrayList<Actor>(), 1);
 	}
 }
 
