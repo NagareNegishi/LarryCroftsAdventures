@@ -42,7 +42,6 @@ class App extends JFrame{
   private Timer gameTimer;
   private int timeLeft;
   private int currentLevel = 1;
-  private int keysCollectednum = 0;
   private Set<String> keysCollected = new HashSet<>();
   private int treasuresLeft;
   private int pingcount = 0;
@@ -456,20 +455,15 @@ class App extends JFrame{
   void setLevel(GameStateController level){
     model = level;
     timeLeft = model.getTime();
+    currentLevel = model.getLevel();
     treasuresLeft = model.getTotalTreasures();
-    System.out.println("total treasures: " + treasuresLeft);/////////////////
-    keysCollectednum = model.getKeysCollected().size();
     keysCollected.clear();
     keysCollected.addAll(model.getKeysCollected().values());
-    gameInfoPanel.setKeys(keysCollectednum);
-    gameInfoPanel.setTreasures(treasuresLeft);
-
-    GameState gamestate = model.getGameState();
-////////////////////////////////////////////////
-    currentLevel = gamestate.getLevel();
-    //if(currentLevel == 0) currentLevel = 1;
+    gameInfoPanel.setKeys(keysCollected);
     gameInfoPanel.setLevel(currentLevel);
-//////////////////////////////////////////////
+    gameInfoPanel.setTreasures(treasuresLeft);
+    
+    GameState gamestate = model.getGameState();
 
     gamestate.setAppNotifier(notifier);
     controller = new Controller(model, actionBindings, timeLeft);
@@ -513,9 +507,8 @@ class App extends JFrame{
    * @param level model of the game (GameStateController)
    */
   private void updateGameInfo(GameStateController level) {
-    keysCollectednum = level.getKeysCollected().size();
     treasuresLeft = level.getTotalTreasures() - level.getTreasuresCollected();
-    gameInfoPanel.setKeys(keysCollectednum);
+    gameInfoPanel.setKeys(keysCollected);
     gameInfoPanel.setTreasures(treasuresLeft);
   }
 

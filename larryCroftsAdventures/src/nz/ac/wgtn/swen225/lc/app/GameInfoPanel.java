@@ -95,12 +95,6 @@ public class GameInfoPanel extends JPanel {
      * set the keys on the keys label
      * @param keys
      */
-    public void setKeys(int keys) {
-        assert keys >= 0 : "Keys cannot be negative";
-        keysPanel.setValue(String.valueOf(keys));
-    }
-
-/////////////////////////////////////////////////////////
     public void setKeys(Set<String> keys) {
         StringBuilder coloredKeys = new StringBuilder("<html>");
         keys.forEach(k -> {
@@ -119,16 +113,12 @@ public class GameInfoPanel extends JPanel {
     }
 
     private String getColorForKey(String key) {
-        return switch (key){//.toLowerCase()) {
-            case "1" -> "red";
-            case "2" -> "blue";
-            case "3" -> "gold";
-            case "green" -> "green";
+        return switch (key.toLowerCase()) {
+            case "red" -> "red";
+            case "blue" -> "blue";
             default -> "black";
         };
     }
-
-/////////////////////////////////////////////////////////
 
     /**
      * set the treasures on the treasures label

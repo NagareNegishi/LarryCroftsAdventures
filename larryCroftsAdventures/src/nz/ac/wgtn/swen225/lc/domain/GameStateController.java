@@ -68,10 +68,8 @@ public class GameStateController{
 	// Added by Adam
 	public int getTime() {return gameState.getTime();}
 	public void setTime(int time) {gameState.setTime(time);}
-
-	//////////////////////////////
 	public int getLevel() { return gameState.getLevel();}
-	//////////////////////////////
+
 
 	public Tile getTileAtChapPosition() { return maze.getTile(chap.getRow(), chap.getCol());}	 
 	public GameState getGameState() {return gameState;}
