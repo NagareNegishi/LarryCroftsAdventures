@@ -20,22 +20,24 @@ public class SaveFile implements Saver{
 	 * @return boolean, True if successfully saved
 	 */
     public static boolean saveGame(String fileName, GameStateController gameControl){
-
-        assert gameControl != null;
-        assert fileName != null && !fileName.isEmpty();
+        if(fileName == null || fileName.isEmpty() || gameControl == null) {
+        	throw new IllegalArgumentException("Null or empty filename");
+        }
         gameControl = removeAppNotifier(gameControl);
         
-        ObjectMapper mapper = new ObjectMapper();
+        return saveObj(Paths.savePath + fileName, gameControl);
         
-        // Map obj to JSON file
-        try{
-            mapper.writeValue( new File(Paths.savePath + fileName + ".json"), gameControl );
-            return true;
-        } catch(IOException e){
-            e.printStackTrace();
-        }
+//        ObjectMapper mapper = new ObjectMapper();
+//        
+//        // Map obj to JSON file
+//        try{
+//            mapper.writeValue( new File(Paths.savePath + fileName + ".json"), gameControl );
+//            return true;
+//        } catch(IOException e){
+//            e.printStackTrace();
+//        }
         // Failed to send
-        return false;
+        //return false;
     }
     
     
@@ -47,7 +49,7 @@ public class SaveFile implements Saver{
      * @param obj
      * @return boolean: true if successful
      */
-    protected static <T> boolean saveObj(String fileName, T obj) {
+    private static <T> boolean saveObj(String fileName, T obj) {
     	assert obj != null;
     	assert !fileName.isEmpty();
     	
