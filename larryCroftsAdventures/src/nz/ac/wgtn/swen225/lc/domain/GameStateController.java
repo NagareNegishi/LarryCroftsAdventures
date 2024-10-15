@@ -61,6 +61,7 @@ public class GameStateController{
 	public int getTotalTreasures() {return gameState.totalTreasures();}
 	public int getTreasuresCollected() {return gameState.getTreasuresCollected();}
 	public boolean isAllTreasureCollected() {return gameState.allTreasureCollected();}
+	public Direction getChapDirection() {return gameState.chapDirection();}
 	 
 	public Maze getMaze() {return gameState.getMaze();}
 	public Chap getChap() {return gameState.getChap();}
