@@ -25,7 +25,7 @@ import nz.ac.wgtn.swen225.lc.persistency.Paths;
  * Class used by the App module to generate a Recorder object.
  */
 public class Recorder {
-	private Map<Integer, File> levelPaths = Map.of(0, Paths.level1, 1, Paths.level2);
+	private Map<Integer, File> levelPaths = Map.of(1, Paths.level1, 2, Paths.level2);
 	// Serializes/de-serializes objects.
 	private ObjectMapper eventMapper = new ObjectMapper();
 
