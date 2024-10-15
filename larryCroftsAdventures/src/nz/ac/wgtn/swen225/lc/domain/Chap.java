@@ -68,10 +68,10 @@ public class Chap {
 	
 	// moves chap in a given direction if it is a valid move in the maze
 	public void move(Direction direction, Maze maze) {
-		if(maze.equals(null) || direction.equals(null)) {
+		if(maze == null || direction == null) {
 			throw new IllegalArgumentException("Maze or Direction is null cannot move Chap");
-			}
-	   
+		}
+		
 		int newRow = this.row;
 	    int newCol = this.col;
 	    
@@ -90,10 +90,8 @@ public class Chap {
 	            break;
 	    }
 	    
-	    if (!maze.validMove(newRow, newCol)) {
-	        throw new IllegalArgumentException(
-	        		"Invalid move: Cannot move " + direction.name() + ".");
-	    }
+	    if (!maze.validMove(newRow, newCol)) {throw new IllegalArgumentException("Invalid move");}
+	    //"Invalid move: Cannot move " + direction.name() + ".");
 	  
 	    this.row = newRow;
 	    this.col = newCol;

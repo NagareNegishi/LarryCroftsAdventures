@@ -47,7 +47,7 @@ public class GameState{
 	@JsonSerialize(as = MockAppNotifier.class)
 	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
-	public int Level;//////////////////////////////////make me json property too :)
+	public int level;//////////////////////////////////make me json property too :)
 	
 	/*public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
 		
@@ -80,6 +80,7 @@ public class GameState{
 	public GameState(@JsonProperty("maze") Maze maze,
 					@JsonProperty("chap") Chap chap,
 					@JsonProperty("totalTreasures") int totalTreasures,
+					@JsonProperty("treasuresCollected")int treasuresCollected,
 					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
 					@JsonProperty("timeLeft") int timeLeft,
 					@JsonProperty("appNotifier") AppNotifier appNotifier,
@@ -91,19 +92,27 @@ public class GameState{
 		if(keysCollected == null) {throw new IllegalArgumentException("KeysCollected list is null");}
 		if(enemies == null) {throw new IllegalArgumentException("List of enemies is null");}
 		if(appNotifier.equals(null)) {throw new IllegalArgumentException("App notifier is null");}
+		if(level < 0) {throw new IllegalArgumentException("Level must be greater than 0");}
 		
 		this.maze = maze;
 		this.chap = chap;
-		this.treasuresCollected = 0;
+		this.treasuresCollected = treasuresCollected;
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = keysCollected;
 		this.timeLeft =timeLeft;
 		this.appNotifier = appNotifier;
 		this.enemies = (ArrayList<Actor>) enemies;
-		this.Level = level;
-		assert this.totalTreasures == totalTreasures;
-		assert this.timeLeft == timeLeft;
+		this.level = level;
 		
+		assert this.chap != null;
+		assert this.maze != null;
+		assert this.treasuresCollected == treasuresCollected;
+		assert this.totalTreasures == totalTreasures;
+		assert this.keysCollected != null;
+		assert this.timeLeft == timeLeft;
+		assert this.appNotifier != null;
+		assert this.enemies != null;
+		assert this.level == level;
 	}
 	
 	
@@ -118,7 +127,7 @@ public class GameState{
 	public void setTime(int time) {this.timeLeft = time;}
 
 	// if we want to store the time at the save/load we probably need it for level too
-	public int getLevel() { return Level;}
+	public int getLevel() { return level;}
 	public Direction chapDirection() {return chapDirection;}
 	
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
@@ -253,7 +262,7 @@ public void KeyPickup(String keyName){
 	
 	// creating a mock game state for testing basic logic and functionality
 	public static GameState mockGameState() {
-		return new GameState(Maze.createBasicMaze(5, 5), new Chap(2,2, new ArrayList<>()),1, new HashMap<Key,String>(), 0, new AppNotifier() {
+		return new GameState(Maze.createBasicMaze(5, 5), new Chap(2,2, new ArrayList<>()),1, 0, new HashMap<Key,String>(), 0, new AppNotifier() {
 		@Override
 		public void onGameWin() {}
 		@Override
