@@ -6,17 +6,28 @@ import nz.ac.wgtn.swen225.lc.persistency.*;
 
 
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 
+
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 // Domain imports
 
 public class PersistencyTest {
+	
+	
+	
 
 	private GameStateController genGsc() {
 		Maze maze = Maze.createCustomMaze();
@@ -27,6 +38,8 @@ public class PersistencyTest {
 		return gsc;
 	}
 	
+	
+
 	
 	/**
 	 * Reflection of SaveFile.saveObj for testing purposes
@@ -49,13 +62,33 @@ public class PersistencyTest {
 		return false;
 	}
 	
+	@SuppressWarnings("unchecked")
+	private <T> Optional<T> loadObj(File file, Class<T> classType) {
+		try {
+	        Class<?>[] argClasses = new Class<?>[]{File.class, Class.class};
+        	Method loadObj = SaveFile.class.getDeclaredMethod("loadObj", argClasses);
+        	loadObj.setAccessible(true);
+        	
+        	return (Optional<T>)loadObj.invoke(null, file, classType);
+    
+        } catch(Exception e) {
+        	e.printStackTrace();
+        }
+		return Optional.empty();
+	}
 	
-    // Test nested object mockGameState into JSON
-//    @Test
-//    public void gameStateToJson(){
-//        GameController gm = new MockController(2, 2, 2, 1, 1);
-//        assert SaveFile.saveGame("Test1", gm);
-//    }
+	
+	
+	
+	/**
+	 * Test if JUnit working as expected
+	 */
+    @Test
+    public void test() {
+        Integer i = 0;
+        assert i != null;
+    }
+	
 	
 	/**
 	 * Tests whether level1 is loadable from /levels
@@ -77,36 +110,54 @@ public class PersistencyTest {
     	GameStateController gsc = gscOption.get();	
 	}
 
-	/**
-	 * Test for Juint
-	 */
-    @Test
-    public void test() {
-        Integer i = 0;
-        assert i != null;
-    }
     
-    
+	
+	
     /**
      * Test for saveObj
      * Uses reflection as saveObj is private
      */
-    @Test public void objTest() {
+    @Test public void saveObjTest() {
     	Seeds s = new Seeds(1000);
 
     	Canary c = new Canary("ObjBird", 1000, s);
-        Class<?>[] argClasses = new Class<?>[]{String.class, Object.class};
     	
-        try {
-        	Method saveObj = SaveFile.class.getDeclaredMethod("saveObj", argClasses);
-        	saveObj.setAccessible(true);
-        	
-        	assert (Boolean)saveObj.invoke(null, "ObjectTest", c);
-    
-        } catch(Exception e) {
-        	e.printStackTrace();
-        }
+    	assert saveObj("saveObj", c);
     }
+    
+    // Tests expected failure of saveObj
+    @Test public void saveObjFail() {
+    	assert !saveObj("saveObj", null);
+    }
+    
+    @Test public void saveObjFail_2() {
+    	Seeds s = new Seeds(1000);
+    	Canary c = new Canary("ObjBird", 1000, s);
+    	assert !saveObj("", c);
+    }
+    
+    @Test public void saveObjFail_3() {
+    	assert saveObj("Fail", (Function<Integer, Integer>)((i)-> 1));
+    }
+    
+    @Test public void saveObjFail_4() {
+    	Seeds s = new Seeds(1000);
+    	Canary c = new Canary("ObjBird", 1000, s);
+    	assert !saveObj("/n", c);
+    }
+    
+    @Test public void saveGameFail() {
+    	GameStateController gsc = genGsc();
+    	assertThrows(IllegalArgumentException.class,()-> SaveFile.saveGame("", gsc));
+    }
+    
+    @Test public void saveGameFail_2() {
+    	assertThrows(IllegalArgumentException.class, ()-> SaveFile.saveGame(null, genGsc()));	
+    }
+    
+//    @Test public void saveGameFail_3() {
+//    	assertThrows(AssertionError.class, ()-> SaveFile.saveGame("NullGsc", null));
+//    }
     
    
     // Tests serialisation of Maze
@@ -229,10 +280,10 @@ public class PersistencyTest {
 		
     }
     
-    @Test
-    public void pathTest() {
-    	assert false : Paths.level1.getAbsolutePath();
-    }
+//    @Test
+//    public void pathTest() {
+//    	assert false : Paths.level1.getAbsolutePath();
+//    }
     
     @Test
     public void workingController() {
