@@ -23,6 +23,7 @@ import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.Paths;
 import nz.ac.wgtn.swen225.lc.persistency.SaveFile;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder;
+import nz.ac.wgtn.swen225.lc.renderer.AudioP;
 import nz.ac.wgtn.swen225.lc.renderer.Renderer;
 
 /**
@@ -39,12 +40,14 @@ class App extends JFrame{
   private SidePanel sidePanel;
 
   private Timer gameTimer;
-  private static final int MAX_TIME = 60;
-  private int timeLeft = MAX_TIME;
+  private int timeLeft;
   private int currentLevel = 1;
   private int keysCollectednum = 0;
   private Set<String> keysCollected = new HashSet<>();
   private int treasuresLeft;
+  private int pingcount = 0;
+  private static final int PINGMAX = 10;
+
 
   Runnable closePhase= ()->{};
   private Map<String, Runnable> actionBindings =  new HashMap<>(); // need to be passed to controller
@@ -57,9 +60,9 @@ class App extends JFrame{
   private enum AppState {PLAY, PAUSED, GAMEOVER, VICTORY}
   private AppState state = AppState.PAUSED;
 
-  private static int width = 800;
-  private static int height = 400;
-  private static final int MAX_LEVEL = 2; //its not pretty... but i need to check loadNextLevel failure
+  private static final int width = 800;
+  private static final int height = 400;
+  private static final int MAX_LEVEL = 2;
   private static boolean continueGame = false;
   
   /**
@@ -67,23 +70,33 @@ class App extends JFrame{
    * Used to store actions in a map and showcase the use of strategy pattern
    */
   private interface Action{
+    /**
+     * Execute the action
+     */
     void execute();
   }
 
+  /**
+   * Constructor for the game application.
+   */
   App(){
     setTitle("Larry Croft's Adventures");
     assert SwingUtilities.isEventDispatchThread();
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+    SwingUtilities.invokeLater(() -> {
+      setMinimumSize(new Dimension(width, height));
+      setPreferredSize(new Dimension(width, height));
+      setSize(width, height);
+      validate();
+    });
     initializeModel();
     initializeUI();
     initializeActionBindings();
     initializeActions();
     initializeController();
-    initializeGameTimer(); //must be after controller??
-
-    setPreferredSize(new Dimension(width, height));
+    initializeGameTimer();
     pack();
+    setLocationRelativeTo(null);
     setVisible(true);
     addWindowListener(new WindowAdapter(){
       public void windowClosed(WindowEvent e){ 
@@ -100,7 +113,7 @@ class App extends JFrame{
   private void initializeModel(){
     Optional<GameStateController> loadedGame = Optional.empty();
     if (continueGame) {
-      loadedGame = LoadFile.loadSave(Paths.level1); //this will be special path 
+      loadedGame = LoadFile.loadSave(Paths.saveAndQuit);
     } else {
       loadedGame = LoadFile.loadLevel(Paths.level1);
     }
@@ -117,19 +130,21 @@ class App extends JFrame{
    * Initialize the UI for the game.
    */
   private void initializeUI() {
-    // Dialogs to pause the game
-    GameDialogs.initializeDialogs(this);
     // game info
     gameInfoPanel = new GameInfoPanel(width/8, height);
     gameInfoPanel.setPreferredSize(new Dimension(width/8, height));
+    gameInfoPanel.addParentResizeListener(this);
     add(gameInfoPanel, BorderLayout.EAST);
     // Side panel for menu/recorder UI
     sidePanel = new SidePanel(width/8, height, e -> handleAction(e),
     e -> handleAction(e), slider -> handleSliderChange(slider));
+    sidePanel.setPreferredSize(new Dimension(width/8, height));
     add(sidePanel, BorderLayout.WEST);
     // Center panel for game rendering
     renderer = new Renderer();
     add(renderer, BorderLayout.CENTER);
+    // Dialogs to pause the game
+    GameDialogs.initializeDialogs(this, renderer);
     GameDialogs.START.show();
 }
 
@@ -149,23 +164,14 @@ class App extends JFrame{
     actions.put("load", () -> loadGame(Paths.savesDir, false));
     actions.put("help", () -> showHelp(MenuPanel.HELP));
     actions.put("exit", () -> exitGame(false));
-    actions.put("toggleMenu", () -> {
-      sidePanel.togglePanel();
-      controller.setRecorderMode(true);
-      GameDialogs.hideAll(); //# 1
-      stopGame();
-    });
+    actions.put("toggleMenu", () -> togglePanel(true));
     actions.put("step", () -> recorder.nextStep());
     actions.put("back", () -> recorder.previousStep());
     actions.put("autoReplay", () -> recorder.autoReplay());
     actions.put("loadRecording", () -> recorder.loadRecording());
     actions.put("saveRecording", () -> recorder.saveRecording());
     actions.put("helpRecorder", () -> showHelp(RecorderPanel.HELP));
-    actions.put("toggleRecorder", () -> {
-      sidePanel.togglePanel();
-      controller.setRecorderMode(false);
-      unpauseGame();
-    });
+    actions.put("toggleRecorder", () -> togglePanel(false));
   }
 
   /**
@@ -187,6 +193,24 @@ class App extends JFrame{
   }
 
   /**
+   * Toggle the side panel between menu and recorder mode.
+   * @param isRecorder whether to set the panel to recorder mode
+   */
+  private void togglePanel(boolean isRecorder){
+    sidePanel.togglePanel();
+    gameInfoPanel.setRecorderMode(isRecorder);
+    controller.setRecorderMode(isRecorder);
+    if (isRecorder) {
+      GameDialogs.hideAll();
+      stopGame();
+    } else {
+      unpauseGame();
+      //recorder.checkState();
+      if (timeLeft == 0) gameOver();
+    }
+  }
+
+  /**
    * Initialize the action bindings (Map of actions to Runnable) for the controller
    */
   private void initializeActionBindings() {
@@ -194,7 +218,7 @@ class App extends JFrame{
     actionBindings.put("exitAndSave", () -> exitGame(true));
     actionBindings.put("resumeSavedGame", () -> loadGame(Paths.savesDir,false));
     actionBindings.put("startNewGame1", () -> loadGame(Paths.level1, true));
-    actionBindings.put("startNewGame2", () -> loadGame(Paths.level1, true));/////////////////////// need to change to level2
+    actionBindings.put("startNewGame2", () -> loadGame(Paths.level2, true));
     actionBindings.put("pause", this::pauseGame);
     actionBindings.put("unpause", this::unpauseGame);
   }
@@ -203,7 +227,7 @@ class App extends JFrame{
    * Initialize the controller for the game
    */
   private void initializeController() {
-    controller = new Controller(model, actionBindings, MAX_TIME); //initialize with level 1
+    controller = new Controller(model, actionBindings, model.getTime()); //initialize with level 1
     addKeyListener(controller);
     setFocusable(true);//could be remove??
   }
@@ -369,15 +393,14 @@ class App extends JFrame{
    * If the next level is not found, the game is won.
    */
   private void loadNextLevel() {
-    int nextlevel = currentLevel++;
-    if (nextlevel > MAX_LEVEL) {
+    stopGame();
+    currentLevel++;
+    if (currentLevel > MAX_LEVEL) {
       state = AppState.VICTORY;
       GameDialogs.VICTORY.show();
       return;
     }
-    // This still works. I've converted everything else to Files, but not sure how to convert this atm -AdamT
-    stopGame();
-    checkModel(LoadFile.loadLevel("level" + nextlevel));
+    checkModel(LoadFile.loadLevel("level" + currentLevel));
     gameRun();
   }
 
@@ -413,7 +436,7 @@ class App extends JFrame{
    */
   private void exitGame(boolean save) {
     if (save) {
-      saveGame();////////////////////probably need to directly call special slot
+      SaveFile.saveGame("saveAndQuit", model);
       continueGame = true;
     } else {
       continueGame = false;
@@ -441,6 +464,12 @@ class App extends JFrame{
     gameInfoPanel.setTreasures(treasuresLeft);
 
     GameState gamestate = model.getGameState();
+////////////////////////////////////////////////
+    currentLevel = gamestate.getLevel();
+    //if(currentLevel == 0) currentLevel = 1;
+    gameInfoPanel.setLevel(currentLevel);
+//////////////////////////////////////////////
+
     gamestate.setAppNotifier(notifier);
     controller = new Controller(model, actionBindings, timeLeft);
 
@@ -461,8 +490,13 @@ class App extends JFrame{
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
       if (state == AppState.PLAY) {
-        //model.moveActor();
-        //recorder.ping();
+
+        pingcount++;
+        if (pingcount == PINGMAX) {
+          model.moveActor();
+          recorder.ping(timeLeft);
+          pingcount = 0;
+        }
         renderer.updateCanvas();
       }
     });
@@ -490,23 +524,41 @@ class App extends JFrame{
    */
   private AppNotifier getAppNotifier(){
     return new AppNotifier(){
+      @Override
       public void onGameWin(){
-        stopGame();
         loadNextLevel();
       }
+      @Override
       public void onGameLose(){
+        //recorder.onGameLose();
         gameOver();
+
+        AudioP.death.play();
+
         System.out.println("Game Over is called");
       }
+      @Override
       public void onKeyPickup(int keyCount){
         assert keyCount >= 0: "keyCount is negative";
-        keysCollectednum = keyCount;
-        gameInfoPanel.setKeys(keysCollectednum);
+        //keysCollectednum = keyCount;
+        //gameInfoPanel.setKeys(keysCollectednum);
+        keysCollected.add(String.valueOf(keyCount));
+        gameInfoPanel.setKeys(keysCollected);
       }
+/////////////////////////////////
+      /*@Override
+      public void onKeyPickup(String keyName){
+        keysCollected.add(keyName);
+        //gameInfoPanel.setKeys(keysCollected);
+        System.out.println("keyName: " + keyName);
+      }*/
+///////////////////////////////////
+      @Override
       public void onTreasurePickup(int treasureCount){
-        assert treasureCount >= 0: "treasureCount is negative";
-        treasuresLeft = treasureCount;
+        treasuresLeft--;
+        assert treasuresLeft >= 0: "treasuresLeft is negative";
         gameInfoPanel.setTreasures(treasuresLeft);
+        AudioP.TreasureCollected.play();
       }
     };
   }

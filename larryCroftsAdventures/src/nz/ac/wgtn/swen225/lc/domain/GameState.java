@@ -39,12 +39,19 @@ public class GameState{
 	@JsonProperty
 	private int timeLeft;
 	// List for enemies in the level
-	@JsonProperty ArrayList<Actor> enemies;
+	@JsonProperty
+	public ArrayList<Actor> enemies;
 	// AppNotifier
 	@JsonProperty
 	@JsonSerialize(as = MockAppNotifier.class)
 	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
+
+
+
+	public int Level;//////////////////////////////////make me json property too :)
+
+
 	
 	public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
 		
@@ -113,15 +120,7 @@ public class GameState{
 	public void setTime(int time) {this.timeLeft = time;}
 
 	///////////////////////////////////////////////////////
-	// if we want to store the time at the save/load we probably need it for level too
-	// remove if it not needed
-	public int currentLevel;
-	public int getCurrentLevel() {
-		return currentLevel;
-	}
-	public void setCurrentLevel(int currentLevel) {
-		this.currentLevel = currentLevel;
-	}
+	public int getLevel() { return Level;}
 	///////////////////////////////////////////////////////////////
 
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
@@ -162,15 +161,17 @@ public class GameState{
         	Lose();
         }
         case TeleportTile tile ->{
-        	chap.moveTo(tile.partner().row(),tile.partner().col(), maze);
+        	chap.moveTo(tile.teleportRow(),tile.teleportCol(), maze);
+        	return;
         }
         default -> {
             
         }
     }
 	    chap.move(direction, maze);
+	    
 	    // checks for an item and enemy everytime Chap moves to a tile
-	   // checkForEnemy();
+	    checkForEnemy();
 	    checkForItem();
 	}
 
@@ -187,6 +188,7 @@ public class GameState{
             case Key key -> {
 				keysCollected.put(key, key.colour());
 				KeyPickup(keysCollected.size()); ////////////// Added by Nagi
+				//KeyPickup(key.colour()); ////////////// Added by Nagi            replace with the above line
 			}
             default -> {}
         }
@@ -195,7 +197,7 @@ public class GameState{
         }
 	}
 	
-	/*public void checkForEnemy() {
+	public void checkForEnemy() {
 		int row = chap.getRow();
 		int col = chap.getCol();
 		
@@ -204,10 +206,15 @@ public class GameState{
 				Lose();
 			}
 		}
-	} */
+	} 
 	
 	public void moveActor() {
 		enemies.forEach(a -> a.move(maze));
+		for(Actor a : enemies) {
+			if(a.getRow() == chap.getRow() && a.getCol() == chap.getCol()) {
+				Lose();
+			}
+		}
 	}
 		
 	public boolean checkForMatchingKey(String doorColour) {
@@ -240,6 +247,13 @@ public class GameState{
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onKeyPickup(keyCount);
 	}
+
+	/////////////////////////////////////replace with the above method
+	/*public void KeyPickup(String keyName){
+		assert appNotifier != null: "AppNotifier is null";
+		appNotifier.onKeyPickup(keyName);
+	}*/
+	/////////////////////////////////////
 
 	public void TreasurePickup(int treasureCount){
 		assert appNotifier != null: "AppNotifier is null";

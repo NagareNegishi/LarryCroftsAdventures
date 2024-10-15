@@ -3,9 +3,13 @@ package nz.ac.wgtn.swen225.lc.persistency;
 import java.util.HashMap;
 import java.util.Map;
 
+import nz.ac.wgtn.swen225.lc.domain.Exit;
+import nz.ac.wgtn.swen225.lc.domain.ExitLockTile;
+import nz.ac.wgtn.swen225.lc.domain.TeleportTile;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
 import nz.ac.wgtn.swen225.lc.domain.WallTile;
 import nz.ac.wgtn.swen225.lc.domain.WaterTile;
+
 
 class Room {
 	// Entry points to room
@@ -68,6 +72,65 @@ class WaterRoom extends Room {
 		super.innerTile.put(new Coord(1, 2), new WaterTile());
 		super.innerTile.put(new Coord(2, 1), new WaterTile());
 		super.innerTile.put(new Coord(3, 1), new WaterTile());
-		super.innerTile.put(new Coord(4, 2), new WaterTile());
+		super.innerTile.put(new Coord(3, 2), new WaterTile());
 	}
+}
+
+/**
+ * 
+ */
+class PortalRoom extends Room {
+	
+	/**
+	 * 
+	 * @param self, Coord of room within maze
+	 * @param dest, Coord of room within maze
+	 */
+	PortalRoom(Coord self, Coord dest){
+		
+		self = Builder.mazeLocation(self, this.centre);
+		dest = Builder.mazeLocation(dest, this.centre);
+		
+		super.innerTile.put(this.centre, new TeleportTile(self.row(), self.col(), dest.row(), dest.col()));
+	}
+	
+	public boolean pairPortal(Room other) {
+		if(other instanceof PortalRoom) {
+			TeleportTile tele = ((TeleportTile) innerTile.get(centre));
+			TeleportTile otherT = (TeleportTile) other.innerTile.get(centre);
+			//tele.setPartner(otherT);
+			//otherT.setPartner(tele);
+			
+			
+			
+			return true;
+		}
+		return false;
+	}
+	
+}
+
+
+
+
+class EnemyRoom extends Room{
+	
+	
+}
+
+
+class ExitRoom extends Room{
+	ExitRoom(){
+		super.innerTile.put(new Coord(1,1), new WallTile());
+		super.innerTile.put(new Coord(2,1), new WallTile());
+		super.innerTile.put(new Coord(3,1), new WallTile());
+		super.innerTile.put(new Coord(1,2), new WallTile());
+		super.innerTile.put(new Coord(3,2), new WallTile());
+		super.innerTile.put(new Coord(1,3), new WallTile());
+		super.innerTile.put(new Coord(3,3), new WallTile());
+		
+		super.innerTile.put(this.centre, new Exit());
+		super.innerTile.put(new Coord(2,3), new ExitLockTile());
+	}
+	
 }

@@ -19,10 +19,6 @@ import javax.swing.JToggleButton;
  * - Display help for the recorder UI.
  * - Go back to the main menu.
  *
- * Note: I could make generic class for this and MenuPanel,
- * However, the two panels are different enough to have separate classes.
- * And it increases readability.
- *
  * @author Nagare Negishi
  * @studentID 300653779
  */
@@ -66,13 +62,13 @@ public class RecorderPanel extends JPanel {
     private void initializeComponents(ActionListener listener, Consumer<Integer> sliderConsumer) {
         stepButton = ComponentFactory.createButton("\u23E9", "step", listener);
         backButton = ComponentFactory.createButton("\u23EA", "back", listener);
-        autoReplayToggle = ComponentFactory.createToggleButton(GameDialogs.format("Auto Replay"), "autoReplay",
+        autoReplayToggle = ComponentFactory.createToggleButton(ComponentFactory.format("Auto Replay",false), "autoReplay",
             e -> {listener.actionPerformed(e);
                 autoMode();
         });
         speedControl = ComponentFactory.createSlider(1, 5, 3, sliderConsumer);
-        loadRecordingButton = ComponentFactory.createButton(GameDialogs.format("Load Recording"), "loadRecording", listener);
-        saveRecordingButton = ComponentFactory.createButton(GameDialogs.format("Save Recording"), "saveRecording", listener);
+        loadRecordingButton = ComponentFactory.createButton(ComponentFactory.format("Load Recording",false), "loadRecording", listener);
+        saveRecordingButton = ComponentFactory.createButton(ComponentFactory.format("Save Recording",false), "saveRecording", listener);
         helpButton = ComponentFactory.createButton("Help", "helpRecorder", listener);
         toggleButton = ComponentFactory.createButton("Show Menu", "toggleRecorder", listener);
     }
@@ -81,16 +77,16 @@ public class RecorderPanel extends JPanel {
      * Add the components to the panel.
      */
     private void addComponents() {
-        JPanel stepPanel = new JPanel(new GridLayout(2, 2));
-        stepPanel.add(new JLabel("Step:"));
-        // fill panel here
-        stepPanel.add(new JLabel(""));
-        stepPanel.add(backButton);
-        stepPanel.add(stepButton);
+        JPanel stepPanel = new JPanel(new GridLayout(2, 1));
+        stepPanel.add(new JLabel("Step:", JLabel.CENTER));
+        JPanel steps = new JPanel(new GridLayout(1, 2));
+        steps.add(backButton);
+        steps.add(stepButton);
+        stepPanel.add(steps);
         add(stepPanel);
         add(autoReplayToggle);
         JPanel speedPanel = new JPanel(new GridLayout(2,1));
-        speedPanel.add(new JLabel("Speed:"));
+        speedPanel.add(new JLabel("Speed:", JLabel.CENTER));
         speedPanel.add(speedControl);
         add(speedPanel);
         add(loadRecordingButton);

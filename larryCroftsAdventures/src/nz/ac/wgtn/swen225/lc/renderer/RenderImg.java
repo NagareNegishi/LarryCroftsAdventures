@@ -5,8 +5,17 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
+/**
+ * 
+ * RenderImg takes in 1 Image and renders that one image properly, adjusting for the image size 
+ * and rendering at a certain location
+ * 
+ * @author Marwan Mohamed
+ * @studentID 300653693
+ */
 public class RenderImg {
-    private final Img img;
+
+    private final BufferedImage image;
     private boolean isOut;
     
     private int w1;
@@ -16,37 +25,15 @@ public class RenderImg {
     private int imgSize = 48; 
     
     Dimension canvas;
-    //This is the img Size
-
+    
+    
     public RenderImg(Img img) {
-        this.img = img;
+        this.image = img.image;
     }
     
-    public int size() {
+
+	public int size() {
     	return imgSize;
-    }
-
-    public void drawChap(Graphics g, Point center, Dimension canvas) {
-        BufferedImage image = img.image;//there's an optimization that can be done here to remove redundancies.
-        this.canvas = canvas;
-        // Get the actual width and height of the image
-        int imageWidth = image.getWidth();
-        int imageHeight = image.getHeight();
-        
-        // Calculate the drawing coordinates
-        int w1 = center.x -imgSize/2; 
-        int h1 = center.y -imgSize/2;
-        int w2 = w1 + imgSize;
-        int h2 = h1 + imgSize;
-
-        // Check if the image is outside the visible area
-        testIfOut(canvas);
-        if (!isOut) {
-            return;
-        }
-        
-        g.drawImage(image, w1, h1, w2, h2, 0, 0, imageWidth, imageHeight, null);
- 
     }
     
     //doesn't actually do anything, this check should be looked over again
@@ -57,8 +44,7 @@ public class RenderImg {
     
     public void drawImg(Graphics g , int x, int y) {
     	//this will draw the img where it needs to be
-        BufferedImage image = img.image;//there's an optimization that can be done here to remove redundancies.
-
+        
         // Get the actual width and height of the image
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
@@ -69,7 +55,10 @@ public class RenderImg {
         int w2 = w1 + imgSize;
         int h2 = h1 + imgSize;
 
+        
+        
         // Check if the image is outside the visible area
+        //currently redundant as Canvas is blank. This would be an optimization step that I can do
         testIfOut(canvas);
         if (!isOut) {
             return;
@@ -80,4 +69,21 @@ public class RenderImg {
     }
     
     
+    /**
+     * drawBG is reserved for drawing an image across the whole screen
+     * 
+     * @param g
+     * @param dimension
+     */
+    public void drawBg(Graphics g, Dimension dimension) {
+    	canvas = dimension;
+        int imageWidth = image.getWidth();
+        int imageHeight = image.getHeight();
+
+        int canvasWidth = canvas.width;
+        int canvasHeight = canvas.height;
+
+        g.drawImage(image, 0, 0, canvasWidth, canvasHeight, 0, 0, imageWidth, imageHeight, null);
+
+    }
 }

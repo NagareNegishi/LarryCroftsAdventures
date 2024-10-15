@@ -88,11 +88,12 @@ public class Maze {
 		return maze;
 	}
 	
+	
 	public static Maze createCustomMaze2() {
+		
 		int rows = 7;
 		int cols = 7;
-		TeleportTile t1 = new TeleportTile();
-		TeleportTile t2 = new TeleportTile();
+	
 		Maze maze = new Maze(rows, cols);
 		for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
@@ -100,14 +101,10 @@ public class Maze {
                     maze.setTile(row, col, new WallTile());
                 } 
                 else if(row == 1 && col == 1) {
-                	maze.setTile(row,col, t1);
-                	t1.row(row);
-                	t1.col(col);
+                	maze.setTile(row,col, new TeleportTile(row,col,3,3));
                 	}
                 else if(row == 1 && col == 5) {
-                	maze.setTile(row, col, t2);
-                	t2.row(row);
-                	t2.col(col);
+                	maze.setTile(row,col, new TeleportTile(row,col,3,3));
                 	}
                 else {
                     maze.setTile(row, col, new FreeTile());
@@ -115,10 +112,10 @@ public class Maze {
                 
             }
         }
-		t1.setPartner(t2);
-		t2.setPartner(t1);
+		//t1.setPartner(t2);
+		//t2.setPartner(t1);
 		return maze;
-	}
+	} 
 	
 	// helper method for creating a square maze with FreeTiles in the middle and WallTiles on the outside
 	public static Maze createBasicMaze(int rows, int cols) {

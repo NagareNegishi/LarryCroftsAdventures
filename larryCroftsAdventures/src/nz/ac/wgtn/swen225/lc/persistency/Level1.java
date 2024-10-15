@@ -23,7 +23,7 @@ public class Level1 {
 		//assert maze.getTile(4, 3) instanceof KeyTile : "Not keytile";
 		
 		Chap chap = new Chap(13, 9, new ArrayList<Item>());
-		GameState gs = new GameState(maze, chap, 2, new MockAppNotifier());
+		GameState gs = new GameState(maze, chap, 4, new MockAppNotifier());
 		
 		GameStateController gsc = new GameStateController(gs);
 
@@ -31,4 +31,4 @@ public class Level1 {
 		Boolean saved = SaveFile.saveGame("level1", gsc);
 		assert saved;
 	}
-}  
+}
