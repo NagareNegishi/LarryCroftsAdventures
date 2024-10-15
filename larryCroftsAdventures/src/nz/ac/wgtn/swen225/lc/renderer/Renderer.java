@@ -66,6 +66,9 @@ public class Renderer extends JPanel {
     final RenderImg Exit = new RenderImg(Img.Stairs);
     final RenderImg info = new RenderImg(Img.InfoTile);
     final RenderImg Blue_LockedDoor = new RenderImg(Img.LockedDoor_blue);
+    final RenderImg Red_LockedDoor = new RenderImg(Img.LockedDoor_red);
+    
+    final RenderImg Kourie = new RenderImg(Img.Kourie);
     //Make a red Locked door
     //make open versions of those doors
     
@@ -89,9 +92,8 @@ public class Renderer extends JPanel {
      * for whenever the player moves and on a seperate thread for when the enemies move
      */
     public Renderer() { 
-        Timer timer = new Timer(frameTime, e -> updateCanvas());
-        timer.start();
-        
+        //Timer timer = new Timer(frameTime, e -> updateCanvas());
+        //timer.start();
         
         System.out.println(this.getSize().getHeight());
         System.out.println(this.getSize().getWidth());
@@ -123,11 +125,7 @@ public class Renderer extends JPanel {
         
         if(game == null) {return;}//in case the game is not set, display nothing
         
-        this.g = g;
-        
-        //Background Logic
-        water.drawBg(g, this.getSize());
-        
+        this.g = g;        
         
     	screenCenterX = getWidth() / 2; // Center of the screen horizontally
         screenCenterY = getHeight() / 2; // Center of the screen vertically
@@ -140,30 +138,30 @@ public class Renderer extends JPanel {
     	maxRow = game.getMaze().getRows(); //max Row for maze
         
         
-        
         playerY = game.getChap().getRow() * imgSize;
         playerX = game.getChap().getCol() * imgSize;
         
         
         drawTiles();
       //Draws Chap at the center of the screen after drawing all the tiles
+        drawActors(game.enemies);
         chap.draw(g, getWidth() / 2, getHeight()/2); 
         
 
 
     }
     
-    private void drawActors(List<Object> actors) {
-//    	
-//    	for (Object actor : actors) {
-//    		col = actor.getcol();
-//    		row = actor.getRow();
-//    		int currentX = col * imgSize + offsetX;
-//			int currentY = row * imgSize + offsetY;
-//    		
-//			Actor.draw(g, currentX, currentY);
-//    	}
-    	
+    private void drawActors(List<Actor> actors) {
+    	if (actors != null){
+    	for (Actor actor : actors) {
+    		int col = actor.getCol();
+    		int row = actor.getRow();
+    		int currentX = col * imgSize + offsetX;
+			int currentY = row * imgSize + offsetY;
+    		
+			Actor.draw(g, currentX, currentY);
+    	}
+    	}
     	
     }
     
@@ -208,10 +206,10 @@ public class Renderer extends JPanel {
     		FreeTile.drawImg(g, x, y);
     		
     		String col = ((LockedDoorTile) i).colour();
-    		if(col == "Blue") {
+    		if(col.equals("Blue")) {
     			Blue_LockedDoor.drawImg(g, x, y);
-    		}else if(col == "Red") {
-    			//Red_key.drawImg(g, x, y);
+    		}else if(col.equals("Red")) {
+    			Red_LockedDoor.drawImg(g, x, y);
     		}
     		
     		
@@ -222,9 +220,13 @@ public class Renderer extends JPanel {
     		Wall.drawImg(g,x,y);
     	}
     	
-//    	else if(i instanceof TP) {
-//    		tp.drawImg(g,x,y);
-//    	}
+    	else if(i instanceof TeleportTile) {
+    		Kourie.drawImg(g,x,y);
+    	}
+    	
+    	else if(i instanceof WaterTile) {
+    		water.draw(g, x, y);
+    	}
     	
     	else if (i instanceof ExitLockTile) {
     		Exit.drawImg(g, x, y);
@@ -243,13 +245,11 @@ public class Renderer extends JPanel {
      */
     private void drawItem(Item i, int x, int y) {
     	
-    	
-    
         	if(i instanceof Key) {
         		String col = ((Key) i).colour();
-        		if(col == "Blue") {
+        		if(col.equals("Blue")) {
         			Blue_key.drawImg(g, x, y);
-        		}else if(col == "Red") {
+        		}else if(col.equals("Red")) {
         			Red_key.drawImg(g, x, y);
         		}
         		
