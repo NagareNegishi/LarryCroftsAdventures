@@ -46,11 +46,8 @@ public class GameState{
 	@JsonSerialize(as = MockAppNotifier.class)
 	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
-
-
 	@JsonProperty
-	public int level;//////////////////////////////////make me json property too :)
-
+	public int level;
 
 	
 	private Direction chapDirection;
@@ -116,7 +113,7 @@ public class GameState{
 	
 	public int totalTreasures() {return totalTreasures;}
 	public int getTreasuresCollected() {return treasuresCollected;}
-	public void treasureCollected() {this.treasuresCollected++;}	
+	public void treasureCollected() {this.treasuresCollected++;}
 	public boolean allTreasureCollected() {return treasuresCollected == totalTreasures ? true : false;}
 	public Map<Key,String> keysCollected(){return keysCollected;}
 	
@@ -124,10 +121,6 @@ public class GameState{
 	public int getTime() {return timeLeft;}
 	public void setTime(int time) {this.timeLeft = time;}
 	public int getLevel() { return level;}
-
-	///////////////////////////////////////////////////////
-	public int getLevel() { return level;}
-	///////////////////////////////////////////////////////////////
 	public Direction chapDirection() {return chapDirection;}
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
