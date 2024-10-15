@@ -33,7 +33,7 @@ public class GameState{
 	private int totalTreasures;
 	@JsonProperty
 	private Map<Key, String> keysCollected;
-	private int currentLevel;
+
 	// Added by Adam
 	// seconds left for level
 	@JsonProperty
@@ -122,9 +122,6 @@ public class GameState{
 	public void setTime(int time) {this.timeLeft = time;}
 	public int getLevel() { return level;}
 
-	///////////////////////////////////////////////////////
-	public int getLevel() { return Level;}
-	///////////////////////////////////////////////////////////////
 	public Direction chapDirection() {return chapDirection;}
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
