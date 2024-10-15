@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -33,7 +34,7 @@ public class PersistencyTest {
 		Maze maze = Maze.createCustomMaze();
 		Chap chap = new Chap(2, 2, new ArrayList<Item>());
 		MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, notif);
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
 		GameStateController gsc = new GameStateController(gs);
 		return gsc;
 	}
@@ -188,7 +189,7 @@ public class PersistencyTest {
     	Item redKey = new Key("red");
     	chap.pickUpItem(redKey);
     	MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, notif);
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
     	GameStateController gsc = new GameStateController(gs);
 
     	
@@ -210,7 +211,7 @@ public class PersistencyTest {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	Chap chap = new Chap(2, 2, new ArrayList<Item>());
     	MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, notif);
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
     	assert saveObj("GameStateTest", gs);
     	Optional<GameState> gsOption = LoadFile.loadObj("GameStateTest", GameState.class);
     	assert gsOption.isPresent();
@@ -256,7 +257,7 @@ public class PersistencyTest {
 		Maze maze = Maze.createCustomMaze();
 		Chap chap = new Chap(2, 2, new ArrayList<Item>());
 		MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, notif);		
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
 		GameStateController gsc = new GameStateController(gs);
 		
 		Boolean saved = SaveFile.saveGame("level1", gsc);
@@ -273,8 +274,8 @@ public class PersistencyTest {
     	Maze maze = Maze.createCustomMaze();
     	Chap chap = new Chap(2,2, new ArrayList<Item>());
     	MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, notif);    	GameStateController gsc = new GameStateController(gs);
-		
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
+		GameStateController gsc = new GameStateController(gs);
 		Boolean saved = SaveFile.saveGame("IntegrationEx", gsc);
 		assert saved;   
 		
@@ -360,8 +361,7 @@ public class PersistencyTest {
 		Key keyRed = new Key("Red");
 		chap.pickUpItem(keyRed);
 		chap.pickUpItem(keyBlue);
-		
-		GameState gs = new GameState(maze, chap, 2, new MockAppNotifier());
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, new MockAppNotifier(), new ArrayList<Actor>(), 0);
 		maze.printMaze();
 		System.out.println("");
 		GameStateController gsc = new GameStateController(gs);
