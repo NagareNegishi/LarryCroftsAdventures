@@ -98,20 +98,21 @@ public class GameInfoPanel extends JPanel {
     public void setKeys(Set<String> keys) {
         StringBuilder coloredKeys = new StringBuilder("<html>");
         keys.forEach(k -> {
-
             String color = getColorForKey(k);
-            System.out.println("color is:" + color);
             // Append each key with its color
             coloredKeys.append("<span style='color: ")
             .append(color)
             .append("'> ◆ </span> ");
         });
         coloredKeys.append("</html>");
-
         keysPanel.setValue(coloredKeys.toString());
-
     }
 
+    /**
+     * get the color for the key
+     * @param key
+     * @return
+     */
     private String getColorForKey(String key) {
         return switch (key.toLowerCase()) {
             case "red" -> "red";

@@ -155,7 +155,6 @@ public class ComponentFactory {
         return new infoPanel(title);
     }
 
-
     /**
      * Create custom file chooser with given directory, title and description
      * User can not change the directory and can only select json files
@@ -196,7 +195,6 @@ public class ComponentFactory {
     public static String underline(String message) {
         return "<u>" + message + "</u>";
     }
-
 
     /*
      * Note:
@@ -240,7 +238,4 @@ public class ComponentFactory {
     public static void setButtonFont(Font font) {
         BUTTON_FONT = font;
     }
-
-
-
 }
