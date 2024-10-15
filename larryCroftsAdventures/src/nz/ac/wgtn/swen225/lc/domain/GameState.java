@@ -48,7 +48,7 @@ public class GameState{
 	public AppNotifier appNotifier;
 
 
-
+	@JsonProperty
 	public int level;//////////////////////////////////make me json property too :)
 
 
@@ -90,7 +90,8 @@ public class GameState{
 					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
 					@JsonProperty("timeLeft") int timeLeft,
 					@JsonProperty("appNotifier") AppNotifier appNotifier,
-					@JsonProperty("enemies")ArrayList<Actor> enemies) {
+					@JsonProperty("enemies")ArrayList<Actor> enemies,
+					@JsonProperty("level") int level) {
 		
 		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
 		if(totalTreasures < 0 || timeLeft < 0) {throw new IllegalArgumentException("Total treasures and time left must be greater than 0");}
@@ -106,8 +107,10 @@ public class GameState{
 		this.timeLeft =timeLeft;
 		this.appNotifier = appNotifier;
 		this.enemies = (ArrayList<Actor>) enemies;
+		this.level = level;
 		assert this.totalTreasures == totalTreasures;
 		assert this.timeLeft == timeLeft;
+		
 	}
 	
 	
@@ -123,7 +126,7 @@ public class GameState{
 	public int getLevel() { return level;}
 
 	///////////////////////////////////////////////////////
-	public int getLevel() { return Level;}
+	public int getLevel() { return level;}
 	///////////////////////////////////////////////////////////////
 	public Direction chapDirection() {return chapDirection;}
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
