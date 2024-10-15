@@ -23,6 +23,13 @@ public class SaveFile implements Saver{
         if(fileName == null || fileName.isEmpty() || gameControl == null) {
         	throw new IllegalArgumentException("Null or empty filename");
         }
+    	//System.out.println(fileName.substring(fileName.length()-5, fileName.length()));
+
+        // removes .json from filename if included
+        if(fileName.substring(fileName.length()-5, fileName.length()).equals(".json")) {
+        	fileName = fileName.substring(0, fileName.length()-5);
+        	//System.out.println(fileName);
+        }
         gameControl = removeAppNotifier(gameControl);
         
         return saveObj(Paths.savePath + fileName, gameControl);
