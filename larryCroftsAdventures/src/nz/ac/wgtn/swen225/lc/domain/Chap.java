@@ -59,7 +59,8 @@ public class Chap {
 	
 	// helper method to move chap anywhere in the maze, good for debugging. Also used for teleport tile logic.
 	public void moveTo(int newRow, int newCol, Maze maze) {
-		if(!maze.validMove(newRow, newCol)) {throw new IllegalArgumentException("Invalid move");}
+		if(!maze.validMove(newRow, newCol)) {throw new IllegalArgumentException("Invalid move, row: " + newRow + " col: " + newCol
+																			+ "\nmaxRow: " + maze.getRows() + " maxCol: " + maze.getCols());}
 		this.row = newRow;
 		this.col = newCol;
 		assert this.row == newRow && this.col == newCol : "Move failed";

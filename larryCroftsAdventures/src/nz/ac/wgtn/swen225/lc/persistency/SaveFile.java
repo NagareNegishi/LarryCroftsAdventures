@@ -23,7 +23,8 @@ public class SaveFile implements Saver{
 
         assert gameControl != null;
         assert fileName != null && !fileName.isEmpty();
-
+        gameControl = removeAppNotifier(gameControl);
+        
         ObjectMapper mapper = new ObjectMapper();
         
         // Map obj to JSON file
@@ -62,10 +63,14 @@ public class SaveFile implements Saver{
         return false;
     }
     
-    
-    
-    
-    
-    
+    /**
+     * Removes non-serialisable appNotifier before serialisation
+     * @return
+     */
+    private static GameStateController removeAppNotifier(GameStateController gsc) {
+    	GameState gs = gsc.getGameState();
+    	gs.setAppNotifier(new MockAppNotifier());
+    	return gsc;
+    }
 }
 

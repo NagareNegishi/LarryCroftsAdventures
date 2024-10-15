@@ -490,6 +490,7 @@ class App extends JFrame{
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
       if (state == AppState.PLAY) {
+
         pingcount++;
         if (pingcount == PINGMAX) {
           model.moveActor();
