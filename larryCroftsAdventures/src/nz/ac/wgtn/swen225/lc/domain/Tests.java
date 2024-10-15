@@ -488,8 +488,8 @@ public class Tests {
 			});
 			GameStateController testController = new GameStateController(test);
 			testController.moveChap(Direction.Left);
-			assertEquals(1,chap.getRow());
-			assertEquals(4,chap.getCol());
+			assertEquals(3,chap.getRow());
+			assertEquals(3,chap.getCol());
 		}
 		
 	// tests to check initialising objects incorrectly are caught correctly
@@ -530,7 +530,7 @@ public class Tests {
 			InfoFieldTile infoFieldTile = new InfoFieldTile("Test");
 			KeyTile keyTile = new KeyTile(new Key("Blue"));
 			LockedDoorTile lockedDoorTile = new LockedDoorTile("Red");
-			TeleportTile teleportTile = new TeleportTile();
+			TeleportTile teleportTile = new TeleportTile(4,3,5,5);
 			TreasureTile treasureTile = new TreasureTile();
 			WallTile wallTile = new WallTile();
 			WaterTile waterTile = new WaterTile();
@@ -555,7 +555,7 @@ public class Tests {
 			InfoFieldTile infoFieldTile = new InfoFieldTile("Test");
 			KeyTile keyTile = new KeyTile(new Key("Blue"));
 			LockedDoorTile lockedDoorTile = new LockedDoorTile("Red");
-			TeleportTile teleportTile = new TeleportTile();
+			TeleportTile teleportTile = new TeleportTile(4,3,5,5);
 			TreasureTile treasureTile = new TreasureTile();
 			WallTile wallTile = new WallTile();
 			WaterTile waterTile = new WaterTile();

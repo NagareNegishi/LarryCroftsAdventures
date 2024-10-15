@@ -1,7 +1,6 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -60,7 +59,8 @@ public class Chap {
 	
 	// helper method to move chap anywhere in the maze, good for debugging. Also used for teleport tile logic.
 	public void moveTo(int newRow, int newCol, Maze maze) {
-		if(!maze.validMove(newRow, newCol)) {throw new IllegalArgumentException("Invalid move");}
+		if(!maze.validMove(newRow, newCol)) {throw new IllegalArgumentException("Invalid move, row: " + newRow + " col: " + newCol
+																			+ "\nmaxRow: " + maze.getRows() + " maxCol: " + maze.getCols());}
 		this.row = newRow;
 		this.col = newCol;
 		assert this.row == newRow && this.col == newCol : "Move failed";
@@ -121,7 +121,6 @@ public class Chap {
 	
 	public void pickUpItem(Item item) {
 		if(item.equals(null)) {throw new IllegalArgumentException("Cannot pick up item because it is null");}
-		//System.out.println("I picked up: " + item.description() + ";)");
 		if(item instanceof Key) {
 		inventory.add(item);
 		assert inventory.contains(item);

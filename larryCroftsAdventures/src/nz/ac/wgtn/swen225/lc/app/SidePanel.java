@@ -1,7 +1,6 @@
 package nz.ac.wgtn.swen225.lc.app;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.util.function.Consumer;
 
 import javax.swing.JPanel;
@@ -55,7 +54,6 @@ public class SidePanel extends JPanel {
      */
     public SidePanel(int width, int height, Consumer<String> menu, Consumer<String> recorder, Consumer<Integer> slider) {
         setLayout(new BorderLayout());
-        setPreferredSize(new Dimension(width, height));
         menuPanel = new MenuPanel(e -> menu.accept(e.getActionCommand()));
         recorderPanel = new RecorderPanel(e -> recorder.accept(e.getActionCommand()),
         value -> slider.accept(value)); //this is equivalent to slider::accept, but it is more readable.
