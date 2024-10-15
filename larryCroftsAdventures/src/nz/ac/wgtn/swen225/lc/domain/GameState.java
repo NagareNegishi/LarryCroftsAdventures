@@ -49,7 +49,7 @@ public class GameState{
 
 
 
-	public int Level;//////////////////////////////////make me json property too :)
+	public int level;//////////////////////////////////make me json property too :)
 
 
 	
@@ -118,10 +118,8 @@ public class GameState{
 	// Added by Adam
 	public int getTime() {return timeLeft;}
 	public void setTime(int time) {this.timeLeft = time;}
+	public int getLevel() { return level;}
 
-	///////////////////////////////////////////////////////
-	public int getLevel() { return Level;}
-	///////////////////////////////////////////////////////////////
 
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
@@ -187,8 +185,7 @@ public class GameState{
 			}
             case Key key -> {
 				keysCollected.put(key, key.colour());
-				KeyPickup(keysCollected.size()); ////////////// Added by Nagi
-				//KeyPickup(key.colour()); ////////////// Added by Nagi            replace with the above line
+				KeyPickup(key.colour());
 			}
             default -> {}
         }
@@ -243,17 +240,11 @@ public class GameState{
 		System.out.println("Game Over is called in GameStateController");
 	}
 
-	public void KeyPickup(int keyCount){
-		assert appNotifier != null: "AppNotifier is null";
-		appNotifier.onKeyPickup(keyCount);
-	}
-
-	/////////////////////////////////////replace with the above method
-	/*public void KeyPickup(String keyName){
+public void KeyPickup(String keyName){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onKeyPickup(keyName);
-	}*/
-	/////////////////////////////////////
+	}
+
 
 	public void TreasurePickup(int treasureCount){
 		assert appNotifier != null: "AppNotifier is null";

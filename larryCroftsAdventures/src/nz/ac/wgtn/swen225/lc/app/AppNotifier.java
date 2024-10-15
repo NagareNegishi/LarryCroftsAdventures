@@ -22,12 +22,9 @@ public interface AppNotifier {
     void onGameLose();
     /**
      * Notify the App that the chap has picked up a key.
-     * @param keyCount
+     * @param keyName
      */
-    void onKeyPickup(int keyCount);
-
-
-   //void onKeyPickup(String keyName);
+    void onKeyPickup(String keyName);
 
 
 

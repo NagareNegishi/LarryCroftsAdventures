@@ -538,22 +538,21 @@ class App extends JFrame{
 
         System.out.println("Game Over is called");
       }
-      @Override
+      /*@Override
       public void onKeyPickup(int keyCount){
         assert keyCount >= 0: "keyCount is negative";
         //keysCollectednum = keyCount;
         //gameInfoPanel.setKeys(keysCollectednum);
         keysCollected.add(String.valueOf(keyCount));
         gameInfoPanel.setKeys(keysCollected);
-      }
-/////////////////////////////////
-      /*@Override
+      }*/
+      @Override
       public void onKeyPickup(String keyName){
         keysCollected.add(keyName);
         //gameInfoPanel.setKeys(keysCollected);
         System.out.println("keyName: " + keyName);
-      }*/
-///////////////////////////////////
+      }
+
       @Override
       public void onTreasurePickup(int treasureCount){
         treasuresLeft--;
