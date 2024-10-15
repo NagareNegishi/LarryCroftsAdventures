@@ -524,7 +524,7 @@ class App extends JFrame{
       }
       @Override
       public void onGameLose(){
-        recorder.onGameLose();
+        //recorder.onGameLose();
         gameOver();
 
         AudioP.death.play();
@@ -542,7 +542,7 @@ class App extends JFrame{
       @Override
       public void onKeyPickup(String keyName){
         keysCollected.add(keyName);
-        //gameInfoPanel.setKeys(keysCollected);
+        gameInfoPanel.setKeys(keysCollected);
         System.out.println("keyName: " + keyName);
       }
 

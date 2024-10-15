@@ -100,7 +100,7 @@ public class GameInfoPanel extends JPanel {
         keys.forEach(k -> {
 
             String color = getColorForKey(k);
-            
+            System.out.println("color is:" + color);
             // Append each key with its color
             coloredKeys.append("<span style='color: ")
             .append(color)
