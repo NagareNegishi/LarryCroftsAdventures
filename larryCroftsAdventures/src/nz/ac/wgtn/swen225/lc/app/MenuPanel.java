@@ -47,7 +47,7 @@ public class MenuPanel extends JPanel{
         add(ComponentFactory.createButton("Load", "load", listener));
         add(ComponentFactory.createButton("Help", "help", listener));
         add(ComponentFactory.createButton("Exit", "exit", listener));
-        add(ComponentFactory.createButton(GameDialogs.format("Show<br>Recorder"), "toggleMenu", listener));
+        add(ComponentFactory.createButton(ComponentFactory.format("Show<br>Recorder",false), "toggleMenu", listener));
     }
 
     /**

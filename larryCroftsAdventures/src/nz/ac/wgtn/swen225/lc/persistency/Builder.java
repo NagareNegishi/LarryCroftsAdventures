@@ -28,6 +28,11 @@ public class Builder {
 		if(botRight.col() < coord.col()) { botRight = new Coord(botRight.row(), coord.col()); }
 	}
 	
+	
+	/**
+	 * Builds maze specified in this Builder
+	 * @return domain.Maze for use in domain.GameState
+	 */
 	public Maze build() {
 		int chunkRows = botRight.row();
 		System.out.println("chunkRow: " + chunkRows);
@@ -75,6 +80,21 @@ public class Builder {
 		}
 	}
 	
+	/**
+	 * Gives absolute coord of tile within maze
+	 * @param roomLoc
+	 * @param insideLoc
+	 * @return
+	 */
+	protected static Coord mazeLocation(Coord roomLoc, Coord insideLoc ) {
+		int roomRow = (roomLoc.row() * (roomSize+1)) + 1;
+		int roomCol = (roomLoc.col() * (roomSize+1) + 1);
+		
+		int row = roomRow + insideLoc.row();
+		int col = roomCol + insideLoc.col();
+		
+		return new Coord(row, col);
+	}
 }
 
 
