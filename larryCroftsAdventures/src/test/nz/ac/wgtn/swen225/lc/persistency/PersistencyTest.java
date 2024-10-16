@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -102,7 +103,19 @@ public class PersistencyTest {
 	
 	
 	 
-
+    // Test default methods of Loader
+    @Test
+    public void loaderTest() {
+    	//Loader loader = new Loader() {};
+    	assertThrows(IOException.class, ()-> Loader.loadLevel("level1"));
+    	//assertThrows(IOException.class, ()-> Loader.loadSave)
+    }
+    
+    @Test
+    public void saverTest() {
+    	assertThrows (IOException.class, ()-> Saver.saveGame("level1", genGsc()));
+    }
+    
     
 	// Test for saveObj
     @Test 
@@ -177,16 +190,46 @@ public class PersistencyTest {
     
     
     // Tests whether level1 is loadable from /levels
- 	@Test
-     public void level1Level() {
-     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
-     	assert gscOptionLevel.isPresent();
-     	GameStateController gscLevel = gscOptionLevel.get();
-     }
+// 	@Test
+//     public void level1Test() {
+// 		Level1.main(null);
+//     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
+//     	assert gscOptionLevel.isPresent();
+//     	}
+// 	
+// 	@Test
+// 	public void level2Test() {
+// 		level2.main(null);
+//     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level2);
+//     	assert gscOptionLevel.isPresent();
+// 	}
 
  	
  	@Test
- 	public void loadLevelFail() {
+ 	public void builderTest() {
+ 		Builder build = new Builder();
+ 		assertThrows(IllegalArgumentException.class, ()-> build.addRoom(new Coord(-1, 2), new Room()));
+ 		assertThrows(IllegalArgumentException.class, ()-> build.addRoom(new Coord(3, -1), new Room()));
+ 	}
+ 	
+ 	@Test
+ 	public void builderBotRightTest() {
+ 		
+ 		try {
+ 			Builder build = new Builder();
+ 	 		build.addRoom(new Coord(1, 3) , new Room());
+ 	 		Class<?> builderClass = build.getClass(); 
+			Field botRightField = builderClass.getDeclaredField("botRight");
+			botRightField.setAccessible(true);
+			Coord botRight = (Coord) botRightField.get(build);
+			assert botRight.row() == 1 && botRight.col() == 3;
+			// Should not shift botRight
+			build.addRoom(new Coord(0, 2), new Room());
+			assert botRight.row() == 1 && botRight.col() == 3;
+			
+		} catch (NoSuchFieldException | IllegalAccessException | SecurityException e) {
+			e.printStackTrace();
+		}
  		
  		
  	}
@@ -194,7 +237,9 @@ public class PersistencyTest {
  	
  	@Test
  	public void saveAndQUit() {
- 		assert SaveFile.saveAndQuit(genGsc());
+ 		Optional<GameStateController> level1 = LoadFile.loadLevel(Paths.level1);
+ 		assert level1.isPresent();
+ 		assert SaveFile.saveAndQuit(level1.get());
  	}
  	
  	@Test
@@ -449,4 +494,20 @@ public class PersistencyTest {
     	
     	
     }
+    
+    
+    @Test
+    public void coordTest() {
+    	Coord coord = new Coord(1, 2);
+    	assert coord.row() == 1 && coord.col() == 2;
+    	assertThrows(IllegalArgumentException.class, ()-> new Coord(-2, 1));
+    	assertThrows(IllegalArgumentException.class, ()-> new Coord(2, -4));
+    	coord = new Coord(-1, -1);
+    	assert coord.row() == -1 && coord.col() == -1;
+    }
+    
+    
+    
+    
+    
 }
