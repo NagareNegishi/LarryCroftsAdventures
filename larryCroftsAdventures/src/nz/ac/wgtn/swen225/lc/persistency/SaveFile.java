@@ -23,6 +23,10 @@ public class SaveFile implements Saver{
         if(fileName == null || fileName.isEmpty() || gameControl == null) {
         	throw new IllegalArgumentException("Null or empty filename");
         }
+    	//System.out.println(fileName.substring(fileName.length()-5, fileName.length()));
+
+        // removes .json from filename if included
+        fileName = removeJsonExt(fileName);
         gameControl = removeAppNotifier(gameControl);
         
         return saveObj(Paths.savePath + fileName, gameControl);
@@ -40,6 +44,31 @@ public class SaveFile implements Saver{
         //return false;
     }
     
+    /**
+     * Used to set the saveAndQuit file
+     * @param gsc
+     * @return
+     */
+    public static boolean saveAndQuit(GameStateController gsc) {
+    	if(gsc == null) {
+    		throw new IllegalArgumentException("Null GameStateController");
+    	}
+    	assert gsc != null;
+    	assert gsc instanceof GameStateController;
+    	
+    	
+    	gsc = removeAppNotifier(gsc);
+    	return saveObj(removeJsonExt(Paths.saveAndQuit + ""), gsc);
+    }
+    
+    
+    private static String removeJsonExt(String fileName) {
+    	if(fileName.substring(fileName.length()-5, fileName.length()).equals(".json")) {
+        	return fileName.substring(0, fileName.length()-5);
+        	//System.out.println(fileName);
+        }
+    	return fileName;
+    }
     
     
     /**
@@ -64,7 +93,7 @@ public class SaveFile implements Saver{
         // Failed to send
         return false;
     }
-    
+        
     /**
      * Removes non-serialisable appNotifier before serialisation
      * @return

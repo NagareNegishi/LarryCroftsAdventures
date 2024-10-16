@@ -10,8 +10,6 @@ import nz.ac.wgtn.swen225.lc.domain.*;
 
 public interface Loader {
 	
-	
-	
 	/**
 	 * Loads level from JSON
 	 * @param String level : name of level file excluding .json
@@ -29,7 +27,7 @@ public interface Loader {
 	 * @param fileName
 	 * @return
 	 */
-	public static Optional<GameStateController> loadSave(String fileName) throws IOException {
-		throw new IOException("Default method");
-	}
+//	public static Optional<GameStateController> loadSave(String fileName) throws IOException {
+//		throw new IOException("Default method");
+//	}
 }
