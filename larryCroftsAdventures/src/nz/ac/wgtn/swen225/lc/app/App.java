@@ -113,7 +113,7 @@ class App extends JFrame{
   private void initializeModel(){
     Optional<GameStateController> loadedGame = Optional.empty();
     if (continueGame) {
-      loadedGame = LoadFile.loadSave(Paths.saveAndQuit);
+      loadedGame = LoadFile.loadLevel(Paths.saveAndQuit);
     } else {
       loadedGame = LoadFile.loadLevel(Paths.level1);
     }
@@ -355,7 +355,7 @@ class App extends JFrame{
     int picked = fileChooser.showOpenDialog(this);
     if (picked == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File file = fileChooser.getSelectedFile();
-      return LoadFile.loadSave(file);
+      return LoadFile.loadLevel(file);
     }
     System.err.println("this is Optional.empty() from load file");
     return Optional.empty();

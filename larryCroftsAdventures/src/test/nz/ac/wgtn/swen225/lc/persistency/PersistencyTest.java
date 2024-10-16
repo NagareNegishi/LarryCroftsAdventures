@@ -215,7 +215,7 @@ public class PersistencyTest {
  	// Tests whether level1 is loadable from /saves
  	@Test
  	public void level1Save() {
- 		Optional<GameStateController> gscOption = LoadFile.loadSave(Paths.level1);
+ 		Optional<GameStateController> gscOption = LoadFile.loadLevel(Paths.level1);
  		assert gscOption.isPresent();
      	GameStateController gsc = gscOption.get();	
  	}
@@ -298,7 +298,7 @@ public class PersistencyTest {
 		Boolean saved = SaveFile.saveGame("integrationTest", gsc);
 		assert saved;
 		
-		Optional<GameStateController> gscOption = LoadFile.loadSave(new File(Paths.savePath, "integrationTest.json"));
+		Optional<GameStateController> gscOption = LoadFile.loadLevel(new File(Paths.savePath, "integrationTest.json"));
 		assert gscOption.isPresent();
 		GameStateController gscDeserial = gscOption.get();
     }
@@ -328,7 +328,7 @@ public class PersistencyTest {
     
     assert SaveFile.saveGame("controlTest", gsc);
     
-    Optional<GameStateController> gscO = LoadFile.loadSave(new File(Paths.savePath ,"controlTest.json"));
+    Optional<GameStateController> gscO = LoadFile.loadLevel(new File(Paths.savePath ,"controlTest.json"));
     assert gscO.isPresent();
     GameStateController gscD = gscO.get();
     

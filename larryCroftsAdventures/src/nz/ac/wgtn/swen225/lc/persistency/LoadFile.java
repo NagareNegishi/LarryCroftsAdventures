@@ -70,13 +70,13 @@ public class LoadFile implements Loader {
      * @param file : .json file containing serialised GameStateControllerInterface
      * @return de-serialsed GameStateControllerInterface
      */
-    public static Optional<GameStateController> loadSave(File file){
-		if(file == null) {
-			throw new IllegalArgumentException("Null file");
-		}
-    	assert file != null;
-		return loadObj(file, GameStateController.class);
-	}
+//    public static Optional<GameStateController> loadSave(File file){
+//		if(file == null) {
+//			throw new IllegalArgumentException("Null file");
+//		}
+//    	assert file != null;
+//		return loadObj(file, GameStateController.class);
+//	}
     
     
     /**
