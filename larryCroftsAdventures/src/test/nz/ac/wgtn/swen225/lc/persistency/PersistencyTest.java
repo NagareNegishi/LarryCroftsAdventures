@@ -154,6 +154,11 @@ public class PersistencyTest {
     	assertThrows(IllegalArgumentException.class, ()-> SaveFile.saveGame("NullGsc", null));
     }
     
+//    @Test
+//    public void saveGameSubString() {
+//    	SaveFile.save
+//    }
+    
     
     @Test
     public void loadObjFail() {
@@ -186,6 +191,17 @@ public class PersistencyTest {
  	public void loadLevelFail() {
  		
  		
+ 	}
+ 	
+ 	
+ 	@Test
+ 	public void saveAndQUit() {
+ 		assert SaveFile.saveAndQuit(genGsc());
+ 	}
+ 	
+ 	@Test
+ 	public void saveAndQuitFail() {
+ 		assertThrows(IllegalArgumentException.class ,()-> SaveFile.saveAndQuit(null));
  	}
  	
  	

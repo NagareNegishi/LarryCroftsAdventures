@@ -47,6 +47,20 @@ public class SaveFile implements Saver{
         //return false;
     }
     
+    /**
+     * Used to set the saveAndQuit file
+     * @param gsc
+     * @return
+     */
+    public static boolean saveAndQuit(GameStateController gsc) {
+    	if(gsc == null) {
+    		throw new IllegalArgumentException("Null GameStateController");
+    	}
+    	assert gsc != null;
+    	assert gsc instanceof GameStateController;
+    	return saveObj(Paths.saveAndQuit + "", gsc);
+    }
+    
     
     
     /**
