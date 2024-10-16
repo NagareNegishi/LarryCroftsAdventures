@@ -193,7 +193,7 @@ public class PersistencyTest {
     @Test public void mazeSave() {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	assert saveObj("MazeTest", maze);
-    	Maze maze2 = LoadFile.loadObj("MazeTest", Maze.class).get();
+    	Maze maze2 = LoadFile.loadObj(new File(Paths.root,"MazeTest.json"), Maze.class).get();
     }
     
     // Tests serialisation / deserialisation of Chap
@@ -202,7 +202,8 @@ public class PersistencyTest {
     	assert chap.getCol() == 2;
     	assert chap.getRow() == 2;
     	assert saveObj("ChapText", chap);
-    	Optional<Chap> chapOption = LoadFile.loadObj("ChapText", Chap.class);
+    	File chapText = new File(Paths.root, "ChapText.json");
+    	Optional<Chap> chapOption = LoadFile.loadObj(chapText, Chap.class);
     	assert chapOption.isPresent();
     	Chap chapDeserial = chapOption.get();
     	assert chapDeserial.getCol() == chap.getCol();
@@ -223,7 +224,7 @@ public class PersistencyTest {
     	
     	
     	assert saveObj("inventoryTest", gsc);
-    	Optional<GameStateController> gsOption = LoadFile.loadObj("inventoryTest", GameStateController.class);
+    	Optional<GameStateController> gsOption = LoadFile.loadObj(new File(Paths.root,"inventoryTest.json"), GameStateController.class);
     	assert gsOption.isPresent();
     	GameStateController gsDeserial = gsOption.get();
     	
@@ -241,7 +242,7 @@ public class PersistencyTest {
     	MockAppNotifier notif = new MockAppNotifier();
 		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
     	assert saveObj("GameStateTest", gs);
-    	Optional<GameState> gsOption = LoadFile.loadObj("GameStateTest", GameState.class);
+    	Optional<GameState> gsOption = LoadFile.loadObj(new File(Paths.root,"GameStateTest.json"), GameState.class);
     	assert gsOption.isPresent();
     	GameState gsDeserial = gsOption.get();
     	assert gsDeserial.totalTreasures() == gs.totalTreasures();
@@ -312,7 +313,7 @@ public class PersistencyTest {
 		notif.run();
 		ArrayList<String> checkLog = new ArrayList<String>();
     	assert saveObj("runnableTest", notif);
-    	Optional<MockAppNotifier> notifO = LoadFile.loadObj("runnableTest", MockAppNotifier.class);
+    	Optional<MockAppNotifier> notifO = LoadFile.loadObj(new File(Paths.root,"runnableTest.json"), MockAppNotifier.class);
     	assert notifO.isPresent();
     	MockAppNotifier notifD = notifO.get();
     	notifD.run();
@@ -332,7 +333,7 @@ public class PersistencyTest {
 		checkLog.add("win");
 		assert notif.log.equals(checkLog);
     	assert saveObj("runnableTest", notif);
-    	Optional<MockAppNotifier> notifO = LoadFile.loadObj("runnableTest", MockAppNotifier.class);
+    	Optional<MockAppNotifier> notifO = LoadFile.loadObj(new File(Paths.root,"runnableTest.json"), MockAppNotifier.class);
     	assert notifO.isPresent();
     	MockAppNotifier notifD = notifO.get();
     }
@@ -374,7 +375,7 @@ public class PersistencyTest {
     public void keySerial() {
     	Key key = new Key("red");
     	assert saveObj("keyTest", key);
-    	Optional<Key> keyO = LoadFile.loadObj("keyTest", Key.class);
+    	Optional<Key> keyO = LoadFile.loadObj(new File(Paths.root,"keyTest.json"), Key.class);
     	assert keyO.isPresent();
     	Key keyD = keyO.get();
     	assert keyD.colour().equals("red");
@@ -391,7 +392,7 @@ public class PersistencyTest {
     	assert chap.inventory().contains(keyRed);
     	
     	assert saveObj("inventoryTest", chap);
-    	Optional<Chap> chapO = LoadFile.loadObj("inventoryTest", Chap.class);
+    	Optional<Chap> chapO = LoadFile.loadObj(new File(Paths.root,"inventoryTest.json"), Chap.class);
     	assert chapO.isPresent();
     	Chap chapD = chapO.get();
     	((Key)chapD.inventory().get(0)).colour().equals("Blue");

@@ -24,8 +24,8 @@ public class LoadFile implements Loader {
 	public static Optional<GameStateController> loadSave(String saveName){
 		assert saveName != null;
 		assert !saveName.isEmpty();
-		final String pathPrefix = "saves/";
-		String path = pathPrefix + saveName;
+		//final String pathPrefix = "saves/";
+		//String path = pathPrefix + saveName;
 		return loadObj(new File(Paths.savesDir, saveName + ".json"), GameStateController.class);
 	}
 	
@@ -36,17 +36,17 @@ public class LoadFile implements Loader {
      * @param valueType : the class type to deserialize to
      * @return an Optional containing the deserialized object
      */
-    public static <T> Optional<T> loadObj(String path, Class<T> classType) {
-        try {
-            File file = new File(path + ".json");
-            ObjectMapper mapper = new ObjectMapper();
-            T loadedObject = mapper.readValue(file, classType);
-            return Optional.of(loadedObject);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
-    }
+//    public static <T> Optional<T> loadObj(String path, Class<T> classType) {
+//        try {
+//            File file = new File(path + ".json");
+//            ObjectMapper mapper = new ObjectMapper();
+//            T loadedObject = mapper.readValue(file, classType);
+//            return Optional.of(loadedObject);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return Optional.empty();
+//    }
     
     /**
      * Overload for file
