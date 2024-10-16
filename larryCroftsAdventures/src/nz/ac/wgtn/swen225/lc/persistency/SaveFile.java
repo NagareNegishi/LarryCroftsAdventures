@@ -26,10 +26,7 @@ public class SaveFile implements Saver{
     	//System.out.println(fileName.substring(fileName.length()-5, fileName.length()));
 
         // removes .json from filename if included
-        if(fileName.substring(fileName.length()-5, fileName.length()).equals(".json")) {
-        	fileName = fileName.substring(0, fileName.length()-5);
-        	//System.out.println(fileName);
-        }
+        fileName = removeJsonExt(fileName);
         gameControl = removeAppNotifier(gameControl);
         
         return saveObj(Paths.savePath + fileName, gameControl);
@@ -59,10 +56,19 @@ public class SaveFile implements Saver{
     	assert gsc != null;
     	assert gsc instanceof GameStateController;
     	
+    	
     	gsc = removeAppNotifier(gsc);
-    	return saveObj(Paths.saveAndQuit + "", gsc);
+    	return saveObj(removeJsonExt(Paths.saveAndQuit + ""), gsc);
     }
     
+    
+    private static String removeJsonExt(String fileName) {
+    	if(fileName.substring(fileName.length()-5, fileName.length()).equals(".json")) {
+        	return fileName.substring(0, fileName.length()-5);
+        	//System.out.println(fileName);
+        }
+    	return fileName;
+    }
     
     
     /**
@@ -87,7 +93,7 @@ public class SaveFile implements Saver{
         // Failed to send
         return false;
     }
-    
+        
     /**
      * Removes non-serialisable appNotifier before serialisation
      * @return

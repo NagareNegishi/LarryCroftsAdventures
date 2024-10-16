@@ -176,9 +176,6 @@ public class PersistencyTest {
     }
     
     
-    
-    
-    
     // Tests whether level1 is loadable from /levels
  	@Test
      public void level1Level() {
@@ -186,6 +183,7 @@ public class PersistencyTest {
      	assert gscOptionLevel.isPresent();
      	GameStateController gscLevel = gscOptionLevel.get();
      }
+
  	
  	@Test
  	public void loadLevelFail() {
@@ -205,10 +203,26 @@ public class PersistencyTest {
  	}
  	
  	
-// 	@Test 
-//    public void loadLevelTest() {
-//    	
-//    }
+ 	@Test 
+    public void loadLevelStringTest() {
+    	assert LoadFile.loadLevel("level1").isPresent();
+    }
+ 	
+ 	@Test
+ 	public void loadLevelStringFail() {
+ 		assertThrows(IllegalArgumentException.class, ()-> LoadFile.loadLevel(""));
+ 		assertThrows(IllegalArgumentException.class, ()-> LoadFile.loadLevel((String)null));
+ 	}
+ 	
+ 	@Test
+ 	public void loadLevelFile() {
+ 		assert LoadFile.loadLevel(Paths.level1).isPresent();
+ 	}
+ 	
+ 	@Test
+ 	public void loadLevelFileFail() {
+ 		assertThrows(IllegalArgumentException.class, ()-> LoadFile.loadLevel((File)null));
+ 	}
  	
  	
  	
