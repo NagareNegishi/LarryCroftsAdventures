@@ -91,8 +91,8 @@ class App extends JFrame{
     });
     initializeModel();
     initializeUI();
-    initializeActionBindings();
     initializeActions();
+    initializeActionBindings();
     initializeController();
     initializeGameTimer();
     pack();
@@ -199,18 +199,23 @@ class App extends JFrame{
    * @param isRecorder whether to set the panel to recorder mode
    */
   private void togglePanel(boolean isRecorder){
-    sidePanel.togglePanel();
-    gameInfoPanel.setRecorderMode(isRecorder);
-    controller.setRecorderMode(isRecorder);
-    if (isRecorder) {
-      beforeRecorder = state;
-      recorder.nextStep();
-      GameDialogs.hideAll();
-      stopGame();
-    } else {
-      state = beforeRecorder;
-      GameDialogs.showDialog(state.name());
-    }
+    SwingUtilities.invokeLater(() -> {
+      sidePanel.togglePanel();
+      gameInfoPanel.setRecorderMode(isRecorder);
+      controller.setRecorderMode(isRecorder);
+      if (isRecorder) {
+          beforeRecorder = state;
+          recorder.nextStep();
+          GameDialogs.hideAll();
+          stopGame();
+      } else {
+          state = beforeRecorder;
+          GameDialogs.showDialog(state.name());
+          if (state == AppState.PLAY) {
+              gameRun();
+          }
+      }
+    });
   }
 
   /**
@@ -227,12 +232,12 @@ class App extends JFrame{
   }
 
   /**
-   * Initialize the controller for the game
+   * Initialize the controller for the game.
    */
-  private void initializeController() {
+  private void initializeController(){
     controller = new Controller(model, actionBindings, model.getTime());
-    addKeyListener(controller);
-    setFocusable(true);
+    renderer.addKeyListener(controller);
+    renderer.setFocusable(true);
   }
 
   /**
@@ -296,8 +301,7 @@ class App extends JFrame{
     GameDialogs.hideAll(); // a bit wasteful to hide all dialogs, but I chose safety and compact code here
     state = AppState.PLAY;
     controller.pause(false);
-    renderer.setFocusable(true); // I could remove next 2 lines
-    renderer.requestFocus();
+    renderer.requestFocus(); //could be removed, but it's a good practice
     assert !gameTimer.isRunning(): "Game is already running";
     gameTimer.start();
   }
@@ -463,7 +467,7 @@ class App extends JFrame{
     // set up the components for the game
     GameState gamestate = model.getGameState();
     gamestate.setAppNotifier(notifier);
-    controller = new Controller(model, actionBindings, timeLeft);
+    controller.setGameStateController(model);
     recorder = new Recorder(currentLevel, (rc)-> {
       timeLeft = rc.updatedTime();
       model = rc.updatedGame();
@@ -475,8 +479,6 @@ class App extends JFrame{
     });
     controller.setRecorder(recorder);
     renderer.gameConsumer(gamestate);
-    renderer.addKeyListener(controller);
-    renderer.setFocusable(true);
     // set up the timer for the level
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();

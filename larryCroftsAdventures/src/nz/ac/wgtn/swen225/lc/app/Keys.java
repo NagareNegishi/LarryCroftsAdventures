@@ -30,7 +30,7 @@ import javax.swing.SwingUtilities;
 class Keys implements KeyListener {
     private final Map<KeyStroke,Runnable> actionsPressed= new HashMap<>();
     private boolean paused = false;
-    private boolean recorderMode = false;
+    private volatile boolean recorderMode = false;
     /*
      * Set of direction keys,
      * used to prevent the chap from moving while the game is paused.
