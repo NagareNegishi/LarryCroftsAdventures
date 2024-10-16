@@ -438,9 +438,6 @@ class App extends JFrame{
     System.exit(0);
   }
 
-
-
-
   /**
    * Set the model of the game, and all the necessary components for the game to run.
    * Once timer starts, the game will run.
