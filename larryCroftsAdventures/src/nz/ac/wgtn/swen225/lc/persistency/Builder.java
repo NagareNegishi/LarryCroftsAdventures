@@ -14,8 +14,8 @@ public class Builder {
 	private static final int roomSize = 5;
 
 	
-	Coord topLeft = new Coord(0, 0);
-	Coord botRight = new Coord(0, 0);
+	private final Coord topLeft = new Coord(0, 0);
+	private Coord botRight = new Coord(0, 0);
 	
 	private Map<Coord, Room> roomMap = new HashMap<Coord, Room>();
 	
@@ -23,6 +23,10 @@ public class Builder {
 	public Builder() {}
 	
 	public void addRoom(Coord coord, Room room) {
+		if(coord.row() < 0 || coord.col() < 0) {
+			throw new IllegalArgumentException("Negative room coord");
+		}
+		
 		roomMap.put(coord, room);
 		if(botRight.row() < coord.row()) { botRight = new Coord(coord.row(), botRight.col());} 
 		if(botRight.col() < coord.col()) { botRight = new Coord(botRight.row(), coord.col()); }

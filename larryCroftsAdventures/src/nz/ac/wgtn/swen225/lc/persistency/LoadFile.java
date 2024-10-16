@@ -14,20 +14,23 @@ import java.io.IOException;
 public class LoadFile implements Loader {
 	
 	public static Optional<GameStateController> loadLevel(String levelName) {
+		if(levelName == null || levelName.isEmpty()) {
+			throw new IllegalArgumentException();
+		}
 		assert levelName != null;
 		assert !levelName.isEmpty();
-		final String pathPrefix = "levels/";
-		String path = pathPrefix + levelName;
+		//final String pathPrefix = "levels/";
+		//String path = pathPrefix + levelName;
 		return loadObj(new File(Paths.levelsDir, levelName + ".json") , GameStateController.class);
 	}
 
-	public static Optional<GameStateController> loadSave(String saveName){
-		assert saveName != null;
-		assert !saveName.isEmpty();
-		final String pathPrefix = "saves/";
-		String path = pathPrefix + saveName;
-		return loadObj(path, GameStateController.class);
-	}
+//	public static Optional<GameStateController> loadSave(String saveName){
+//		assert saveName != null;
+//		assert !saveName.isEmpty();
+//		//final String pathPrefix = "saves/";
+//		//String path = pathPrefix + saveName;
+//		return loadObj(new File(Paths.savesDir, saveName + ".json"), GameStateController.class);
+//	}
 	
 	
 	/**
@@ -36,17 +39,17 @@ public class LoadFile implements Loader {
      * @param valueType : the class type to deserialize to
      * @return an Optional containing the deserialized object
      */
-    public static <T> Optional<T> loadObj(String path, Class<T> classType) {
-        try {
-            File file = new File(path + ".json");
-            ObjectMapper mapper = new ObjectMapper();
-            T loadedObject = mapper.readValue(file, classType);
-            return Optional.of(loadedObject);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
-    }
+//    public static <T> Optional<T> loadObj(String path, Class<T> classType) {
+//        try {
+//            File file = new File(path + ".json");
+//            ObjectMapper mapper = new ObjectMapper();
+//            T loadedObject = mapper.readValue(file, classType);
+//            return Optional.of(loadedObject);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return Optional.empty();
+//    }
     
     /**
      * Overload for file
@@ -54,8 +57,12 @@ public class LoadFile implements Loader {
      * @return de-serialsed GameStateControllerInterface
      */
     public static Optional<GameStateController> loadLevel(File file) {
-		assert file != null;
-		return loadObj(file, GameStateController.class);
+		if(file == null) {
+			throw new IllegalArgumentException("Null file");
+		}
+    	assert file != null;
+    	return loadObj(file, GameStateController.class);		
+
 	}
     
     /**
@@ -63,10 +70,13 @@ public class LoadFile implements Loader {
      * @param file : .json file containing serialised GameStateControllerInterface
      * @return de-serialsed GameStateControllerInterface
      */
-    public static Optional<GameStateController> loadSave(File file){
-		assert file != null;
-		return loadObj(file, GameStateController.class);
-	}
+//    public static Optional<GameStateController> loadSave(File file){
+//		if(file == null) {
+//			throw new IllegalArgumentException("Null file");
+//		}
+//    	assert file != null;
+//		return loadObj(file, GameStateController.class);
+//	}
     
     
     /**
@@ -76,7 +86,7 @@ public class LoadFile implements Loader {
      * @param classType
      * @return de-serialised object of type T
      */
-    public static <T> Optional<T> loadObj(File file, Class<T> classType){
+    private static <T> Optional<T> loadObj(File file, Class<T> classType){
     	try {
     		ObjectMapper mapper = new ObjectMapper();
         	T loadedObject = mapper.readValue(file, classType);
