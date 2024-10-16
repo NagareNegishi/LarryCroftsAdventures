@@ -7,14 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
@@ -22,70 +19,86 @@ import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.Paths;
 
 /**
- * Class used by the App module to generate a Recorder object.
+ * Class used by the App module to generate a Recorder object. Handles recording
+ * and playback of game events.
+ * 
+ * @author Joshua Neylan
+ * @studentID 300654087
  */
+
 public class Recorder {
+	// Map of level numbers to their corresponding file paths.
 	private Map<Integer, File> levelPaths = Map.of(1, Paths.level1, 2, Paths.level2);
+
 	// Serializes/de-serializes objects.
 	private ObjectMapper eventMapper = new ObjectMapper();
 
 	// Holds Chap's recorded movements and when they happened.
 	private List<Event> events = new ArrayList<>();
 
-	// Limit to prevent memory issues 
+	// Limit to prevent memory issues
 	// Probably not an issue unless trying to stress test game :/
 	private final int EventsLimit = 10000000;
-	
+
 	// Index of event in list that replay is up to.
 	private int currentEventIndex = -1;
-	
+
+	// Keeps track of where the end of event list should be.
 	private int headEventIndex = currentEventIndex;
-	
+
 	// Rate events are shown per second during auto-replay.
 	private int autoReplaySpeed = 1;
-	
-	private Runnable lastStepMethodUsed = ()->{nextStep();};
-	
-	// Provides controllable model of game at start of first level
+
+	// Used during auto replay to decide direction to traverse events.
+	private Runnable lastStepMethodUsed = this::nextStep;
+
+	// Provides controllable model of game at start of first level.
 	private Supplier<GameStateController> firstLevelSupplier;
 
-	// Reference to the controllable game model
+	// Reference to the controllable game model.
 	private GameStateController recordingGame;
 
-	// Thread used for auto replays
+	// Thread used for auto replays.
 	private Thread replayThread = null;
 
-	// An object to receive changes for App
+	// An object to receive changes for App.
 	private Consumer<RecordingChanges> updateReciever;
 
-	private interface Event{
+	/**
+	 * Interface representing an event in the game.
+	 */
+	private interface Event {
 		int time();
+
 		default void run(GameStateController gsc) {
 			gsc.moveActor();
 		}
 	}
+
 	/**
-	 * Wraps an actor's movement into an object to read at a later point.
+	 * Wraps Chap's movement into an object to be read at a later point.
 	 * 
 	 * @param direction The direction actor is moving.
 	 * @param time      Time when user inputed to move actor.
 	 */
-	private record ChapEvent(Direction direction, int time) implements Event{
+	private record ChapEvent(Direction direction, int time) implements Event {
 		public ChapEvent {
 			assert direction != null : "ChapEvent can't have null direction!";
 			assert time >= 0 : "ChapEvent's time cannot be below 0";
 		}
-		@Override 
+
+		@Override
 		public void run(GameStateController gsc) {
 			gsc.moveChap(direction);
 		}
 	}
 
 	/**
-	 * Wraps an actor's movement into an object to read at a later point.
+	 * Represents changes made by recorder to the game to be consumed by App
 	 * 
-	 * @param direction The direction actor is moving.
-	 * @param time      Time when user inputed to move actor.
+	 * @param updatedGame A controllable GameState that reflects changes done by
+	 *                    recorder.
+	 * @param updatedTime Time that most recent event occurred at.
 	 */
 	public record RecordingChanges(GameStateController updatedGame, int updatedTime) {
 		public RecordingChanges {
@@ -104,6 +117,9 @@ public class Recorder {
 
 	/**
 	 * Constructor intended to be used by App for creating recorder object.
+	 * 
+	 * @param currentLevel   The current level number.
+	 * @param updateReciever Takes in recording changes so App can adapt to them.
 	 */
 	public Recorder(int currentLevel, Consumer<RecordingChanges> updateReciever) {
 		assert updateReciever != null : "Null update reciever given to record during construction!";
@@ -112,7 +128,6 @@ public class Recorder {
 			assert LoadFile.loadLevel(levelPaths.get(currentLevel)).isPresent()
 					: "Exception occured when attempting to load first level for recorder!";
 			return LoadFile.loadLevel(levelPaths.get(currentLevel)).get();
-			//return LoadFile.loadSave("level1").get();
 		};
 		recordingGame = firstLevelSupplier.get();
 	}
@@ -146,8 +161,8 @@ public class Recorder {
 	}
 
 	/**
-	 * Used by App module.
-	 * Reads JSON file, interpreting data into a list of ChapEvent objects.
+	 * Used by App module. Reads JSON file, interpreting data into a list of
+	 * ChapEvent objects.
 	 */
 	public void loadRecording() {
 		currentEventIndex = -1;
@@ -155,13 +170,12 @@ public class Recorder {
 			events = eventMapper.readValue(rfc.recordingLoc,
 					eventMapper.getTypeFactory().constructCollectionType(List.class, ChapEvent.class));
 		});
-		updateReciever.accept(new RecordingChanges(firstLevelSupplier.get(), 
-				events.get(0).time()));
+		updateReciever.accept(new RecordingChanges(firstLevelSupplier.get(), events.get(0).time()));
 	}
 
 	/**
-	 * Used by App module.
-	 * Writes JSON file, by serializing a list of ChapEvent objects.
+	 * Used by App module. Writes JSON file, by serializing a list of ChapEvent
+	 * objects.
 	 */
 	public void saveRecording() {
 		handleRecording("save", rfc -> {
@@ -176,21 +190,31 @@ public class Recorder {
 	 * @param currentTime Time when user inputed to move chap.
 	 */
 	public void ping(Direction direction, int currentTime) {
-	    ping(currentTime);
-	    events.set(events.size() - 1, new ChapEvent(direction, currentTime));
+		ping(currentTime);
+		events.set(events.size() - 1, new ChapEvent(direction, currentTime));
 	}
-	public void ping(int currentTime) {
-	    assert events != null : "Recorder events storage is null!";
-	    if(events.size() == EventsLimit) return;
-	    if(headEventIndex < events.size() - 1) {
-	    	events = new ArrayList<>(events.subList(0, headEventIndex + 1));
-	    	
-	    }
-	    headEventIndex++;
-	    events.add(()->{return currentTime;});
 
-	    
+	/**
+	 * Used by App module to inform Recorder of an unspecified event In current
+	 * state the only unspecified event that you would use this without the other
+	 * ping method is for actor.
+	 * 
+	 * @param currentTime Time when user inputed to move chap.
+	 */
+	public void ping(int currentTime) {
+		assert events != null : "Recorder events storage is null!";
+		if (events.size() == EventsLimit)
+			return;
+		if (headEventIndex < events.size() - 1) {
+			events = new ArrayList<>(events.subList(0, headEventIndex + 1));
+
+		}
+		headEventIndex++;
+		events.add(() -> {
+			return currentTime;
+		});
 	}
+
 	/**
 	 * Used by App module to just set the automatic replay speed.
 	 * 
@@ -198,56 +222,86 @@ public class Recorder {
 	 * @return Rate that autoReplaySpeed was set to.
 	 */
 	public int setPlaybackSpeed(int eventsPerSecond) {
-		assert eventsPerSecond > 0 : "Auto replay speed must be above zero!";
+		if (eventsPerSecond <= 0)
+			throw new IllegalArgumentException("Playback speed must be positive.");
 		return (autoReplaySpeed = eventsPerSecond);
 	}
 
 	/**
-	 * Used by App module to manually step the recording back by one event.
+	 * Used by App module to go back to the previous chap movement.
 	 */
 	public void previousStep() {
-		System.out.print(currentEventIndex);
-		lastStepMethodUsed = ()->{previousStep();};
-		if(events.isEmpty() || recordingGame == null) {return;}
-		if (currentEventIndex <= 0) {
-			updateReciever.accept(new RecordingChanges(recordingGame, events.get(0).time()));
-			return;
-		}
-		while(currentEventIndex > 1 && !(events.get(currentEventIndex - 1) instanceof ChapEvent)) {
-			currentEventIndex--;
-			
-		}
-
-		step(currentEventIndex - 1);
+		if (checkInvalidStepState()) return;
+		lastStepMethodUsed = this::previousStep;
+		findPreviousChapEvent();
+		step();
 	}
 
 	/**
-	 * Used by App module to manually step the recording forward by one event.
+	 * Used by App module to go forward to the next chap movement.
 	 */
 	public void nextStep() {
-		lastStepMethodUsed = ()->{nextStep();};
-		if(events.isEmpty() || recordingGame == null) {return;}
-		if(currentEventIndex == -1) {step(0); return;}
-		while(currentEventIndex < events.size() - 2 && !(events.get(currentEventIndex + 1) instanceof ChapEvent)) {
-			currentEventIndex++;
+		if (checkInvalidStepState()) return;
+		lastStepMethodUsed = this::nextStep;
+
+		if (currentEventIndex == -1) {
+			currentEventIndex = 0;
+			step();
+			return;
 		}
-		step(Math.min(currentEventIndex + 1, events.size() - 1));
+		findNextChapEvent();
+		step();
 	}
-	
-	private void step(int newCurrentIndex) {
-		currentEventIndex = newCurrentIndex;
-		headEventIndex = currentEventIndex;
+
+	/**
+	 * Used to step recording forward to appropriate position from beginning.
+	 * updates App using its receiver after doing so.
+	 */
+	private void step() {
+		headEventIndex = (currentEventIndex = Math.max(currentEventIndex, 0));
 		recordingGame = firstLevelSupplier.get();
+
 		for (int i = 0; i <= currentEventIndex; i++) {
 			events.get(i).run(recordingGame);
-			
 		}
+
 		updateReciever.accept(new RecordingChanges(recordingGame, events.get(currentEventIndex).time()));
 	}
-	
+
 	/**
-	 * Used by App module to automatically step forward recording.
-	 * Can be toggled on and off.
+	 * Provides information to tell if stepping should be occur.
+	 * 
+	 * @return boolean which is true if stepping should occur.
+	 */
+	private boolean checkInvalidStepState() {
+		return events.isEmpty() || recordingGame == null;
+	}
+
+	/**
+	 * Finds where the last chap event is in event list from current event's index.
+	 * returns to start if there isn't a chap event to go back to.
+	 */
+	private void findPreviousChapEvent() {
+		while (currentEventIndex > 1 && !(events.get(currentEventIndex - 1) instanceof ChapEvent)) {
+			currentEventIndex--;
+		}
+		currentEventIndex--;
+	}
+
+	/**
+	 * Finds where the next chap event is in event list from current event's index.
+	 * goes to end if there isn't a chap event to go forward to.
+	 */
+	private void findNextChapEvent() {
+		while (currentEventIndex < events.size() - 2 && !(events.get(currentEventIndex + 1) instanceof ChapEvent)) {
+			currentEventIndex++;
+		}
+		currentEventIndex = Math.min(currentEventIndex + 1, events.size() - 1);
+	}
+
+	/**
+	 * Used by App module to automatically step forward or backwards through
+	 * recording. Can be toggled on and off.
 	 */
 	public void autoReplay() {
 		if (replayThread != null && replayThread.isAlive()) {
@@ -267,16 +321,21 @@ public class Recorder {
 
 		replayThread.start();
 	}
-	
-	public void onGameLose() {
-		for(Event e = events.getLast(); !(e instanceof ChapEvent) && events.size() > 1; e = events.getLast()){
-			events.removeLast();
-		}
-		events.removeLast();
-	}
-	
 
-	
+	/**
+	 * Removes the most recent chap event added to event list.
+	 * (Additionally any others in the way!)
+	 */
+	public void onGameLose() {
+
+		if (events.isEmpty()) return;
+
+		for (Event e = events.getLast(); !(e instanceof ChapEvent) && events.size() > 1; e = events.removeLast()) {
+		}
+
+		if (events.getLast() instanceof ChapEvent) events.removeLast();
+	}
+
 	/**
 	 * Intended for making testing easier.
 	 * 
@@ -286,7 +345,6 @@ public class Recorder {
 		return recordingGame.getChap();
 	}
 
-	
 }
 
 /**
