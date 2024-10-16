@@ -14,6 +14,9 @@ import java.io.IOException;
 public class LoadFile implements Loader {
 	
 	public static Optional<GameStateController> loadLevel(String levelName) {
+		if(levelName == null || levelName.isEmpty()) {
+			throw new IllegalArgumentException();
+		}
 		assert levelName != null;
 		assert !levelName.isEmpty();
 		//final String pathPrefix = "levels/";
@@ -21,13 +24,13 @@ public class LoadFile implements Loader {
 		return loadObj(new File(Paths.levelsDir, levelName + ".json") , GameStateController.class);
 	}
 
-	public static Optional<GameStateController> loadSave(String saveName){
-		assert saveName != null;
-		assert !saveName.isEmpty();
-		//final String pathPrefix = "saves/";
-		//String path = pathPrefix + saveName;
-		return loadObj(new File(Paths.savesDir, saveName + ".json"), GameStateController.class);
-	}
+//	public static Optional<GameStateController> loadSave(String saveName){
+//		assert saveName != null;
+//		assert !saveName.isEmpty();
+//		//final String pathPrefix = "saves/";
+//		//String path = pathPrefix + saveName;
+//		return loadObj(new File(Paths.savesDir, saveName + ".json"), GameStateController.class);
+//	}
 	
 	
 	/**
@@ -54,8 +57,12 @@ public class LoadFile implements Loader {
      * @return de-serialsed GameStateControllerInterface
      */
     public static Optional<GameStateController> loadLevel(File file) {
-		assert file != null;
-		return loadObj(file, GameStateController.class);
+		if(file == null) {
+			throw new IllegalArgumentException("Null file");
+		}
+    	assert file != null;
+    	return loadObj(file, GameStateController.class);		
+
 	}
     
     /**
@@ -64,7 +71,10 @@ public class LoadFile implements Loader {
      * @return de-serialsed GameStateControllerInterface
      */
     public static Optional<GameStateController> loadSave(File file){
-		assert file != null;
+		if(file == null) {
+			throw new IllegalArgumentException("Null file");
+		}
+    	assert file != null;
 		return loadObj(file, GameStateController.class);
 	}
     
@@ -76,7 +86,7 @@ public class LoadFile implements Loader {
      * @param classType
      * @return de-serialised object of type T
      */
-    public static <T> Optional<T> loadObj(File file, Class<T> classType){
+    private static <T> Optional<T> loadObj(File file, Class<T> classType){
     	try {
     		ObjectMapper mapper = new ObjectMapper();
         	T loadedObject = mapper.readValue(file, classType);

@@ -63,9 +63,9 @@ public class PersistencyTest {
 		return false;
 	}
 	
-	// Reflection of private method LoadFile.loadObj for testing purposes
+	// Reflection of private method loadObj for testing purposes
 	@SuppressWarnings("unchecked")
-	private <T> Optional<T> loadObjFile(File file, Class<T> classType) {
+	private <T> Optional<T> loadObj(File file, Class<T> classType) {
 		try {
 	        Class<?>[] argClasses = new Class<?>[]{File.class, Class.class};
         	Method loadObj = LoadFile.class.getDeclaredMethod("loadObj", argClasses);
@@ -79,18 +79,18 @@ public class PersistencyTest {
 		return Optional.empty();
 	}
 	
-	@SuppressWarnings("unchecked")
-	private <T> Optional<T> loadObjString(String path, Class<T> classType){
-		try{
-			Class<?>[] argClasses = new Class<?>[] {String.class, Class.class};
-			Method loadObj = LoadFile.class.getDeclaredMethod("loadObj", argClasses);
-			loadObj.setAccessible(true);
-			return (Optional<T>)loadObj.invoke(null, path, classType);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		return Optional.empty();
-	}
+//	@SuppressWarnings("unchecked")
+//	private <T> Optional<T> loadObjString(String path, Class<T> classType){
+//		try{
+//			Class<?>[] argClasses = new Class<?>[] {String.class, Class.class};
+//			Method loadObj = LoadFile.class.getDeclaredMethod("loadObj", argClasses);
+//			loadObj.setAccessible(true);
+//			return (Optional<T>)loadObj.invoke(null, path, classType);
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		}
+//		return Optional.empty();
+//	}
 	
 	
 	// Test if JUnit is working as expected
@@ -156,9 +156,22 @@ public class PersistencyTest {
     
     
     @Test
-    public void loadObjStringTest() {
-    	
+    public void loadObjFail() {
+    	assertEquals(loadObj(null, Canary.class), Optional.empty());
     }
+    
+    @Test
+    public void loadObjFail_2() {
+    	assertEquals(loadObj(Paths.level1, null), Optional.empty());
+    }
+    
+    @Test
+    public void loadObjFail_3() {
+    	assertEquals(loadObj(Paths.level1, Canary.class), Optional.empty());
+    }
+    
+    
+    
     
     
     // Tests whether level1 is loadable from /levels
@@ -168,6 +181,13 @@ public class PersistencyTest {
      	assert gscOptionLevel.isPresent();
      	GameStateController gscLevel = gscOptionLevel.get();
      }
+ 	
+ 	@Test
+ 	public void loadLevelFail() {
+ 		
+ 		
+ 	}
+ 	
  	
 // 	@Test 
 //    public void loadLevelTest() {
@@ -179,7 +199,7 @@ public class PersistencyTest {
  	// Tests whether level1 is loadable from /saves
  	@Test
  	public void level1Save() {
- 		Optional<GameStateController> gscOption = LoadFile.loadSave("level1");
+ 		Optional<GameStateController> gscOption = LoadFile.loadSave(Paths.level1);
  		assert gscOption.isPresent();
      	GameStateController gsc = gscOption.get();	
  	}
@@ -193,7 +213,7 @@ public class PersistencyTest {
     @Test public void mazeSave() {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	assert saveObj("MazeTest", maze);
-    	Maze maze2 = LoadFile.loadObj(new File(Paths.root,"MazeTest.json"), Maze.class).get();
+    	Maze maze2 = loadObj(new File(Paths.root,"MazeTest.json"), Maze.class).get();
     }
     
     // Tests serialisation / deserialisation of Chap
@@ -203,7 +223,7 @@ public class PersistencyTest {
     	assert chap.getRow() == 2;
     	assert saveObj("ChapText", chap);
     	File chapText = new File(Paths.root, "ChapText.json");
-    	Optional<Chap> chapOption = LoadFile.loadObj(chapText, Chap.class);
+    	Optional<Chap> chapOption = loadObj(chapText, Chap.class);
     	assert chapOption.isPresent();
     	Chap chapDeserial = chapOption.get();
     	assert chapDeserial.getCol() == chap.getCol();
@@ -224,7 +244,7 @@ public class PersistencyTest {
     	
     	
     	assert saveObj("inventoryTest", gsc);
-    	Optional<GameStateController> gsOption = LoadFile.loadObj(new File(Paths.root,"inventoryTest.json"), GameStateController.class);
+    	Optional<GameStateController> gsOption = loadObj(new File(Paths.root,"inventoryTest.json"), GameStateController.class);
     	assert gsOption.isPresent();
     	GameStateController gsDeserial = gsOption.get();
     	
@@ -242,7 +262,7 @@ public class PersistencyTest {
     	MockAppNotifier notif = new MockAppNotifier();
 		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
     	assert saveObj("GameStateTest", gs);
-    	Optional<GameState> gsOption = LoadFile.loadObj(new File(Paths.root,"GameStateTest.json"), GameState.class);
+    	Optional<GameState> gsOption = loadObj(new File(Paths.root,"GameStateTest.json"), GameState.class);
     	assert gsOption.isPresent();
     	GameState gsDeserial = gsOption.get();
     	assert gsDeserial.totalTreasures() == gs.totalTreasures();
@@ -259,10 +279,10 @@ public class PersistencyTest {
 		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
 		GameStateController gsc = new GameStateController(gs);
 		
-		Boolean saved = SaveFile.saveGame("level1", gsc);
+		Boolean saved = SaveFile.saveGame("integrationTest", gsc);
 		assert saved;
 		
-		Optional<GameStateController> gscOption = LoadFile.loadSave("level1");
+		Optional<GameStateController> gscOption = LoadFile.loadSave(new File(Paths.savePath, "integrationTest.json"));
 		assert gscOption.isPresent();
 		GameStateController gscDeserial = gscOption.get();
     }
@@ -292,7 +312,7 @@ public class PersistencyTest {
     
     assert SaveFile.saveGame("controlTest", gsc);
     
-    Optional<GameStateController> gscO = LoadFile.loadSave("controlTest");
+    Optional<GameStateController> gscO = LoadFile.loadSave(new File(Paths.savePath ,"controlTest.json"));
     assert gscO.isPresent();
     GameStateController gscD = gscO.get();
     
@@ -313,7 +333,7 @@ public class PersistencyTest {
 		notif.run();
 		ArrayList<String> checkLog = new ArrayList<String>();
     	assert saveObj("runnableTest", notif);
-    	Optional<MockAppNotifier> notifO = LoadFile.loadObj(new File(Paths.root,"runnableTest.json"), MockAppNotifier.class);
+    	Optional<MockAppNotifier> notifO = loadObj(new File(Paths.root,"runnableTest.json"), MockAppNotifier.class);
     	assert notifO.isPresent();
     	MockAppNotifier notifD = notifO.get();
     	notifD.run();
@@ -333,7 +353,7 @@ public class PersistencyTest {
 		checkLog.add("win");
 		assert notif.log.equals(checkLog);
     	assert saveObj("runnableTest", notif);
-    	Optional<MockAppNotifier> notifO = LoadFile.loadObj(new File(Paths.root,"runnableTest.json"), MockAppNotifier.class);
+    	Optional<MockAppNotifier> notifO = loadObj(new File(Paths.root,"runnableTest.json"), MockAppNotifier.class);
     	assert notifO.isPresent();
     	MockAppNotifier notifD = notifO.get();
     }
@@ -375,7 +395,7 @@ public class PersistencyTest {
     public void keySerial() {
     	Key key = new Key("red");
     	assert saveObj("keyTest", key);
-    	Optional<Key> keyO = LoadFile.loadObj(new File(Paths.root,"keyTest.json"), Key.class);
+    	Optional<Key> keyO = loadObj(new File(Paths.root,"keyTest.json"), Key.class);
     	assert keyO.isPresent();
     	Key keyD = keyO.get();
     	assert keyD.colour().equals("red");
@@ -392,7 +412,7 @@ public class PersistencyTest {
     	assert chap.inventory().contains(keyRed);
     	
     	assert saveObj("inventoryTest", chap);
-    	Optional<Chap> chapO = LoadFile.loadObj(new File(Paths.root,"inventoryTest.json"), Chap.class);
+    	Optional<Chap> chapO = loadObj(new File(Paths.root,"inventoryTest.json"), Chap.class);
     	assert chapO.isPresent();
     	Chap chapD = chapO.get();
     	((Key)chapD.inventory().get(0)).colour().equals("Blue");
