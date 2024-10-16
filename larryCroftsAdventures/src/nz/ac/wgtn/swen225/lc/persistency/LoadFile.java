@@ -16,8 +16,8 @@ public class LoadFile implements Loader {
 	public static Optional<GameStateController> loadLevel(String levelName) {
 		assert levelName != null;
 		assert !levelName.isEmpty();
-		final String pathPrefix = "levels/";
-		String path = pathPrefix + levelName;
+		//final String pathPrefix = "levels/";
+		//String path = pathPrefix + levelName;
 		return loadObj(new File(Paths.levelsDir, levelName + ".json") , GameStateController.class);
 	}
 
@@ -26,7 +26,7 @@ public class LoadFile implements Loader {
 		assert !saveName.isEmpty();
 		final String pathPrefix = "saves/";
 		String path = pathPrefix + saveName;
-		return loadObj(path, GameStateController.class);
+		return loadObj(new File(Paths.savesDir, saveName + ".json"), GameStateController.class);
 	}
 	
 	

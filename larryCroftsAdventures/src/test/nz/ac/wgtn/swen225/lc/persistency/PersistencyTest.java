@@ -27,28 +27,28 @@ import java.util.function.Function;
 
 public class PersistencyTest {
 	
-	
-	
-
-	private GameStateController genGsc() {
-		Maze maze = Maze.createCustomMaze();
-		Chap chap = new Chap(2, 2, new ArrayList<Item>());
-		MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
-		GameStateController gsc = new GameStateController(gs);
-		return gsc;
+	// Facory methods for common objects
+	private Chap genChap() {
+		return new Chap(2, 2, new ArrayList<Item>());
 	}
 	
+	private GameState genGameState() {
+		return new GameState(Maze.createCustomMaze(),
+						genChap(),
+						2,
+						new HashMap<Key, String>(),
+						60,
+						new MockAppNotifier(),
+						new ArrayList<Actor>(),
+						0);
+	}
+	
+	private GameStateController genGsc() {
+		return new GameStateController(genGameState());
+	}
 	
 
-	
-	/**
-	 * Reflection of SaveFile.saveObj for testing purposes
-	 * @param <T>
-	 * @param fileName
-	 * @param obj
-	 * @return
-	 */
+	// Reflection of private method SaveFile.saveObj for testing purposes
 	private <T> boolean saveObj(String fileName, T obj) {
 		try {
 	        Class<?>[] argClasses = new Class<?>[]{String.class, Object.class};
@@ -63,11 +63,12 @@ public class PersistencyTest {
 		return false;
 	}
 	
+	// Reflection of private method LoadFile.loadObj for testing purposes
 	@SuppressWarnings("unchecked")
-	private <T> Optional<T> loadObj(File file, Class<T> classType) {
+	private <T> Optional<T> loadObjFile(File file, Class<T> classType) {
 		try {
 	        Class<?>[] argClasses = new Class<?>[]{File.class, Class.class};
-        	Method loadObj = SaveFile.class.getDeclaredMethod("loadObj", argClasses);
+        	Method loadObj = LoadFile.class.getDeclaredMethod("loadObj", argClasses);
         	loadObj.setAccessible(true);
         	
         	return (Optional<T>)loadObj.invoke(null, file, classType);
@@ -78,12 +79,21 @@ public class PersistencyTest {
 		return Optional.empty();
 	}
 	
+	@SuppressWarnings("unchecked")
+	private <T> Optional<T> loadObjString(String path, Class<T> classType){
+		try{
+			Class<?>[] argClasses = new Class<?>[] {String.class, Class.class};
+			Method loadObj = LoadFile.class.getDeclaredMethod("loadObj", argClasses);
+			loadObj.setAccessible(true);
+			return (Optional<T>)loadObj.invoke(null, path, classType);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		return Optional.empty();
+	}
 	
 	
-	
-	/**
-	 * Test if JUnit working as expected
-	 */
+	// Test if JUnit is working as expected
     @Test
     public void test() {
         Integer i = 0;
@@ -91,34 +101,12 @@ public class PersistencyTest {
     }
 	
 	
-	/**
-	 * Tests whether level1 is loadable from /levels
-	 */
-	@Test
-    public void level1Level() {
-    	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
-    	assert gscOptionLevel.isPresent();
-    	GameStateController gscLevel = gscOptionLevel.get();
-    }
-	
-	/**
-	 * Tests whether level1 is loadable from /saves
-	 */
-	@Test
-	public void level1Save() {
-		Optional<GameStateController> gscOption = LoadFile.loadSave("level1");
-		assert gscOption.isPresent();
-    	GameStateController gsc = gscOption.get();	
-	}
+	 
 
     
-	
-	
-    /**
-     * Test for saveObj
-     * Uses reflection as saveObj is private
-     */
-    @Test public void saveObjTest() {
+	// Test for saveObj
+    @Test 
+    public void saveObjTest() {
     	Seeds s = new Seeds(1000);
 
     	Canary c = new Canary("ObjBird", 1000, s);
@@ -127,17 +115,20 @@ public class PersistencyTest {
     }
     
     // Tests expected failure of saveObj
-    @Test public void saveObjFail() {
+    @Test 
+    public void saveObjFail() {
     	assert !saveObj("saveObj", null);
     }
     
-    @Test public void saveObjFail_2() {
+    @Test 
+    public void saveObjFail_2() {
     	Seeds s = new Seeds(1000);
     	Canary c = new Canary("ObjBird", 1000, s);
     	assert !saveObj("", c);
     }
     
-    @Test public void saveObjFail_3() {
+    @Test 
+    public void saveObjFail_3() {
     	assert saveObj("Fail", (Function<Integer, Integer>)((i)-> 1));
     }
     
@@ -147,20 +138,57 @@ public class PersistencyTest {
     	assert !saveObj("/n", c);
     }
     
-    @Test public void saveGameFail() {
+    @Test 
+    public void saveGameFail() {
     	GameStateController gsc = genGsc();
     	assertThrows(IllegalArgumentException.class,()-> SaveFile.saveGame("", gsc));
     }
     
-    @Test public void saveGameFail_2() {
+    @Test 
+    public void saveGameFail_2() {
     	assertThrows(IllegalArgumentException.class, ()-> SaveFile.saveGame(null, genGsc()));	
     }
     
-//    @Test public void saveGameFail_3() {
-//    	assertThrows(AssertionError.class, ()-> SaveFile.saveGame("NullGsc", null));
-//    }
+    @Test 
+    public void saveGameFail_3() {
+    	assertThrows(IllegalArgumentException.class, ()-> SaveFile.saveGame("NullGsc", null));
+    }
     
-   
+    
+    @Test
+    public void loadObjStringTest() {
+    	
+    }
+    
+    
+    // Tests whether level1 is loadable from /levels
+ 	@Test
+     public void level1Level() {
+     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
+     	assert gscOptionLevel.isPresent();
+     	GameStateController gscLevel = gscOptionLevel.get();
+     }
+ 	
+// 	@Test 
+//    public void loadLevelTest() {
+//    	
+//    }
+ 	
+ 	
+ 	
+ 	// Tests whether level1 is loadable from /saves
+ 	@Test
+ 	public void level1Save() {
+ 		Optional<GameStateController> gscOption = LoadFile.loadSave("level1");
+ 		assert gscOption.isPresent();
+     	GameStateController gsc = gscOption.get();	
+ 	}
+    
+    
+    
+    
+    
+    
     // Tests serialisation of Maze
     @Test public void mazeSave() {
     	Maze maze = Maze.createBasicMaze(5, 5);
@@ -220,36 +248,6 @@ public class PersistencyTest {
     }
     
     
-    /**
-     * Test serialisation of GameStateController
-     */
-//    @Test public void gameControlTest() {
-//    	GameStateController gsc = new GameStateController(5, 5, 2, 2, 1);
-//    	assert SaveFile.saveGame("GameSaveTest", gsc);
-//    	
-//    	Optional<GameStateController> gsOp = LoadFile.loadSave("GameSaveTest");
-//    	assert gsOp.isPresent();
-//    	GameStateController gscDeserial = gsOp.get();
-//    }
-    
-     // Tests de-serialisation of GameStateController
-//    @Test public void gameSaveLoadTest() {
-//    	Maze maze = Maze.createBasicMaze(5, 5);
-//    	Chap chap = new Chap(2, 2, new ArrayList<Item>());
-//    	GameState gs = new GameState(maze, chap, 2);
-//    	GameStateController gsc = new GameStateController(gs);
-//    	
-//    	assert SaveFile.saveObj("GameSaveLoadTest", gsc);
-//    	
-//    	Optional<GameStateController> gscOption = LoadFile.loadObj("GameSaveLoadTest", GameStateController.class);
-//    	assert gscOption.isPresent();
-//    	GameStateController gscDeserial = gscOption.get();
-//    	
-//    	//assert gscDeserial.getChapPosition().equals(chap.getPosition());
-//    	
-//    	// checking if same type of tile as hashcode prevents .equals directly
-//    	assert gscDeserial.getTileAtChapPosition().getClass().equals(maze.getTile(2, 2).getClass());    	
-//    }
     
     @Test 
     public void integrationTestInit() {
