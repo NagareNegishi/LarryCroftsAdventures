@@ -39,7 +39,6 @@ class App extends JFrame{
   private static final int height = 400;
   private static final int MAX_LEVEL = 2;
   private static final int PINGMAX = 10;
-  private static boolean continueGame;//////////////////////////////////////////////////////////////
   //fields related to information of the model
   private Timer gameTimer;
   private int timeLeft;
@@ -106,26 +105,18 @@ class App extends JFrame{
     setLevel(model);
     stopGame();
     state = AppState.START;
-    System.out.println("continueGame is:" + continueGame);/////////////////////////////////////////
   }
 
   /**
    * Initialize the model for the game by loading the first level or a saved game.
    */
   private void initializeModel(){
-    Optional<GameStateController> loadedGame = Optional.empty();
-    if (continueGame) {
-      loadedGame = LoadFile.loadLevel(Paths.saveAndQuit);
-    } else {
-      loadedGame = LoadFile.loadLevel(Paths.level1);
-    }
-    if (loadedGame.isPresent()) {
-      model = loadedGame.get();
-    } else {
-      handleFileError("Failed to load game", "Load Error", 
-      new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
-      () -> loadGame(Paths.levelsDir, false));
-    }
+    LoadFile.loadLevel(Paths.saveAndQuit).ifPresentOrElse(
+      l -> model = l,
+      () -> handleFileError("Failed to load game", "Load Error",
+        new String[]{"Choose different file", "start level 1", "quit"}, "Choose different file",
+        () -> loadGame(Paths.levelsDir, false))
+    );
   }
 
   /**
@@ -434,13 +425,12 @@ class App extends JFrame{
    * @param save whether to save the game before exiting
    */
   private void exitGame(boolean save) {
+    stopGame();
     if (save) {
-      stopGame();
-      SaveFile.saveGame("saveAndQuit", model);
-      continueGame = true;///////////////////////////////////////////
-      System.out.println("save is called:" + continueGame);
+      SaveFile.saveAndQuit(model);
     } else {
-      continueGame = false;///////////////////////////////////////////
+      Optional<GameStateController> level1 = LoadFile.loadLevel(Paths.level1);
+      level1.ifPresent(l1 -> SaveFile.saveAndQuit(l1));
     }
     closePhase.run();
     gameTimer.stop();
@@ -448,12 +438,15 @@ class App extends JFrame{
     System.exit(0);
   }
 
+
+
+
   /**
    * Set the model of the game, and all the necessary components for the game to run.
    * Once timer starts, the game will run.
    * @param level model of the game (GameStateController)
    */
-  void setLevel(GameStateController level){
+  private void setLevel(GameStateController level){
     // set up the game information
     model = level;
     timeLeft = model.getTime();
