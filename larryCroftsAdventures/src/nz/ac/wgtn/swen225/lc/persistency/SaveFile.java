@@ -58,6 +58,8 @@ public class SaveFile implements Saver{
     	}
     	assert gsc != null;
     	assert gsc instanceof GameStateController;
+    	
+    	gsc = removeAppNotifier(gsc);
     	return saveObj(Paths.saveAndQuit + "", gsc);
     }
     
