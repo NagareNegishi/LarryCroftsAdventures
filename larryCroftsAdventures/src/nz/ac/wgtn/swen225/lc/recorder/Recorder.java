@@ -38,10 +38,14 @@ public class Recorder {
 	
 	// Index of event in list that replay is up to.
 	private int currentEventIndex = -1;
-
+	
+	private int headEventIndex = currentEventIndex;
+	
 	// Rate events are shown per second during auto-replay.
 	private int autoReplaySpeed = 1;
-
+	
+	private Runnable lastStepMethodUsed = ()->{nextStep();};
+	
 	// Provides controllable model of game at start of first level
 	private Supplier<GameStateController> firstLevelSupplier;
 
@@ -178,11 +182,13 @@ public class Recorder {
 	public void ping(int currentTime) {
 	    assert events != null : "Recorder events storage is null!";
 	    if(events.size() == EventsLimit) return;
-	    if(currentEventIndex != events.size() - 1) {
-	    	events = new ArrayList<>(events.subList(0, currentEventIndex + 1));
+	    if(headEventIndex < events.size() - 1) {
+	    	events = new ArrayList<>(events.subList(0, headEventIndex + 1));
+	    	
 	    }
+	    headEventIndex++;
 	    events.add(()->{return currentTime;});
-	    currentEventIndex++;
+
 	    
 	}
 	/**
@@ -200,13 +206,14 @@ public class Recorder {
 	 * Used by App module to manually step the recording back by one event.
 	 */
 	public void previousStep() {
-
+		System.out.print(currentEventIndex);
+		lastStepMethodUsed = ()->{previousStep();};
 		if(events.isEmpty() || recordingGame == null) {return;}
 		if (currentEventIndex <= 0) {
 			updateReciever.accept(new RecordingChanges(recordingGame, events.get(0).time()));
 			return;
 		}
-		while(currentEventIndex > 2 && !(events.get(currentEventIndex - 1) instanceof ChapEvent)) {
+		while(currentEventIndex > 1 && !(events.get(currentEventIndex - 1) instanceof ChapEvent)) {
 			currentEventIndex--;
 			
 		}
@@ -218,7 +225,9 @@ public class Recorder {
 	 * Used by App module to manually step the recording forward by one event.
 	 */
 	public void nextStep() {
+		lastStepMethodUsed = ()->{nextStep();};
 		if(events.isEmpty() || recordingGame == null) {return;}
+		if(currentEventIndex == -1) {step(0); return;}
 		while(currentEventIndex < events.size() - 2 && !(events.get(currentEventIndex + 1) instanceof ChapEvent)) {
 			currentEventIndex++;
 		}
@@ -227,6 +236,7 @@ public class Recorder {
 	
 	private void step(int newCurrentIndex) {
 		currentEventIndex = newCurrentIndex;
+		headEventIndex = currentEventIndex;
 		recordingGame = firstLevelSupplier.get();
 		for (int i = 0; i <= currentEventIndex; i++) {
 			events.get(i).run(recordingGame);
@@ -248,7 +258,7 @@ public class Recorder {
 			try {
 				while (currentEventIndex < events.size()) {
 					Thread.sleep(1000 / autoReplaySpeed);
-					nextStep();
+					lastStepMethodUsed.run();
 				}
 			} catch (InterruptedException e) {
 				return;
@@ -259,13 +269,10 @@ public class Recorder {
 	}
 	
 	public void onGameLose() {
-		
-		while(!(events.getLast() instanceof ChapEvent)){
+		for(Event e = events.getLast(); !(e instanceof ChapEvent) && events.size() > 1; e = events.getLast()){
 			events.removeLast();
-		currentEventIndex--;
 		}
 		events.removeLast();
-		currentEventIndex--;
 	}
 	
 
