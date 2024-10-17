@@ -59,7 +59,7 @@ public class Maze {
 		}
 		return maze[row][col] != null && maze[row][col].canMoveTo();
 		}
-	
+
 	// helper method for creating a custom maze for testing different tiles
 	public static Maze createCustomMaze() {
 		int rows = 7;
@@ -206,7 +206,6 @@ public class Maze {
 	}
 	
 	public void printMaze() {
-
 		for (int i = 0; i<rows; i++) {
 			for (int j = 0; j<cols; j++) {
 				System.out.print(maze[i][j].initial());
@@ -214,5 +213,6 @@ public class Maze {
 			System.out.println();
 }
 	}
+
 	
 }

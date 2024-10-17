@@ -1,4 +1,4 @@
-package nz.ac.wgtn.swen225.lc.domain;
+package test.nz.ac.wgtn.swen225.lc.domain;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -8,6 +8,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
+import nz.ac.wgtn.swen225.lc.domain.Chap;
+import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
 
