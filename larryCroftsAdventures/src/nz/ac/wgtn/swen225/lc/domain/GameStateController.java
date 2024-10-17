@@ -35,8 +35,8 @@ public class GameStateController{
 	public void moveChap(Direction direction) {gameState.moveChap(direction);}
 	
 	public void moveActor() {
-		gameState.checkForEnemy();
 		gameState.enemies.forEach(a -> a.move(maze));
+		gameState.checkForEnemy();
 		}
 	
 	@JsonIgnore
@@ -55,25 +55,9 @@ public class GameStateController{
 	public int getTime() {return gameState.getTime();}
 	public void setTime(int time) {gameState.setTime(time);}
 
-	//////////////////////////////
 	public int getLevel() { return gameState.getLevel();}
-	//////////////////////////////
 
 	public Tile getTileAtChapPosition() { return maze.getTile(chap.getRow(), chap.getCol());}	 
 	public GameState getGameState() {return gameState;}
 	
-	/*public GameStateController(int mazeRows, int mazeCols, int startRow, int startCol, int totalTreasures) {
-	if(mazeRows < 0 || mazeCols < 0 || startRow < 0 || startCol < 0 || totalTreasures < 0) {
-		throw new IllegalArgumentException("Maze must have parameters above 0 to create properly");}
-	if(startRow > mazeRows || startCol > mazeCols) {
-		throw new IllegalArgumentException("Chap must spawn within the bounds of the maze");}
-	
-	// basic maze initially but will be extended for the maze we choose
-    this.maze = Maze.createCustomMaze();
-    this.chap = new Chap(startRow, startCol);
-    this.gameState = new GameState(maze, chap, totalTreasures);
-    
-    assert mazeRows == maze.getRows() && mazeCols == maze.getCols();
-    assert startRow == chap.getRow() && startCol == chap.getCol();
-    } */
 }

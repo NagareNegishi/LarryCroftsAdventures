@@ -49,27 +49,8 @@ public class GameState{
 	public AppNotifier appNotifier;
 	public int level;//////////////////////////////////make me json property too :)
 	
-	/*public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
-		
-		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
-		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
-		if(appNotifier.equals(null)) {throw new IllegalArgumentException("App notifier is null");}
-		
-		this.maze = maze;
-		this.chap = chap;
-		this.treasuresCollected = 0;
-		this.totalTreasures = totalTreasures;
-		this.keysCollected = new HashMap<>();
-		this.timeLeft = 60; // 60 seconds by default
-		this.appNotifier = appNotifier;
-		this.enemies = new ArrayList<Actor>();
-
-		assert this.totalTreasures == totalTreasures;
-		assert keysCollected.isEmpty() == true;
-	} */
 	
 	/**
-	 * New constructor specifically for Jackson reconstruction
 	 * @param maze
 	 * @param chap
 	 * @param totalTreasures
@@ -143,7 +124,6 @@ public class GameState{
         case LockedDoorTile tile -> {
             if (checkForMatchingKey(tile.colour())) {
                 tile.unlock();
-				//System.out.println("Chap has unlocked the door");
                 maze.setTile(newRow, newCol, new FreeTile()); // Replace the locked door with a free tile
             } else {
                 return; // Stop Chap from moving if he doesn't have the right key
@@ -152,17 +132,14 @@ public class GameState{
         case ExitLockTile tile -> {
             if (allTreasureCollected()) {
                 tile.unlock();
-				//System.out.println("Chap has unlocked the exit");
             } else {
                 return; // Stop Chap from moving if there's still treasure to collect
             }
         }
         case InfoFieldTile tile -> {
-			//System.out.println("Chap has entered an info field");
             tile.displayText(); // Display information on the tile
         }
         case Exit tile ->{
-			//System.out.println("Chap has reached the exit");
 			Win();
         }
         case WaterTile tile ->{
@@ -212,15 +189,6 @@ public class GameState{
 			}
 		}
 	} 
-	
-	/*public void moveActor() {
-		for(Actor a : enemies) {
-		if(a.getRow() == chap.getRow() && a.getCol() == chap.getCol()) {
-			Lose();
-			}
-		}
-		enemies.forEach(a -> a.move(maze)); 
-	} */
 		
 	public boolean checkForMatchingKey(String doorColour) {
 		return chap.inventory().stream()
@@ -248,7 +216,7 @@ public class GameState{
 		System.out.println("Game Over is called in GameStateController");
 	}
 
-public void KeyPickup(String keyName){
+	public void KeyPickup(String keyName){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onKeyPickup(keyName);
 	}
@@ -261,7 +229,8 @@ public void KeyPickup(String keyName){
 	
 	// creating a mock game state for testing basic logic and functionality
 	public static GameState mockGameState() {
-		return new GameState(Maze.createBasicMaze(5, 5), new Chap(2,2, new ArrayList<>()),1, 0, new HashMap<Key,String>(), 0, new AppNotifier() {
+		return new GameState(Maze.createBasicMaze(5, 5), new Chap(2,2, 
+				new ArrayList<>()),1, 0, new HashMap<Key,String>(), 0, new AppNotifier() {
 		@Override
 		public void onGameWin() {}
 		@Override
