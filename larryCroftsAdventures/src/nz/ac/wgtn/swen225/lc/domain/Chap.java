@@ -107,7 +107,7 @@ public class Chap {
 	}
 	
 	public void pickUpItem(Item item) {
-		if(item.equals(null)) {throw new IllegalArgumentException("Cannot pick up item because it is null");}
+		if(item == null) {throw new IllegalArgumentException("Cannot pick up item because it is null");}
 		if(item instanceof Key) {
 		inventory.add(item);
 		assert inventory.contains(item);

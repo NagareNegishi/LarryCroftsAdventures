@@ -74,7 +74,7 @@ public class GameState{
 		if(totalTreasures < 0 || timeLeft < 0) {throw new IllegalArgumentException("Total treasures and time left must be greater than 0");}
 		if(keysCollected == null) {throw new IllegalArgumentException("KeysCollected list is null");}
 		if(enemies == null) {throw new IllegalArgumentException("List of enemies is null");}
-		if(appNotifier.equals(null)) {throw new IllegalArgumentException("App notifier is null");}
+		if(appNotifier == null) {throw new IllegalArgumentException("App notifier is null");}
 		if(level < 0) {throw new IllegalArgumentException("Level must be greater than 0");}
 		
 		this.maze = maze;
@@ -116,7 +116,7 @@ public class GameState{
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
 		this.chapDirection = direction;
-		if(direction.equals(null)) {throw new IllegalArgumentException("Cannot move because direction is null");}
+		if(direction == null) {throw new IllegalArgumentException("Cannot move because direction is null");}
 		
 		int newRow = chap.getRow() + direction.rowDirection();
 		int newCol = chap.getCol() + direction.colDirection();

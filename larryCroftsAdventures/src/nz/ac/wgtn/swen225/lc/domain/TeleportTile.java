@@ -34,10 +34,6 @@ public class TeleportTile extends Tile{
 		this.teleportCol = teleportToCol;
 	}
 	
-
-	public void row(int row) {this.row = row;}
-	public void col(int col) {this.col = col;}
-	
 	public int teleportRow() {return teleportRow;}
 	public int teleportCol() {return teleportCol;}
 	
