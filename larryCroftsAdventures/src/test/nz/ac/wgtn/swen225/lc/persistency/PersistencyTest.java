@@ -282,11 +282,12 @@ public class PersistencyTest {
  		} catch(Exception e) {}
  		
  	}
- 	@Test
- 	public void builderLocationTest() {
- 		
- 	}
  	
+ 	
+// 	@Test
+// 	public void roomPairPortal() {
+// 		Room 
+// 	}
  	
  	@Test
  	public void saveAndQUit() {

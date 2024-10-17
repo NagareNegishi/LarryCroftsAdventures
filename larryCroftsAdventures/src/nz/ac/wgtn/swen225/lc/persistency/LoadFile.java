@@ -10,7 +10,10 @@ import java.util.Optional;
 
 import java.io.IOException;
 
-
+/**
+ * De-serialises .json files into levels
+ * @author titheradam	300652933
+ */
 public class LoadFile implements Loader {
 	
 	public static Optional<GameStateController> loadLevel(String levelName) {

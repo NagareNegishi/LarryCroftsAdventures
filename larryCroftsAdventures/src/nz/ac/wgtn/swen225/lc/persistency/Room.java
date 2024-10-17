@@ -10,7 +10,11 @@ import nz.ac.wgtn.swen225.lc.domain.Tile;
 import nz.ac.wgtn.swen225.lc.domain.WallTile;
 import nz.ac.wgtn.swen225.lc.domain.WaterTile;
 
-
+/**
+ * Composite class for persistency.Builder
+ * Used to set rooms within the produced Maze 
+ * @author titheradam	300652933
+ */
 public class Room {
 	// Entry points to room
 //    public Tile top = new WallTile();
@@ -104,7 +108,6 @@ class PortalRoom extends Room {
 		}
 		return false;
 	}
-	
 }
 
 

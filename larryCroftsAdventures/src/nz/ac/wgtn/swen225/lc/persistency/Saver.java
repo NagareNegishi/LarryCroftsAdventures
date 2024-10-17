@@ -12,8 +12,9 @@ import nz.ac.wgtn.swen225.lc.domain.*;
 
 
 /**
- * Used to save game state
  * Entry point to persistency module
+ * Used to serialise level state
+ * @author titheradam	300652933
  */
 public interface Saver {
 

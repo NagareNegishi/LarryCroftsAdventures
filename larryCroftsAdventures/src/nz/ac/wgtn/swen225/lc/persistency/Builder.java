@@ -9,6 +9,11 @@ import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
 import nz.ac.wgtn.swen225.lc.domain.WallTile;
 
+/**
+ * Fluid builder for nz.ac.wgtn.swen225.lc.domain.Maze
+ * @author titheradam	300652933
+ */
+
 public class Builder {
 	
 	private static final int roomSize = 5;

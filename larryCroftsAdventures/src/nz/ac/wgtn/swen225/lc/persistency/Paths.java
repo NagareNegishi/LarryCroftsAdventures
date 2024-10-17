@@ -4,6 +4,7 @@ import java.io.File;
 
 /**
  * Contains all the relevant File paths for persistency
+ * @author titheradam	300652933
  */
 public class Paths {
 	

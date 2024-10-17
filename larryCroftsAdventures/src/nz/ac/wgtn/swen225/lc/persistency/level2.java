@@ -18,7 +18,10 @@ import nz.ac.wgtn.swen225.lc.domain.TreasureTile;
 import nz.ac.wgtn.swen225.lc.persistency.Room.Direction;
 
 
-
+/**
+ * Used to build level2.json file 
+ * @author titheradam	300652933
+ */
 public class level2 {
 	
 	
