@@ -3,6 +3,7 @@ package nz.ac.wgtn.swen225.lc.persistency;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.IntStream;
 
 import nz.ac.wgtn.swen225.lc.domain.FreeTile;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
@@ -78,15 +79,25 @@ public class Builder {
 		int firstRow = 1 + coord.row() * (roomSize+1);
 		int firstCol = 1 + coord.col() * (roomSize+1);
 		
-		for(int row = firstRow; row < firstRow + roomSize; row++) {
-			for(int col = firstCol; col < firstCol + roomSize; col++) {
-				tiles[row][col] = new FreeTile();
-			}
-		}
+		
+		
+		
+//		for(int row = firstRow; row < firstRow + roomSize; row++) {
+//			for(int col = firstCol; col < firstCol + roomSize; col++) {
+//				tiles[row][col] = new FreeTile();
+//			}
+//		}
+		
+		IntStream.range(firstRow, firstRow + roomSize)
+	    .forEach(row -> IntStream.range(firstCol, firstCol + roomSize)
+	        .forEach(col -> tiles[row][col] = new FreeTile()));
+		
+		room.innerTile.entrySet().forEach(
+				e -> tiles[e.getKey().row() + firstRow][e.getKey().col() + firstCol] = e.getValue());
 		// Set inner tiles
-		for(Entry<Coord, Tile> innerTile : room.innerTile.entrySet()) {
-			tiles[innerTile.getKey().row() + firstRow][innerTile.getKey().col() + firstCol] = innerTile.getValue();
-		}
+//		for(Entry<Coord, Tile> innerTile : room.innerTile.entrySet()) {
+//			tiles[innerTile.getKey().row() + firstRow][innerTile.getKey().col() + firstCol] = innerTile.getValue();
+//		}
 	}
 	
 	/**

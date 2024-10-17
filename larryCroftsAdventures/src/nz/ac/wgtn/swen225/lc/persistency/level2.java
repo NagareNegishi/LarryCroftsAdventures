@@ -83,8 +83,10 @@ public class level2 {
 		maze.printMaze();
 		
 		ArrayList<Actor> enemies = new ArrayList<Actor>();
-		enemies.add(new Actor(8, 8));
-		
+		Coord leftRoomCentre = Builder.mazeLocation(new Coord(1, 0), leftRoom.centre);
+		enemies.add(new Actor(leftRoomCentre.row()-1, leftRoomCentre.col()-1));
+		Coord portalRoomCentre = Builder.mazeLocation(entryPortal, portal1.centre);
+		enemies.add(new Actor(portalRoomCentre.row()-1, portalRoomCentre.col()-1));
 		Chap chap = new Chap(10, 10, new ArrayList<Item>());
 		GameState gs = new GameState(maze, chap, 2, 2, new HashMap<Key, String>() , 60, new MockAppNotifier(), enemies, 2);
 		GameStateController gsc = new GameStateController(gs);

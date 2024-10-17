@@ -17,10 +17,6 @@ import nz.ac.wgtn.swen225.lc.domain.WaterTile;
  */
 public class Room {
 	// Entry points to room
-//    public Tile top = new WallTile();
-//    public Tile bot = new WallTile();
-//    public Tile left = new WallTile();
-//    public Tile right = new WallTile();
     
     public final Coord left = new Coord(2, -1); // original top
     public final Coord right = new Coord(2, 5);
@@ -39,24 +35,6 @@ public class Room {
     	innerTile.put(coord, tile);
     }
     
-//    public void setTile(Direction dir, Tile tile) {
-//        switch (dir) {
-//            case Up:
-//                top = tile;
-//                break; // Add break to prevent fall-through
-//            case Down:
-//                bot = tile;
-//                break;
-//            case Left:
-//                left = tile;
-//                break;
-//            case Right:
-//                right = tile;
-//                break;
-//            default:
-//                return; // Default case if none of the directions match
-//        }
-//    }
     
     public enum Direction {
         Up,
@@ -110,13 +88,6 @@ class PortalRoom extends Room {
 	}
 }
 
-
-
-
-class EnemyRoom extends Room{
-	
-	
-}
 
 
 class ExitRoom extends Room{
