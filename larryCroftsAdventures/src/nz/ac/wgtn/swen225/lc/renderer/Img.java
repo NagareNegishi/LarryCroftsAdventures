@@ -6,8 +6,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -30,7 +28,7 @@ import javax.imageio.ImageIO;
 
 public enum Img {
 	FreeTile,
-	LockedDoor_blue,
+	LockedDoor_blue,LockedDoor_red,
     Wall_Tile,
     InfoTile,
     Stairs,

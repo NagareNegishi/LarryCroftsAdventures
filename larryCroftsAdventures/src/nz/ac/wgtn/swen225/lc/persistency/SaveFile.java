@@ -20,24 +20,55 @@ public class SaveFile implements Saver{
 	 * @return boolean, True if successfully saved
 	 */
     public static boolean saveGame(String fileName, GameStateController gameControl){
+        if(fileName == null || fileName.isEmpty() || gameControl == null) {
+        	throw new IllegalArgumentException("Null or empty filename");
+        }
+    	//System.out.println(fileName.substring(fileName.length()-5, fileName.length()));
 
-        assert gameControl != null;
-        assert fileName != null && !fileName.isEmpty();
+        // removes .json from filename if included
+        fileName = removeJsonExt(fileName);
         gameControl = removeAppNotifier(gameControl);
         
-        ObjectMapper mapper = new ObjectMapper();
+        return saveObj(Paths.savePath + fileName, gameControl);
         
-        // Map obj to JSON file
-        try{
-            mapper.writeValue( new File(Paths.savePath + fileName + ".json"), gameControl );
-            return true;
-        } catch(IOException e){
-            e.printStackTrace();
-        }
+//        ObjectMapper mapper = new ObjectMapper();
+//        
+//        // Map obj to JSON file
+//        try{
+//            mapper.writeValue( new File(Paths.savePath + fileName + ".json"), gameControl );
+//            return true;
+//        } catch(IOException e){
+//            e.printStackTrace();
+//        }
         // Failed to send
-        return false;
+        //return false;
     }
     
+    /**
+     * Used to set the saveAndQuit file
+     * @param gsc
+     * @return
+     */
+    public static boolean saveAndQuit(GameStateController gsc) {
+    	if(gsc == null) {
+    		throw new IllegalArgumentException("Null GameStateController");
+    	}
+    	assert gsc != null;
+    	assert gsc instanceof GameStateController;
+    	
+    	
+    	gsc = removeAppNotifier(gsc);
+    	return saveObj(removeJsonExt(Paths.saveAndQuit + ""), gsc);
+    }
+    
+    
+    private static String removeJsonExt(String fileName) {
+    	if(fileName.substring(fileName.length()-5, fileName.length()).equals(".json")) {
+        	return fileName.substring(0, fileName.length()-5);
+        	//System.out.println(fileName);
+        }
+    	return fileName;
+    }
     
     
     /**
@@ -47,7 +78,7 @@ public class SaveFile implements Saver{
      * @param obj
      * @return boolean: true if successful
      */
-    protected static <T> boolean saveObj(String fileName, T obj) {
+    private static <T> boolean saveObj(String fileName, T obj) {
     	assert obj != null;
     	assert !fileName.isEmpty();
     	
@@ -62,7 +93,7 @@ public class SaveFile implements Saver{
         // Failed to send
         return false;
     }
-    
+        
     /**
      * Removes non-serialisable appNotifier before serialisation
      * @return

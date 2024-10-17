@@ -39,19 +39,13 @@ public class MockAppNotifier implements AppNotifier, Serializable{
 		
 	}
 
+	
 	@Override
-	public void onKeyPickup(int keyCount) {
+	public void onKeyPickup(String keyName) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	///////////////////////////////////// replace with int keyCount
-	/*@Override
-	public void onKeyPickup(String keyName) {
-		// TODO Auto-generated method stub
-		
-	}*/
-	/////////////////////////////////////
 
 	@Override
 	public void onTreasurePickup(int treasureCount) {

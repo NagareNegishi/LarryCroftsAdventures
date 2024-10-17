@@ -113,7 +113,7 @@ class App extends JFrame{
   private void initializeModel(){
     Optional<GameStateController> loadedGame = Optional.empty();
     if (continueGame) {
-      loadedGame = LoadFile.loadSave(Paths.saveAndQuit);
+      loadedGame = LoadFile.loadLevel(Paths.saveAndQuit);
     } else {
       loadedGame = LoadFile.loadLevel(Paths.level1);
     }
@@ -201,13 +201,14 @@ class App extends JFrame{
     gameInfoPanel.setRecorderMode(isRecorder);
     controller.setRecorderMode(isRecorder);
     if (isRecorder) {
-      GameDialogs.hideAll();
-      stopGame();
-    } else {
-      unpauseGame();
-      //recorder.checkState();
-      if (timeLeft == 0) gameOver();
-    }
+        recorder.nextStep();
+        GameDialogs.hideAll();
+        stopGame();
+      } else {
+        state = AppState.PLAY;
+        gameRun();
+        if (timeLeft == 0) gameOver();
+      }
   }
 
   /**
@@ -354,7 +355,7 @@ class App extends JFrame{
     int picked = fileChooser.showOpenDialog(this);
     if (picked == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File file = fileChooser.getSelectedFile();
-      return LoadFile.loadSave(file);
+      return LoadFile.loadLevel(file);
     }
     System.err.println("this is Optional.empty() from load file");
     return Optional.empty();
@@ -473,15 +474,15 @@ class App extends JFrame{
     gamestate.setAppNotifier(notifier);
     controller = new Controller(model, actionBindings, timeLeft);
 
-    recorder = new Recorder((rc)-> {
-      timeLeft = rc.updatedTime();
-      model = rc.updatedGame();
-      gameInfoPanel.setTime(timeLeft);
-      initializeGameTimer();
-      controller.setGameStateController(model);
-      renderer.gameConsumer(model.getGameState());
-      updateGameInfo(model);
-    });
+	recorder = new Recorder(currentLevel, (rc)-> {
+	  timeLeft = rc.updatedTime();
+	  model = rc.updatedGame();
+	  model.getGameState().setAppNotifier(notifier);
+	  gameInfoPanel.setTime(timeLeft);
+	  controller.setGameStateController(model);
+	  renderer.gameConsumer(model.getGameState());
+	  updateGameInfo(model);
+	});
     controller.setRecorder(recorder);
 
     renderer.gameConsumer(gamestate);
@@ -497,8 +498,8 @@ class App extends JFrame{
           recorder.ping(timeLeft);
           pingcount = 0;
         }
-        renderer.updateCanvas();
       }
+      renderer.updateCanvas();
     });
     closePhase.run();//close phase before adding any element of the new phase
     closePhase = ()->{ timer.stop();};
@@ -530,29 +531,28 @@ class App extends JFrame{
       }
       @Override
       public void onGameLose(){
-        //recorder.onGameLose();
+        recorder.onGameLose();
         gameOver();
 
         AudioP.death.play();
 
         System.out.println("Game Over is called");
       }
-      @Override
+      /*@Override
       public void onKeyPickup(int keyCount){
         assert keyCount >= 0: "keyCount is negative";
         //keysCollectednum = keyCount;
         //gameInfoPanel.setKeys(keysCollectednum);
         keysCollected.add(String.valueOf(keyCount));
         gameInfoPanel.setKeys(keysCollected);
-      }
-/////////////////////////////////
-      /*@Override
+      }*/
+      @Override
       public void onKeyPickup(String keyName){
         keysCollected.add(keyName);
         //gameInfoPanel.setKeys(keysCollected);
         System.out.println("keyName: " + keyName);
-      }*/
-///////////////////////////////////
+      }
+
       @Override
       public void onTreasurePickup(int treasureCount){
         treasuresLeft--;

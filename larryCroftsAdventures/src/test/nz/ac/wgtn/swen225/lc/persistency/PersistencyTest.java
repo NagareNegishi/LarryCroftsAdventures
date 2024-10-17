@@ -6,35 +6,50 @@ import nz.ac.wgtn.swen225.lc.persistency.*;
 
 
 import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 
+
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 // Domain imports
 
 public class PersistencyTest {
-
-	private GameStateController genGsc() {
-		Maze maze = Maze.createCustomMaze();
-		Chap chap = new Chap(2, 2, new ArrayList<Item>());
-		MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, notif);
-		GameStateController gsc = new GameStateController(gs);
-		return gsc;
+	
+	// Facory methods for common objects
+	private Chap genChap() {
+		return new Chap(2, 2, new ArrayList<Item>());
 	}
 	
+	private GameState genGameState() {
+		return new GameState(Maze.createCustomMaze(),
+						genChap(),
+						2,
+						new HashMap<Key, String>(),
+						60,
+						new MockAppNotifier(),
+						new ArrayList<Actor>(),
+						0);
+	}
 	
-	/**
-	 * Reflection of SaveFile.saveObj for testing purposes
-	 * @param <T>
-	 * @param fileName
-	 * @param obj
-	 * @return
-	 */
+	private GameStateController genGsc() {
+		return new GameStateController(genGameState());
+	}
+	
+
+	// Reflection of private method SaveFile.saveObj for testing purposes
 	private <T> boolean saveObj(String fileName, T obj) {
 		try {
 	        Class<?>[] argClasses = new Class<?>[]{String.class, Object.class};
@@ -49,71 +64,231 @@ public class PersistencyTest {
 		return false;
 	}
 	
-	
-    // Test nested object mockGameState into JSON
-//    @Test
-//    public void gameStateToJson(){
-//        GameController gm = new MockController(2, 2, 2, 1, 1);
-//        assert SaveFile.saveGame("Test1", gm);
-//    }
-	
-	/**
-	 * Tests whether level1 is loadable from /levels
-	 */
-	@Test
-    public void level1Level() {
-    	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
-    	assert gscOptionLevel.isPresent();
-    	GameStateController gscLevel = gscOptionLevel.get();
-    }
-	
-	/**
-	 * Tests whether level1 is loadable from /saves
-	 */
-	@Test
-	public void level1Save() {
-		Optional<GameStateController> gscOption = LoadFile.loadSave("level1");
-		assert gscOption.isPresent();
-    	GameStateController gsc = gscOption.get();	
+	// Reflection of private method loadObj for testing purposes
+	@SuppressWarnings("unchecked")
+	private <T> Optional<T> loadObj(File file, Class<T> classType) {
+		try {
+	        Class<?>[] argClasses = new Class<?>[]{File.class, Class.class};
+        	Method loadObj = LoadFile.class.getDeclaredMethod("loadObj", argClasses);
+        	loadObj.setAccessible(true);
+        	
+        	return (Optional<T>)loadObj.invoke(null, file, classType);
+    
+        } catch(Exception e) {
+        	e.printStackTrace();
+        }
+		return Optional.empty();
 	}
-
-	/**
-	 * Test for Juint
-	 */
+	
+//	@SuppressWarnings("unchecked")
+//	private <T> Optional<T> loadObjString(String path, Class<T> classType){
+//		try{
+//			Class<?>[] argClasses = new Class<?>[] {String.class, Class.class};
+//			Method loadObj = LoadFile.class.getDeclaredMethod("loadObj", argClasses);
+//			loadObj.setAccessible(true);
+//			return (Optional<T>)loadObj.invoke(null, path, classType);
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		}
+//		return Optional.empty();
+//	}
+	
+	
+	// Test if JUnit is working as expected
     @Test
     public void test() {
         Integer i = 0;
         assert i != null;
     }
+	
+	
+	 
+    // Test default methods of Loader
+    @Test
+    public void loaderTest() {
+    	//Loader loader = new Loader() {};
+    	assertThrows(IOException.class, ()-> Loader.loadLevel("level1"));
+    	//assertThrows(IOException.class, ()-> Loader.loadSave)
+    }
+    
+    @Test
+    public void saverTest() {
+    	assertThrows (IOException.class, ()-> Saver.saveGame("level1", genGsc()));
+    }
     
     
-    /**
-     * Test for saveObj
-     * Uses reflection as saveObj is private
-     */
-    @Test public void objTest() {
+	// Test for saveObj
+    @Test 
+    public void saveObjTest() {
     	Seeds s = new Seeds(1000);
 
     	Canary c = new Canary("ObjBird", 1000, s);
-        Class<?>[] argClasses = new Class<?>[]{String.class, Object.class};
     	
-        try {
-        	Method saveObj = SaveFile.class.getDeclaredMethod("saveObj", argClasses);
-        	saveObj.setAccessible(true);
-        	
-        	assert (Boolean)saveObj.invoke(null, "ObjectTest", c);
-    
-        } catch(Exception e) {
-        	e.printStackTrace();
-        }
+    	assert saveObj("saveObj", c);
     }
     
-   
+    // Tests expected failure of saveObj
+    @Test 
+    public void saveObjFail() {
+    	assert !saveObj("saveObj", null);
+    }
+    
+    @Test 
+    public void saveObjFail_2() {
+    	Seeds s = new Seeds(1000);
+    	Canary c = new Canary("ObjBird", 1000, s);
+    	assert !saveObj("", c);
+    }
+    
+    @Test 
+    public void saveObjFail_3() {
+    	assert saveObj("Fail", (Function<Integer, Integer>)((i)-> 1));
+    }
+    
+    @Test public void saveObjFail_4() {
+    	Seeds s = new Seeds(1000);
+    	Canary c = new Canary("ObjBird", 1000, s);
+    	assert !saveObj("/n", c);
+    }
+    
+    @Test 
+    public void saveGameFail() {
+    	GameStateController gsc = genGsc();
+    	assertThrows(IllegalArgumentException.class,()-> SaveFile.saveGame("", gsc));
+    }
+    
+    @Test 
+    public void saveGameFail_2() {
+    	assertThrows(IllegalArgumentException.class, ()-> SaveFile.saveGame(null, genGsc()));	
+    }
+    
+    @Test 
+    public void saveGameFail_3() {
+    	assertThrows(IllegalArgumentException.class, ()-> SaveFile.saveGame("NullGsc", null));
+    }
+    
+//    @Test
+//    public void saveGameSubString() {
+//    	SaveFile.save
+//    }
+    
+    
+    @Test
+    public void loadObjFail() {
+    	assertEquals(loadObj(null, Canary.class), Optional.empty());
+    }
+    
+    @Test
+    public void loadObjFail_2() {
+    	assertEquals(loadObj(Paths.level1, null), Optional.empty());
+    }
+    
+    @Test
+    public void loadObjFail_3() {
+    	assertEquals(loadObj(Paths.level1, Canary.class), Optional.empty());
+    }
+    
+    
+    // Tests whether level1 is loadable from /levels
+// 	@Test
+//     public void level1Test() {
+// 		Level1.main(null);
+//     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
+//     	assert gscOptionLevel.isPresent();
+//     	}
+// 	
+// 	@Test
+// 	public void level2Test() {
+// 		level2.main(null);
+//     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level2);
+//     	assert gscOptionLevel.isPresent();
+// 	}
+
+ 	
+ 	@Test
+ 	public void builderTest() {
+ 		Builder build = new Builder();
+ 		assertThrows(IllegalArgumentException.class, ()-> build.addRoom(new Coord(-1, 2), new Room()));
+ 		assertThrows(IllegalArgumentException.class, ()-> build.addRoom(new Coord(3, -1), new Room()));
+ 	}
+ 	
+ 	@Test
+ 	public void builderBotRightTest() {
+ 		
+ 		try {
+ 			Builder build = new Builder();
+ 	 		build.addRoom(new Coord(1, 3) , new Room());
+ 	 		Class<?> builderClass = build.getClass(); 
+			Field botRightField = builderClass.getDeclaredField("botRight");
+			botRightField.setAccessible(true);
+			Coord botRight = (Coord) botRightField.get(build);
+			assert botRight.row() == 1 && botRight.col() == 3;
+			// Should not shift botRight
+			build.addRoom(new Coord(0, 2), new Room());
+			assert botRight.row() == 1 && botRight.col() == 3;
+			
+		} catch (NoSuchFieldException | IllegalAccessException | SecurityException e) {
+			e.printStackTrace();
+		}
+ 		
+ 		
+ 	}
+ 	
+ 	
+ 	@Test
+ 	public void saveAndQUit() {
+ 		Optional<GameStateController> level1 = LoadFile.loadLevel(Paths.level1);
+ 		assert level1.isPresent();
+ 		assert SaveFile.saveAndQuit(level1.get());
+ 	}
+ 	
+ 	@Test
+ 	public void saveAndQuitFail() {
+ 		assertThrows(IllegalArgumentException.class ,()-> SaveFile.saveAndQuit(null));
+ 	}
+ 	
+ 	
+ 	@Test 
+    public void loadLevelStringTest() {
+    	assert LoadFile.loadLevel("level1").isPresent();
+    }
+ 	
+ 	@Test
+ 	public void loadLevelStringFail() {
+ 		assertThrows(IllegalArgumentException.class, ()-> LoadFile.loadLevel(""));
+ 		assertThrows(IllegalArgumentException.class, ()-> LoadFile.loadLevel((String)null));
+ 	}
+ 	
+ 	@Test
+ 	public void loadLevelFile() {
+ 		assert LoadFile.loadLevel(Paths.level1).isPresent();
+ 	}
+ 	
+ 	@Test
+ 	public void loadLevelFileFail() {
+ 		assertThrows(IllegalArgumentException.class, ()-> LoadFile.loadLevel((File)null));
+ 	}
+ 	
+ 	
+ 	
+ 	// Tests whether level1 is loadable from /saves
+ 	@Test
+ 	public void level1Save() {
+ 		Optional<GameStateController> gscOption = LoadFile.loadLevel(Paths.level1);
+ 		assert gscOption.isPresent();
+     	GameStateController gsc = gscOption.get();	
+ 	}
+    
+    
+    
+    
+    
+    
     // Tests serialisation of Maze
     @Test public void mazeSave() {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	assert saveObj("MazeTest", maze);
-    	Maze maze2 = LoadFile.loadObj("MazeTest", Maze.class).get();
+    	Maze maze2 = loadObj(new File(Paths.root,"MazeTest.json"), Maze.class).get();
     }
     
     // Tests serialisation / deserialisation of Chap
@@ -122,7 +297,8 @@ public class PersistencyTest {
     	assert chap.getCol() == 2;
     	assert chap.getRow() == 2;
     	assert saveObj("ChapText", chap);
-    	Optional<Chap> chapOption = LoadFile.loadObj("ChapText", Chap.class);
+    	File chapText = new File(Paths.root, "ChapText.json");
+    	Optional<Chap> chapOption = loadObj(chapText, Chap.class);
     	assert chapOption.isPresent();
     	Chap chapDeserial = chapOption.get();
     	assert chapDeserial.getCol() == chap.getCol();
@@ -137,13 +313,13 @@ public class PersistencyTest {
     	Item redKey = new Key("red");
     	chap.pickUpItem(redKey);
     	MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, notif);
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
     	GameStateController gsc = new GameStateController(gs);
 
     	
     	
     	assert saveObj("inventoryTest", gsc);
-    	Optional<GameStateController> gsOption = LoadFile.loadObj("inventoryTest", GameStateController.class);
+    	Optional<GameStateController> gsOption = loadObj(new File(Paths.root,"inventoryTest.json"), GameStateController.class);
     	assert gsOption.isPresent();
     	GameStateController gsDeserial = gsOption.get();
     	
@@ -159,45 +335,15 @@ public class PersistencyTest {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	Chap chap = new Chap(2, 2, new ArrayList<Item>());
     	MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, notif);
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
     	assert saveObj("GameStateTest", gs);
-    	Optional<GameState> gsOption = LoadFile.loadObj("GameStateTest", GameState.class);
+    	Optional<GameState> gsOption = loadObj(new File(Paths.root,"GameStateTest.json"), GameState.class);
     	assert gsOption.isPresent();
     	GameState gsDeserial = gsOption.get();
     	assert gsDeserial.totalTreasures() == gs.totalTreasures();
     }
     
     
-    /**
-     * Test serialisation of GameStateController
-     */
-//    @Test public void gameControlTest() {
-//    	GameStateController gsc = new GameStateController(5, 5, 2, 2, 1);
-//    	assert SaveFile.saveGame("GameSaveTest", gsc);
-//    	
-//    	Optional<GameStateController> gsOp = LoadFile.loadSave("GameSaveTest");
-//    	assert gsOp.isPresent();
-//    	GameStateController gscDeserial = gsOp.get();
-//    }
-    
-     // Tests de-serialisation of GameStateController
-//    @Test public void gameSaveLoadTest() {
-//    	Maze maze = Maze.createBasicMaze(5, 5);
-//    	Chap chap = new Chap(2, 2, new ArrayList<Item>());
-//    	GameState gs = new GameState(maze, chap, 2);
-//    	GameStateController gsc = new GameStateController(gs);
-//    	
-//    	assert SaveFile.saveObj("GameSaveLoadTest", gsc);
-//    	
-//    	Optional<GameStateController> gscOption = LoadFile.loadObj("GameSaveLoadTest", GameStateController.class);
-//    	assert gscOption.isPresent();
-//    	GameStateController gscDeserial = gscOption.get();
-//    	
-//    	//assert gscDeserial.getChapPosition().equals(chap.getPosition());
-//    	
-//    	// checking if same type of tile as hashcode prevents .equals directly
-//    	assert gscDeserial.getTileAtChapPosition().getClass().equals(maze.getTile(2, 2).getClass());    	
-//    }
     
     @Test 
     public void integrationTestInit() {
@@ -205,13 +351,13 @@ public class PersistencyTest {
 		Maze maze = Maze.createCustomMaze();
 		Chap chap = new Chap(2, 2, new ArrayList<Item>());
 		MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, notif);		
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
 		GameStateController gsc = new GameStateController(gs);
 		
-		Boolean saved = SaveFile.saveGame("level1", gsc);
+		Boolean saved = SaveFile.saveGame("integrationTest", gsc);
 		assert saved;
 		
-		Optional<GameStateController> gscOption = LoadFile.loadSave("level1");
+		Optional<GameStateController> gscOption = LoadFile.loadLevel(new File(Paths.savePath, "integrationTest.json"));
 		assert gscOption.isPresent();
 		GameStateController gscDeserial = gscOption.get();
     }
@@ -222,17 +368,17 @@ public class PersistencyTest {
     	Maze maze = Maze.createCustomMaze();
     	Chap chap = new Chap(2,2, new ArrayList<Item>());
     	MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, notif);    	GameStateController gsc = new GameStateController(gs);
-		
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
+		GameStateController gsc = new GameStateController(gs);
 		Boolean saved = SaveFile.saveGame("IntegrationEx", gsc);
 		assert saved;   
 		
     }
     
-    @Test
-    public void pathTest() {
-    	assert false : Paths.level1.getAbsolutePath();
-    }
+//    @Test
+//    public void pathTest() {
+//    	assert false : Paths.level1.getAbsolutePath();
+//    }
     
     @Test
     public void workingController() {
@@ -241,7 +387,7 @@ public class PersistencyTest {
     
     assert SaveFile.saveGame("controlTest", gsc);
     
-    Optional<GameStateController> gscO = LoadFile.loadSave("controlTest");
+    Optional<GameStateController> gscO = LoadFile.loadLevel(new File(Paths.savePath ,"controlTest.json"));
     assert gscO.isPresent();
     GameStateController gscD = gscO.get();
     
@@ -262,7 +408,7 @@ public class PersistencyTest {
 		notif.run();
 		ArrayList<String> checkLog = new ArrayList<String>();
     	assert saveObj("runnableTest", notif);
-    	Optional<MockAppNotifier> notifO = LoadFile.loadObj("runnableTest", MockAppNotifier.class);
+    	Optional<MockAppNotifier> notifO = loadObj(new File(Paths.root,"runnableTest.json"), MockAppNotifier.class);
     	assert notifO.isPresent();
     	MockAppNotifier notifD = notifO.get();
     	notifD.run();
@@ -282,7 +428,7 @@ public class PersistencyTest {
 		checkLog.add("win");
 		assert notif.log.equals(checkLog);
     	assert saveObj("runnableTest", notif);
-    	Optional<MockAppNotifier> notifO = LoadFile.loadObj("runnableTest", MockAppNotifier.class);
+    	Optional<MockAppNotifier> notifO = loadObj(new File(Paths.root,"runnableTest.json"), MockAppNotifier.class);
     	assert notifO.isPresent();
     	MockAppNotifier notifD = notifO.get();
     }
@@ -309,8 +455,7 @@ public class PersistencyTest {
 		Key keyRed = new Key("Red");
 		chap.pickUpItem(keyRed);
 		chap.pickUpItem(keyBlue);
-		
-		GameState gs = new GameState(maze, chap, 2, new MockAppNotifier());
+		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, new MockAppNotifier(), new ArrayList<Actor>(), 0);
 		maze.printMaze();
 		System.out.println("");
 		GameStateController gsc = new GameStateController(gs);
@@ -325,7 +470,7 @@ public class PersistencyTest {
     public void keySerial() {
     	Key key = new Key("red");
     	assert saveObj("keyTest", key);
-    	Optional<Key> keyO = LoadFile.loadObj("keyTest", Key.class);
+    	Optional<Key> keyO = loadObj(new File(Paths.root,"keyTest.json"), Key.class);
     	assert keyO.isPresent();
     	Key keyD = keyO.get();
     	assert keyD.colour().equals("red");
@@ -342,11 +487,27 @@ public class PersistencyTest {
     	assert chap.inventory().contains(keyRed);
     	
     	assert saveObj("inventoryTest", chap);
-    	Optional<Chap> chapO = LoadFile.loadObj("inventoryTest", Chap.class);
+    	Optional<Chap> chapO = loadObj(new File(Paths.root,"inventoryTest.json"), Chap.class);
     	assert chapO.isPresent();
     	Chap chapD = chapO.get();
     	((Key)chapD.inventory().get(0)).colour().equals("Blue");
     	
     	
     }
+    
+    
+    @Test
+    public void coordTest() {
+    	Coord coord = new Coord(1, 2);
+    	assert coord.row() == 1 && coord.col() == 2;
+    	assertThrows(IllegalArgumentException.class, ()-> new Coord(-2, 1));
+    	assertThrows(IllegalArgumentException.class, ()-> new Coord(2, -4));
+    	coord = new Coord(-1, -1);
+    	assert coord.row() == -1 && coord.col() == -1;
+    }
+    
+    
+    
+    
+    
 }
