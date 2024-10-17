@@ -83,7 +83,7 @@ public class level2 {
 		enemies.add(new Actor(8, 8));
 		
 		Chap chap = new Chap(10, 10, new ArrayList<Item>());
-		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>() , 60, new MockAppNotifier(), enemies, 2);
+		GameState gs = new GameState(maze, chap, 2, 2, new HashMap<Key, String>() , 60, new MockAppNotifier(), enemies, 2);
 		GameStateController gsc = new GameStateController(gs);
 		
 		boolean saved = SaveFile.saveGame("level2", gsc);

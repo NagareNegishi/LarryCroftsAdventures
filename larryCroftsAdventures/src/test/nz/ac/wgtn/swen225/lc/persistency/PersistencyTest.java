@@ -24,7 +24,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-// Domain imports
+
+/**
+ * Tests for Persistency module
+ * @author titheradam	300652933
+ */
+
 
 public class PersistencyTest {
 	
@@ -37,7 +42,7 @@ public class PersistencyTest {
 		return new GameState(Maze.createCustomMaze(),
 						genChap(),
 						2,
-						new HashMap<Key, String>(),
+						0, new HashMap<Key, String>(),
 						60,
 						new MockAppNotifier(),
 						new ArrayList<Actor>(),
@@ -78,6 +83,19 @@ public class PersistencyTest {
         	e.printStackTrace();
         }
 		return Optional.empty();
+	}
+	
+	
+	private Coord mazeLocation(Coord roomLoc, Coord insideLoc) throws Exception {
+		try {
+			Class<?>[] argClasses = new Class<?>[] {Coord.class, Coord.class};
+			Method mazeLocation = Builder.class.getDeclaredMethod("mazeLocation", argClasses);
+			mazeLocation.setAccessible(true);
+			return (Coord) mazeLocation.invoke(null , roomLoc, insideLoc);
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}
 	
 //	@SuppressWarnings("unchecked")
@@ -190,19 +208,19 @@ public class PersistencyTest {
     
     
     // Tests whether level1 is loadable from /levels
-// 	@Test
-//     public void level1Test() {
-// 		Level1.main(null);
-//     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
-//     	assert gscOptionLevel.isPresent();
-//     	}
-// 	
-// 	@Test
-// 	public void level2Test() {
-// 		level2.main(null);
-//     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level2);
-//     	assert gscOptionLevel.isPresent();
-// 	}
+ 	@Test
+     public void level1Test() {
+ 		Level1.main(null);
+     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
+     	assert gscOptionLevel.isPresent();
+     	}
+ 	
+ 	@Test
+ 	public void level2Test() {
+ 		level2.main(null);
+     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level2);
+     	assert gscOptionLevel.isPresent();
+ 	}
 
  	
  	@Test
@@ -230,7 +248,42 @@ public class PersistencyTest {
 		} catch (NoSuchFieldException | IllegalAccessException | SecurityException e) {
 			e.printStackTrace();
 		}
+ 	}
+ 	
+ 	@Test
+ 	public void builderBuildTest() {
+ 		Builder build = new Builder();
+ 		Maze maze = build.build();
+ 		maze.printMaze();
+ 		Room room = new Room();
+ 		Coord roomLoc = new Coord(2, 2);
+ 		build.addRoom(new Coord(2, 2), room);
+ 		Maze maze2 = build.build();
+ 		maze2.printMaze();
  		
+ 		try {
+ 	 		assert mazeLocation(roomLoc, room.centre).equals(new Coord(15,15));
+ 		} catch(Exception e) {}
+ 		
+ 		
+ 	}
+ 	
+ 	@Test
+ 	public void builderInnerTile() {
+ 		try {
+ 			Builder build = new Builder();
+ 	 		Room room = new Room();
+ 	 		room.setTile(room.centre, new WallTile());
+ 	 		Coord roomLoc = new Coord(2,2);
+ 	 		build.addRoom(roomLoc, room);
+ 	 		Maze maze = build.build();
+ 	 		Coord tileLoc = mazeLocation(roomLoc, room.centre);
+ 	 		assert maze.getTile(tileLoc.row(), tileLoc.col()) instanceof WallTile;
+ 		} catch(Exception e) {}
+ 		
+ 	}
+ 	@Test
+ 	public void builderLocationTest() {
  		
  	}
  	
@@ -313,7 +366,8 @@ public class PersistencyTest {
     	Item redKey = new Key("red");
     	chap.pickUpItem(redKey);
     	MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
+		GameState gs = genGameState();
+    	//GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
     	GameStateController gsc = new GameStateController(gs);
 
     	
@@ -335,7 +389,8 @@ public class PersistencyTest {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	Chap chap = new Chap(2, 2, new ArrayList<Item>());
     	MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
+		GameState gs = genGameState();
+    	//GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
     	assert saveObj("GameStateTest", gs);
     	Optional<GameState> gsOption = loadObj(new File(Paths.root,"GameStateTest.json"), GameState.class);
     	assert gsOption.isPresent();
@@ -351,7 +406,8 @@ public class PersistencyTest {
 		Maze maze = Maze.createCustomMaze();
 		Chap chap = new Chap(2, 2, new ArrayList<Item>());
 		MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
+		GameState gs = genGameState();
+		//GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
 		GameStateController gsc = new GameStateController(gs);
 		
 		Boolean saved = SaveFile.saveGame("integrationTest", gsc);
@@ -368,7 +424,8 @@ public class PersistencyTest {
     	Maze maze = Maze.createCustomMaze();
     	Chap chap = new Chap(2,2, new ArrayList<Item>());
     	MockAppNotifier notif = new MockAppNotifier();
-		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
+		GameState gs = genGameState();
+    	//GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
 		GameStateController gsc = new GameStateController(gs);
 		Boolean saved = SaveFile.saveGame("IntegrationEx", gsc);
 		assert saved;   
@@ -455,7 +512,8 @@ public class PersistencyTest {
 		Key keyRed = new Key("Red");
 		chap.pickUpItem(keyRed);
 		chap.pickUpItem(keyBlue);
-		GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, new MockAppNotifier(), new ArrayList<Actor>(), 0);
+		GameState gs = genGameState();
+		//GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, new MockAppNotifier(), new ArrayList<Actor>(), 0);
 		maze.printMaze();
 		System.out.println("");
 		GameStateController gsc = new GameStateController(gs);
