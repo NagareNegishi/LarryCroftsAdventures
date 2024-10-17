@@ -11,7 +11,10 @@ import nz.ac.wgtn.swen225.lc.domain.*;
 import java.io.File;
 import java.io.IOException;
 
-
+/**
+* Used to serialise level state
+* @author titheradam	300652933
+*/
 public class SaveFile implements Saver{
 	/**
 	 * Saves GameStateController as .json file in /saves directory

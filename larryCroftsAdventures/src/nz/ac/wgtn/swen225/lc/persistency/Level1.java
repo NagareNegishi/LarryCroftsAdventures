@@ -13,6 +13,10 @@ import nz.ac.wgtn.swen225.lc.domain.Key;
 import nz.ac.wgtn.swen225.lc.domain.KeyTile;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 
+/**
+ * Used to build level1.json file
+ * @author titheradam	300652933
+ */
 public class Level1 {
 	
 	public static void main(String args[]) {

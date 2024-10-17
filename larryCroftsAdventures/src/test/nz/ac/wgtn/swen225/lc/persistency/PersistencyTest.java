@@ -38,8 +38,17 @@ public class PersistencyTest {
 		return new Chap(2, 2, new ArrayList<Item>());
 	}
 	
+	private Maze genMaze() {
+		
+		Builder build = new Builder();
+		Room room = new Room();
+		build.addRoom(new Coord(0, 0), new Room());
+		build.addRoom(new Coord(0, 1), new Room());
+		return build.build();	
+	}
+	
 	private GameState genGameState() {
-		return new GameState(Maze.createCustomMaze(),
+		return new GameState(genMaze(),
 						genChap(),
 						2,
 						0, new HashMap<Key, String>(),
@@ -209,6 +218,7 @@ public class PersistencyTest {
     
     // Tests whether level1 is loadable from /levels
  	@Test
+ 	//@SuppressFBWarnings("NP_NULL_PARAM_DEREF_ALL_TARGETS_DANGEROUS")
      public void level1Test() {
  		Level1.main(null);
      	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
@@ -217,6 +227,7 @@ public class PersistencyTest {
  	
  	@Test
  	public void level2Test() {
+ 		
  		level2.main(null);
      	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level2);
      	assert gscOptionLevel.isPresent();
@@ -282,11 +293,12 @@ public class PersistencyTest {
  		} catch(Exception e) {}
  		
  	}
- 	@Test
- 	public void builderLocationTest() {
- 		
- 	}
  	
+ 	
+// 	@Test
+// 	public void roomPairPortal() {
+// 		Room 
+// 	}
  	
  	@Test
  	public void saveAndQUit() {
@@ -403,7 +415,7 @@ public class PersistencyTest {
     @Test 
     public void integrationTestInit() {
 		
-		Maze maze = Maze.createCustomMaze();
+		Maze maze = genMaze();
 		Chap chap = new Chap(2, 2, new ArrayList<Item>());
 		MockAppNotifier notif = new MockAppNotifier();
 		GameState gs = genGameState();
@@ -421,7 +433,7 @@ public class PersistencyTest {
     
     @Test
     public void newTest() {
-    	Maze maze = Maze.createCustomMaze();
+    	Maze maze = genMaze();
     	Chap chap = new Chap(2,2, new ArrayList<Item>());
     	MockAppNotifier notif = new MockAppNotifier();
 		GameState gs = genGameState();

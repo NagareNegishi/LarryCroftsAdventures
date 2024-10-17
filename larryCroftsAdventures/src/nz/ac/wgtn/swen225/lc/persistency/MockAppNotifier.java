@@ -8,6 +8,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 
+/**
+ * Mock class for AppNotifier
+ * Used to test SerialRunnable
+ * @author titheradam	300652933
+ */
 public class MockAppNotifier implements AppNotifier, Serializable{
 
 	@JsonProperty
