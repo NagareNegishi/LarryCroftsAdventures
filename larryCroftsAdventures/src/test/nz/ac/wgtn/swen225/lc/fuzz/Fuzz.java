@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
-import javax.swing.SwingUtilities;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
@@ -17,9 +17,7 @@ import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
-import nz.ac.wgtn.swen225.lc.domain.WallTile;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
-import test.nz.ac.wgtn.swen225.lc.domain.Tests;
 
 /**
  * The fuzz testing class randomly generates input in order to "play" the game,
@@ -33,7 +31,7 @@ import test.nz.ac.wgtn.swen225.lc.domain.Tests;
 
 public class Fuzz {
 	private static Random random;
-	
+	public static List<String> events = new ArrayList<String>();
 	public Fuzz() {
 		random = new Random(); 
 	}
@@ -71,8 +69,8 @@ public class Fuzz {
 		//create the level
 		GameStateController level = LoadFile.loadLevel(levelName).orElseThrow(IllegalArgumentException::new);
 		MockController mockController = new MockController(level);
-		Chap chap = mockController.stateController.getChap();
-		Maze maze = mockController.stateController.getMaze();
+		Chap chap = mockController.getChap();
+		Maze maze = mockController.getMaze();
 		
 		
 		//timer, currently set to 30 seconds
@@ -81,17 +79,21 @@ public class Fuzz {
 		long duration = 3000;
 		
 		//add the current tile as a base
-		visitedTiles.add(mockController.stateController.getTileAtChapPosition());
-		for (int i =0; i < maze.getRows(); i++) {
-			for(int j=0; j<maze.getCols(); j++) {
-				allTiles.add(maze.getTile(i, j));
-			}
-		}
+		visitedTiles.add(mockController.getTileAtChapPosition());
+		//fill the list with all tiles in the maze
+		allTiles.addAll(
+			    IntStream.range(0, maze.getRows())
+			        .boxed()
+			        .flatMap(i -> IntStream.range(0, maze.getCols())
+			            .mapToObj(j -> maze.getTile(i, j)))
+			        .collect(Collectors.toList())
+			);
+		//now stream those tiles, and visit the locked ones. this ensures that chap will not get 
+		//stuck trying to move to a locked tile that he cannot visit
 		allTiles.stream()
 		.filter(t->(t instanceof LockedDoorTile || t instanceof ExitLockTile))
 		.forEach(t->visitedTiles.add(t));
-		
-		mockController.stateController.getMaze().printMaze();
+	
 		
 		//iterate until timer reached
 		while(System.currentTimeMillis() - startTime < duration) {
@@ -108,29 +110,28 @@ public class Fuzz {
 					Chap.Direction.Right, maze.getTile(chap.getRow(), chap.getCol() + 1),
 					Chap.Direction.Down, maze.getTile(chap.getRow() + 1, chap.getCol())
 					);
+			
 			//filter the list to not yet visited directions
 			List<Chap.Direction> notVisitedDirections =
 					adjacent.entrySet().stream()
 					.filter(t-> !visitedTiles.contains(t.getKey()))
 					.map(t-> t.getValue())
 					.toList();
+			
 			//if there are not yet visited directions, then move one of them
 			if (notVisitedDirections.size() > 0) {
 				Chap.Direction moveDirection = notVisitedDirections.get(random.nextInt(notVisitedDirections.size()));
 				try {
-					mockController.stateController.moveChap(moveDirection);
-					visitedTiles.add(mockController.stateController.getTileAtChapPosition());
+					mockController.moveChap(moveDirection);
+					visitedTiles.add(mockController.getTileAtChapPosition());
 				} catch (IllegalArgumentException e) {
 					visitedTiles.add(reverse.get(moveDirection));
 					if (e.getMessage().contains("Cannot move")) {
-					} else {
-						System.out.println(e);
-						System.out.println(" Current Pos:" + chap.getRow() + "," + chap.getCol());
 					}
-					
 				} catch (Exception e) {
 					exceptions.add(e);
 				}
+			
 			//otherwise move randomly
 			} else {
 				Chap.Direction moveDirection = List.of(Chap.Direction.Left,
@@ -139,29 +140,35 @@ public class Fuzz {
 						Chap.Direction.Down
 						).get(random.nextInt(4));
 				try {
-					mockController.stateController.moveChap(moveDirection);
+					mockController.moveChap(moveDirection);
 				} catch (IllegalArgumentException e) {
 					if (e.getMessage().contains("Cannot move")) {
 
-					} else {
-						System.out.println(e);
-						System.out.println(" Current Pos:" + chap.getRow() + "," + chap.getCol());
 					}
-					
-					
 				} catch (Exception e) {
 					exceptions.add(e);
 				}
 			}
-			mockController.stateController.moveActor();
+			
+			//move the actors
+			mockController.moveActor();
 			
 		}
-		//print a message to console, indicating the tiles visited.
+		//print a message to console
 		System.out.println("Testing done for " + levelName +"!");
-		System.out.println("Detected exceptions:");
-		exceptions.stream().forEach(e-> System.out.println(e));
-		if (exceptions.size() == 0) {
-			System.out.println("NONE DETECTED!!! :)))");
-		}
+		eventCounter("chap unlocked the door");
+		eventCounter("chap tried the door");
+		eventCounter("chap unlocked the exit");
+		eventCounter("chap tried the exit");
+		eventCounter("chap opened info ");
+		eventCounter("chap exited, win");
+		eventCounter("chap fell into water, lose");
+		eventCounter("chap got teleported");
+		eventCounter("chap got owned by enemy, lose");
+		System.out.println("");
+	}
+	public void eventCounter(String event) {
+		System.out.println(event + " count: " + events.stream().filter(s->s.contains(event)).count());
+
 	}
 }

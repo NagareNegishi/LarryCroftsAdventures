@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 import nz.ac.wgtn.swen225.lc.persistency.MockAppNotifier;
+import test.nz.ac.wgtn.swen225.lc.fuzz.Fuzz;
 
 /**
  * GameState class represents the state the game is currently in. This includes the current maze, Chap,
@@ -139,40 +140,39 @@ public class GameState{
         case LockedDoorTile tile -> {
             if (checkForMatchingKey(tile.colour())) {
                 tile.unlock();
-				//System.out.println("Chap has unlocked the door");
+                Fuzz.events.add("chap unlocked the door");
                 maze.setTile(newRow, newCol, new FreeTile()); // Replace the locked door with a free tile
             } else {
-            	//System.out.println("Chap doesnt have the right key!");
+            	Fuzz.events.add("chap tried the door");
                 return; // Stop Chap from moving if he doesn't have the right key
             }
         }
         case ExitLockTile tile -> {
             if (allTreasureCollected()) {
                 tile.unlock();
-                //ANTHONY
-				//System.out.println("Chap has unlocked the exit");
+                Fuzz.events.add("chap unlocked the exit");
+
             } else {
-            	//System.out.println("Chap doesnt have all the treasures!");
+            	Fuzz.events.add("chap tried the exit");
                 return; // Stop Chap from moving if there's still treasure to collect
             }
         }
         case InfoFieldTile tile -> {
-        	//ANTHONY
-			//System.out.println("Chap has entered an info field");
+        	Fuzz.events.add("chap opened info ");
             tile.displayText(); // Display information on the tile
         }
         case Exit tile ->{
-        	//ANTHONY
-			//System.out.println("Chap has reached the exit");
+        	Fuzz.events.add("chap exited, win");
+
 			Win();
         }
         case WaterTile tile ->{
-        	//System.out.println("Chap hit a water tile!");
+        	Fuzz.events.add("chap fell into water, lose");
         	Lose();
         }
         case TeleportTile tile ->{
         	chap.moveTo(tile.teleportRow(),tile.teleportCol(), maze);
-        	//System.out.println("Chap hit a teleport tile!");
+        	Fuzz.events.add("chap got teleported");
         	return;
         }
         default -> {
@@ -221,7 +221,7 @@ public class GameState{
 		enemies.forEach(a -> a.move(maze));
 		for(Actor a : enemies) {
 			if(a.getRow() == chap.getRow() && a.getCol() == chap.getCol()) {
-				//System.out.println("Chap hit an enemy!");
+				Fuzz.events.add("chap got owned by enemy, lose");
 				Lose();
 			}
 		}
