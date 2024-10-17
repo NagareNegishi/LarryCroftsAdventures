@@ -48,7 +48,6 @@ public class Maze {
 	        throw new IllegalArgumentException("Row or column is outside the bounds of the maze.");
 	    }
 		maze[row][col] = tile;
-		// TODO: assert to check tile is correctly inserted
 		// assert tile instanceof ...
 	}
 	
@@ -112,8 +111,6 @@ public class Maze {
                 
             }
         }
-		//t1.setPartner(t2);
-		//t2.setPartner(t1);
 		return maze;
 	} 
 	
