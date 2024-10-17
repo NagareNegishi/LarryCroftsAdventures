@@ -1,4 +1,4 @@
-package nz.ac.wgtn.swen225.lc.domain;
+package test.nz.ac.wgtn.swen225.lc.domain;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -9,7 +9,23 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
+import nz.ac.wgtn.swen225.lc.domain.Actor;
+import nz.ac.wgtn.swen225.lc.domain.Chap;
+import nz.ac.wgtn.swen225.lc.domain.Maze;
+import nz.ac.wgtn.swen225.lc.domain.TeleportTile;
+import nz.ac.wgtn.swen225.lc.domain.TreasureTile;
+import nz.ac.wgtn.swen225.lc.domain.WallTile;
+import nz.ac.wgtn.swen225.lc.domain.WaterTile;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
+import nz.ac.wgtn.swen225.lc.domain.Exit;
+import nz.ac.wgtn.swen225.lc.domain.ExitLockTile;
+import nz.ac.wgtn.swen225.lc.domain.FreeTile;
+import nz.ac.wgtn.swen225.lc.domain.GameState;
+import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+import nz.ac.wgtn.swen225.lc.domain.InfoFieldTile;
+import nz.ac.wgtn.swen225.lc.domain.Key;
+import nz.ac.wgtn.swen225.lc.domain.KeyTile;
+import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 
 
 /**
