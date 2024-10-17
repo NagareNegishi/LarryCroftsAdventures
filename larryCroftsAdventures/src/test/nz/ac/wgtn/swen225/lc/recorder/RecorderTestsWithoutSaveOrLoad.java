@@ -44,7 +44,7 @@ public class RecorderTestsWithoutSaveOrLoad {
         Supplier<Maze> mockMazeSupplier = ()->Maze.createBasicMaze(8, 8);
         Supplier<Chap> mockChapSupplier = ()->new Chap(1, 1, new ArrayList<>()); 
         mockGameStateSupplier = ()->new GameState(mockMazeSupplier.get(), mockChapSupplier.get(),
-        		10, Map.of(), time, mockAppNotifier, new ArrayList<>(), 1);
+        		10, 0, Map.of(), time, mockAppNotifier, new ArrayList<>(), 1);
         gameModel = new GameStateController(mockGameStateSupplier.get());
         crc = (rc) -> {
             time = rc.updatedTime();
@@ -87,7 +87,7 @@ public class RecorderTestsWithoutSaveOrLoad {
 	@Test
 	public void testRecordingWithLargeMaze() {
 		Supplier<GameStateController> largeGameGiver = ()->new GameStateController(
-				new GameState(Maze.createBasicMaze(1000, 1000), new Chap(1, 1, new ArrayList<>()), 10, 
+				new GameState(Maze.createBasicMaze(1000, 1000), new Chap(1, 1, new ArrayList<>()), 10, 0, 
 						Map.of(), time, mockAppNotifier, new ArrayList<>(), 1)); 
 		
 		GameStateController mainGame = largeGameGiver.get();
@@ -150,7 +150,6 @@ public class RecorderTestsWithoutSaveOrLoad {
 		            testRec.ping(d, i);
 		            testRec.nextStep();
 				} catch(IllegalArgumentException iae) {
-					System.out.println("\n\n\n\n\n" +gameModel.chapSurroundings() + "\n"+ iae.getMessage());
 					i--;
 				}
 	           
