@@ -58,8 +58,8 @@ public class Actor {
         int newCol = col + currentDirection.colDirection();
 		
         if (maze.getTile(newRow, newCol).canMoveTo()) {
-            row = newRow;
-            col = newCol;
+            this.row = newRow;
+            this.col = newCol;
             steps++;
         }
         
