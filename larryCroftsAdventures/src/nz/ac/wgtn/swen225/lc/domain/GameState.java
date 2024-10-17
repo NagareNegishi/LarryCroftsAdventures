@@ -213,15 +213,14 @@ public class GameState{
 		}
 	} 
 	
-	public void moveActor() {
-		//enemies.forEach(a -> a.move(maze));
+	/*public void moveActor() {
 		for(Actor a : enemies) {
-			if(a.getRow() == chap.getRow() && a.getCol() == chap.getCol()) {
-				Lose();
+		if(a.getRow() == chap.getRow() && a.getCol() == chap.getCol()) {
+			Lose();
 			}
 		}
-		enemies.forEach(a -> a.move(maze));
-	}
+		enemies.forEach(a -> a.move(maze)); 
+	} */
 		
 	public boolean checkForMatchingKey(String doorColour) {
 		return chap.inventory().stream()
