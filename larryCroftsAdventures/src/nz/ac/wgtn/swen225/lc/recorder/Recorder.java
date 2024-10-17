@@ -3,8 +3,10 @@ package nz.ac.wgtn.swen225.lc.recorder;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.swing.JFileChooser;
@@ -17,6 +19,17 @@ import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
 import nz.ac.wgtn.swen225.lc.persistency.Paths;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Class used by the App module to generate a Recorder object. Handles recording
@@ -52,9 +65,6 @@ public class Recorder {
 	// Used during auto replay to decide direction to traverse events.
 	private Runnable lastStepMethodUsed = this::nextStep;
 
-	// Provides controllable model of game at start of first level.
-	private Supplier<GameStateController> firstLevelSupplier;
-
 	// Reference to the controllable game model.
 	private GameStateController recordingGame;
 
@@ -64,9 +74,19 @@ public class Recorder {
 	// An object to receive changes for App.
 	private Consumer<RecordingChanges> updateReciever;
 
+	private int currentLevel = 1;
+
+	private Supplier<GameStateController> levelSupplier = () -> {
+		assert LoadFile.loadLevel(levelPaths.get(currentLevel)).isPresent()
+				: "Exception occured when attempting to load first level for recorder!";
+		return LoadFile.loadLevel(levelPaths.get(currentLevel)).get();
+	};
+
 	/**
 	 * Interface representing an event in the game.
 	 */
+	@JsonSerialize(using = EventSerializer.class)
+	@JsonDeserialize(using = EventDeserializer.class)
 	private interface Event {
 		int time();
 
@@ -81,6 +101,8 @@ public class Recorder {
 	 * @param direction The direction actor is moving.
 	 * @param time      Time when user inputed to move actor.
 	 */
+	@JsonSerialize(using = ChapEventSerializer.class)
+	@JsonDeserialize(using = ChapEventDeserializer.class)
 	private record ChapEvent(Direction direction, int time) implements Event {
 		public ChapEvent {
 			assert direction != null : "ChapEvent can't have null direction!";
@@ -100,7 +122,7 @@ public class Recorder {
 	 *                    recorder.
 	 * @param updatedTime Time that most recent event occurred at.
 	 */
-	public record RecordingChanges(GameStateController updatedGame, int updatedTime) {
+	public record RecordingChanges(GameStateController updatedGame, int updatedTime, Set<String> keysCollected) {
 		public RecordingChanges {
 			assert updatedGame != null : "RecordingChanges can't have null GameStateController!";
 			assert updatedTime >= 0 : "ChapEvent's time cannot be below 0";
@@ -123,27 +145,22 @@ public class Recorder {
 	 */
 	public Recorder(int currentLevel, Consumer<RecordingChanges> updateReciever) {
 		assert updateReciever != null : "Null update reciever given to record during construction!";
+		this.currentLevel = currentLevel;
 		this.updateReciever = updateReciever;
-		firstLevelSupplier = () -> {
-			assert LoadFile.loadLevel(levelPaths.get(currentLevel)).isPresent()
-					: "Exception occured when attempting to load first level for recorder!";
-			return LoadFile.loadLevel(levelPaths.get(currentLevel)).get();
-		};
-		recordingGame = firstLevelSupplier.get();
+		recordingGame = levelSupplier.get();
 	}
 
 	/**
 	 * Constructor allowing recorder to work When first level is not "level1".
 	 * Intended for testing
 	 * 
-	 * @param firstLevelSupplier Gives recorder modifiable game at first level.
+	 * @param levelSupplier Gives recorder modifiable game at first level.
 	 */
-	public Recorder(Consumer<RecordingChanges> updateReciever, Supplier<GameStateController> firstLevelSupplier) {
+	public Recorder(Consumer<RecordingChanges> updateReciever, Supplier<GameStateController> levelSupplier) {
 		assert updateReciever != null : "Null update reciever given to record during construction!";
-		assert firstLevelSupplier != null : "Null first level supplier given to record during construction!";
+		assert levelSupplier != null : "Null first level supplier given to record during construction!";
 		this.updateReciever = updateReciever;
-		this.firstLevelSupplier = firstLevelSupplier;
-		recordingGame = firstLevelSupplier.get();
+		recordingGame = levelSupplier.get();
 	}
 
 	/**
@@ -167,10 +184,17 @@ public class Recorder {
 	public void loadRecording() {
 		currentEventIndex = -1;
 		handleRecording("load", rfc -> {
-			events = eventMapper.readValue(rfc.recordingLoc,
-					eventMapper.getTypeFactory().constructCollectionType(List.class, ChapEvent.class));
+			SimpleModule module = new SimpleModule();
+			module.addDeserializer(Event.class, new EventDeserializer());
+			module.addDeserializer(ChapEvent.class, new ChapEventDeserializer());
+			eventMapper.registerModule(module);
+
+			JsonNode rootNode = eventMapper.readTree(rfc.recordingLoc);
+			currentLevel = rootNode.get("level").asInt();
+			events = eventMapper.convertValue(rootNode.get("events"),
+					eventMapper.getTypeFactory().constructCollectionType(List.class, Event.class));
 		});
-		updateReciever.accept(new RecordingChanges(firstLevelSupplier.get(), events.get(0).time()));
+		updateReciever.accept(new RecordingChanges(levelSupplier.get(), events.get(0).time(), new HashSet<>()));
 	}
 
 	/**
@@ -179,8 +203,76 @@ public class Recorder {
 	 */
 	public void saveRecording() {
 		handleRecording("save", rfc -> {
-			eventMapper.writeValue(rfc.recordingLoc, events);
+			SimpleModule module = new SimpleModule();
+			module.addSerializer(Event.class, new EventSerializer());
+			module.addSerializer(ChapEvent.class, new ChapEventSerializer());
+			eventMapper.registerModule(module);
+
+			ObjectNode rootNode = eventMapper.createObjectNode();
+			rootNode.put("level", currentLevel);
+			rootNode.set("events", eventMapper.valueToTree(events));
+
+			eventMapper.writeValue(rfc.recordingLoc, rootNode);
 		});
+	}
+
+	/**
+	 * Serializes generic Event objects to JSON.
+	 */
+	private static class EventSerializer extends JsonSerializer<Event> {
+
+		public void serialize(Event e, JsonGenerator jg, SerializerProvider sp) throws IOException {
+			jg.writeStartObject();
+			jg.writeStringField("type", "Event");
+			jg.writeNumberField("time", e.time());
+			jg.writeEndObject();
+		}
+	}
+
+	/**
+	 * Deserializes JSON into Event objects, handling both generic Events and
+	 * ChapEvents.
+	 */
+	private static class EventDeserializer extends JsonDeserializer<Event> {
+
+		public Event deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+			JsonNode node = p.getCodec().readTree(p);
+			String type = node.get("type").asText();
+			int time = node.get("time").asInt();
+
+			if ("ChapEvent".equals(type)) {
+				Direction direction = Direction.valueOf(node.get("direction").asText());
+				return new ChapEvent(direction, time);
+			} else {
+				return () -> time;
+			}
+		}
+	}
+
+	/**
+	 * Serializes ChapEvent objects to JSON.
+	 */
+	private static class ChapEventSerializer extends JsonSerializer<ChapEvent> {
+
+		public void serialize(ChapEvent ce, JsonGenerator jg, SerializerProvider sp) throws IOException {
+			jg.writeStartObject();
+			jg.writeStringField("type", "ChapEvent");
+			jg.writeStringField("direction", ce.direction().name());
+			jg.writeNumberField("time", ce.time());
+			jg.writeEndObject();
+		}
+	}
+
+	/**
+	 * Deserializes JSON into ChapEvent objects.
+	 */
+	private static class ChapEventDeserializer extends JsonDeserializer<ChapEvent> {
+		public ChapEvent deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+			JsonNode node = jp.getCodec().readTree(jp);
+			Direction direction = Direction.valueOf(node.get("direction").asText());
+			int time = node.get("time").asInt();
+			return new ChapEvent(direction, time);
+		}
 	}
 
 	/**
@@ -232,7 +324,8 @@ public class Recorder {
 	 * Used by App module to go back to the previous chap movement.
 	 */
 	public void previousStep() {
-		if (checkInvalidStepState()) return;
+		if (checkInvalidStepState())
+			return;
 		lastStepMethodUsed = this::previousStep;
 		findPreviousChapEvent();
 		step();
@@ -242,7 +335,8 @@ public class Recorder {
 	 * Used by App module to go forward to the next chap movement.
 	 */
 	public void nextStep() {
-		if (checkInvalidStepState()) return;
+		if (checkInvalidStepState())
+			return;
 		lastStepMethodUsed = this::nextStep;
 
 		if (currentEventIndex == -1) {
@@ -259,18 +353,20 @@ public class Recorder {
 	 * updates App using its receiver after doing so.
 	 */
 	private void step() {
-		
+
 		headEventIndex = (currentEventIndex = Math.max(currentEventIndex, 0));
-		recordingGame = firstLevelSupplier.get();
-		
+		recordingGame = levelSupplier.get();
+
 		for (int i = 0; i <= currentEventIndex; i++) {
 			// This line is needed to initialize App notifier for sound
-			if(i == currentEventIndex) updateReciever.accept(new RecordingChanges(recordingGame, 0));
+			if (i == currentEventIndex)
+				updateReciever.accept(new RecordingChanges(recordingGame, 0, new HashSet<>()));
 			events.get(i).run(recordingGame);
-			
+
 		}
 
-		updateReciever.accept(new RecordingChanges(recordingGame, events.get(currentEventIndex).time()));
+		updateReciever.accept(new RecordingChanges(recordingGame, events.get(currentEventIndex).time(),
+				new HashSet<String>(recordingGame.getKeysCollected().values())));
 	}
 
 	/**
@@ -328,17 +424,19 @@ public class Recorder {
 	}
 
 	/**
-	 * Removes the most recent chap event added to event list.
-	 * (Additionally any others in the way!)
+	 * Removes the most recent chap event added to event list. (Additionally any
+	 * others in the way!)
 	 */
 	public void onGameLose() {
 
-		if (events.isEmpty()) return;
+		if (events.isEmpty())
+			return;
 
 		for (Event e = events.getLast(); !(e instanceof ChapEvent) && events.size() > 1; e = events.removeLast()) {
 		}
 
-		if (events.getLast() instanceof ChapEvent) events.removeLast();
+		if (events.getLast() instanceof ChapEvent)
+			events.removeLast();
 	}
 
 	/**
