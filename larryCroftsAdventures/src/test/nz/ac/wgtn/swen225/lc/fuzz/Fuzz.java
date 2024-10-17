@@ -1,26 +1,37 @@
 package test.nz.ac.wgtn.swen225.lc.fuzz;
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-//import org.junit.Test;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Test;
 
-
 import nz.ac.wgtn.swen225.lc.app.MockController;
 import nz.ac.wgtn.swen225.lc.domain.Chap;
+import nz.ac.wgtn.swen225.lc.domain.ExitLockTile;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
 import nz.ac.wgtn.swen225.lc.persistency.LoadFile;
-import nz.ac.wgtn.swen225.lc.persistency.Loader;
 
+/**
+ * The fuzz testing class randomly generates input in order to "play" the game,
+ * therefore allowing us to brute force many different game situations
+ * It is enhanced with some intelligence - it will choose any tiles next to it that have not been
+ * yet visited and keep track of all visited tiles
+ * 
+ * @author wenanth 300653874
+ * 
+ */
 
 public class Fuzz {
 	private static Random random;
+	public static List<String> events = new ArrayList<String>();
 	public Fuzz() {
 		random = new Random(); 
 	}
@@ -28,26 +39,61 @@ public class Fuzz {
 	public static void main(String[] args) {
 		Fuzz fuzz = new Fuzz();
 		fuzz.Test1();
+		fuzz.Test2();
+		
+		
 	}
+	//test for level1
 	@Test 
 	public void Test1() {
+		runTest("level1");
+	}
+	//test for level2
+	@Test 
+	public void Test2() {
+		runTest("level2");
+	}
+	
+	/**
+	 * the main method which runs the fuzz test
+	 * 
+	 * @param a string which is used by LoadFile to make the level as a GameStateController
+	 * 
+	 */
+	public void runTest(String levelName) {
 		
 		//definining variables for access later
-		List<Tile> visitedTiles = new ArrayList<Tile>();
-		//create the level
-		GameStateController level = LoadFile.loadLevel("level1").orElseThrow(IllegalArgumentException::new);
-		MockController mockController = new MockController(level);
-		Chap chap = mockController.update.getChap();
-		Maze maze = mockController.update.getMaze();
-		
+		Set<Tile> visitedTiles = new HashSet<Tile>();
 		List<Exception> exceptions = new ArrayList<Exception>();
-		//timer, currently set to 3000ms or 3 seconds
+		List<Tile> allTiles = new ArrayList<Tile>();
+		//create the level
+		GameStateController level = LoadFile.loadLevel(levelName).orElseThrow(IllegalArgumentException::new);
+		MockController mockController = new MockController(level);
+		Chap chap = mockController.getChap();
+		Maze maze = mockController.getMaze();
+		
+		
+		//timer, currently set to 30 seconds
 		//note: System time was used, because Timeout annotation was not working in eclipse.
 		long startTime = System.currentTimeMillis();
 		long duration = 3000;
 		
 		//add the current tile as a base
-		visitedTiles.add(mockController.update.getTileAtChapPosition());
+		visitedTiles.add(mockController.getTileAtChapPosition());
+		//fill the list with all tiles in the maze
+		allTiles.addAll(
+			    IntStream.range(0, maze.getRows())
+			        .boxed()
+			        .flatMap(i -> IntStream.range(0, maze.getCols())
+			            .mapToObj(j -> maze.getTile(i, j)))
+			        .collect(Collectors.toList())
+			);
+		//now stream those tiles, and visit the locked ones. this ensures that chap will not get 
+		//stuck trying to move to a locked tile that he cannot visit
+		allTiles.stream()
+		.filter(t->(t instanceof LockedDoorTile || t instanceof ExitLockTile))
+		.forEach(t->visitedTiles.add(t));
+	
 		
 		//iterate until timer reached
 		while(System.currentTimeMillis() - startTime < duration) {
@@ -64,25 +110,28 @@ public class Fuzz {
 					Chap.Direction.Right, maze.getTile(chap.getRow(), chap.getCol() + 1),
 					Chap.Direction.Down, maze.getTile(chap.getRow() + 1, chap.getCol())
 					);
+			
 			//filter the list to not yet visited directions
 			List<Chap.Direction> notVisitedDirections =
 					adjacent.entrySet().stream()
 					.filter(t-> !visitedTiles.contains(t.getKey()))
 					.map(t-> t.getValue())
 					.toList();
+			
 			//if there are not yet visited directions, then move one of them
 			if (notVisitedDirections.size() > 0) {
 				Chap.Direction moveDirection = notVisitedDirections.get(random.nextInt(notVisitedDirections.size()));
 				try {
-					chap.move(moveDirection, maze);
-					visitedTiles.add(mockController.update.getTileAtChapPosition());
-					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
+					mockController.moveChap(moveDirection);
+					visitedTiles.add(mockController.getTileAtChapPosition());
 				} catch (IllegalArgumentException e) {
 					visitedTiles.add(reverse.get(moveDirection));
-					System.out.println(e);
+					if (e.getMessage().contains("Cannot move")) {
+					}
 				} catch (Exception e) {
 					exceptions.add(e);
 				}
+			
 			//otherwise move randomly
 			} else {
 				Chap.Direction moveDirection = List.of(Chap.Direction.Left,
@@ -91,26 +140,35 @@ public class Fuzz {
 						Chap.Direction.Down
 						).get(random.nextInt(4));
 				try {
-					chap.move(moveDirection, maze);
-					System.out.println("Chap moved " + moveDirection.name() + " Current Pos:" + chap.getPosition());
+					mockController.moveChap(moveDirection);
 				} catch (IllegalArgumentException e) {
-					System.out.println(e);
+					if (e.getMessage().contains("Cannot move")) {
+
+					}
 				} catch (Exception e) {
 					exceptions.add(e);
 				}
-				
-				
 			}
 			
+			//move the actors
+			mockController.moveActor();
+			
 		}
-		//print a message to console, indicating the tiles visited.
-		System.out.println("Testing done!");
-		System.out.println(visitedTiles.size() + "/" + ((maze.getCols() * maze.getCols())-4) + " visitable tiles visited");
-		System.out.println("Detected exceptions:");
-		exceptions.stream().forEach(e-> System.out.println(e));
-		if (exceptions.size() == 0) {
-			System.out.println("NONE DETECTED!!! :)))");
-		}
+		//print a message to console
+		System.out.println("Testing done for " + levelName +"!");
+		eventCounter("chap unlocked the door");
+		eventCounter("chap tried the door");
+		eventCounter("chap unlocked the exit");
+		eventCounter("chap tried the exit");
+		eventCounter("chap opened info ");
+		eventCounter("chap exited, win");
+		eventCounter("chap fell into water, lose");
+		eventCounter("chap got teleported");
+		eventCounter("chap got owned by enemy, lose");
+		System.out.println("");
 	}
-	
+	public void eventCounter(String event) {
+		System.out.println(event + " count: " + events.stream().filter(s->s.contains(event)).count());
+
+	}
 }

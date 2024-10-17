@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 import nz.ac.wgtn.swen225.lc.persistency.MockAppNotifier;
+import test.nz.ac.wgtn.swen225.lc.fuzz.Fuzz;
 
 /**
  * GameState class represents the state the game is currently in. This includes the current maze, Chap,
@@ -126,29 +127,39 @@ public class GameState{
         case LockedDoorTile tile -> {
             if (checkForMatchingKey(tile.colour())) {
                 tile.unlock();
+                Fuzz.events.add("chap unlocked the door");
                 maze.setTile(newRow, newCol, new FreeTile()); // Replace the locked door with a free tile
             } else {
+            	Fuzz.events.add("chap tried the door");
                 return; // Stop Chap from moving if he doesn't have the right key
             }
         }
         case ExitLockTile tile -> {
             if (allTreasureCollected()) {
                 tile.unlock();
+                Fuzz.events.add("chap unlocked the exit");
+
             } else {
+            	Fuzz.events.add("chap tried the exit");
                 return; // Stop Chap from moving if there's still treasure to collect
             }
         }
         case InfoFieldTile tile -> {
+        	Fuzz.events.add("chap opened info ");
             tile.displayText(); // Display information on the tile
         }
         case Exit tile ->{
+        	Fuzz.events.add("chap exited, win");
+
 			Win();
         }
         case WaterTile tile ->{
+        	Fuzz.events.add("chap fell into water, lose");
         	Lose();
         }
         case TeleportTile tile ->{
         	chap.moveTo(tile.teleportRow(),tile.teleportCol(), maze);
+        	Fuzz.events.add("chap got teleported");
         	return;
         }
         default -> {}
@@ -210,12 +221,14 @@ public class GameState{
 	public void Win(){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onGameWin();
+		//ANTHONY: added for debugging :)
+		//System.out.println("Game Win is called in GameStateController");
 	}
 
 	public void Lose(){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onGameLose();
-		System.out.println("Game Over is called in GameStateController");
+		//System.out.println("Game Over is called in GameStateController");
 	}
 
 	public void KeyPickup(String keyName){
