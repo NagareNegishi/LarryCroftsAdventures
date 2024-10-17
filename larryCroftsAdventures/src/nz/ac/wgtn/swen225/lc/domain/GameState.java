@@ -1,6 +1,7 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -33,11 +34,11 @@ public class GameState{
 	private int totalTreasures;
 	@JsonProperty
 	private Map<Key, String> keysCollected;
-
 	// Added by Adam
 	// seconds left for level
 	@JsonProperty
 	private int timeLeft;
+	public Direction chapDirection;
 	// List for enemies in the level
 	@JsonProperty
 	public ArrayList<Actor> enemies;
@@ -71,7 +72,6 @@ public class GameState{
 		assert keysCollected.isEmpty() == true;
 	} */
 	
-	
 	/**
 	 * New constructor specifically for Jackson reconstruction
 	 * @param maze
@@ -84,6 +84,7 @@ public class GameState{
 	public GameState(@JsonProperty("maze") Maze maze,
 					@JsonProperty("chap") Chap chap,
 					@JsonProperty("totalTreasures") int totalTreasures,
+					@JsonProperty("treasuresCollected")int treasuresCollected,
 					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
 					@JsonProperty("timeLeft") int timeLeft,
 					@JsonProperty("appNotifier") AppNotifier appNotifier,
@@ -95,19 +96,27 @@ public class GameState{
 		if(keysCollected == null) {throw new IllegalArgumentException("KeysCollected list is null");}
 		if(enemies == null) {throw new IllegalArgumentException("List of enemies is null");}
 		if(appNotifier.equals(null)) {throw new IllegalArgumentException("App notifier is null");}
+		if(level < 0) {throw new IllegalArgumentException("Level must be greater than 0");}
 		
 		this.maze = maze;
 		this.chap = chap;
-		this.treasuresCollected = 0;
+		this.treasuresCollected = treasuresCollected;
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = keysCollected;
 		this.timeLeft =timeLeft;
 		this.appNotifier = appNotifier;
 		this.enemies = (ArrayList<Actor>) enemies;
 		this.level = level;
-		assert this.totalTreasures == totalTreasures;
-		assert this.timeLeft == timeLeft;
 		
+		assert this.chap != null;
+		assert this.maze != null;
+		assert this.treasuresCollected == treasuresCollected;
+		assert this.totalTreasures == totalTreasures;
+		assert this.keysCollected != null;
+		assert this.timeLeft == timeLeft;
+		assert this.appNotifier != null;
+		assert this.enemies != null;
+		assert this.level == level;
 	}
 	
 	
@@ -120,8 +129,11 @@ public class GameState{
 	// Added by Adam
 	public int getTime() {return timeLeft;}
 	public void setTime(int time) {this.timeLeft = time;}
+
+	// if we want to store the time at the save/load we probably need it for level too
 	public int getLevel() { return level;}
 	public Direction chapDirection() {return chapDirection;}
+	
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
 		this.chapDirection = direction;
@@ -164,9 +176,7 @@ public class GameState{
         	chap.moveTo(tile.teleportRow(),tile.teleportCol(), maze);
         	return;
         }
-        default -> {
-            
-        }
+        default -> {}
     }
 	    chap.move(direction, maze);
 	    
@@ -207,14 +217,14 @@ public class GameState{
 		}
 	} 
 	
-	public void moveActor() {
-		enemies.forEach(a -> a.move(maze));
+	/*public void moveActor() {
 		for(Actor a : enemies) {
-			if(a.getRow() == chap.getRow() && a.getCol() == chap.getCol()) {
-				Lose();
+		if(a.getRow() == chap.getRow() && a.getCol() == chap.getCol()) {
+			Lose();
 			}
 		}
-	}
+		enemies.forEach(a -> a.move(maze)); 
+	} */
 		
 	public boolean checkForMatchingKey(String doorColour) {
 		return chap.inventory().stream()
@@ -251,6 +261,20 @@ public void KeyPickup(String keyName){
 	public void TreasurePickup(int treasureCount){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onTreasurePickup(treasureCount);
+	}
+	
+	// creating a mock game state for testing basic logic and functionality
+	public static GameState mockGameState() {
+		return new GameState(Maze.createBasicMaze(5, 5), new Chap(2,2, new ArrayList<>()),1, 0, new HashMap<Key,String>(), 0, new AppNotifier() {
+		@Override
+		public void onGameWin() {}
+		@Override
+	    public void onGameLose() {}
+		@Override
+	    public void onKeyPickup(String keyName) {}
+		@Override
+	    public void onTreasurePickup(int treasureCount) {}
+	}, new ArrayList<Actor>(), 1);
 	}
 }
 

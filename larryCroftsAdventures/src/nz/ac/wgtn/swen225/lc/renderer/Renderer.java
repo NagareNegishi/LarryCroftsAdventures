@@ -41,8 +41,13 @@ public class Renderer extends JPanel {
     //I can most definitely improve this
     final RenderImg Chap1 = new RenderImg(Img.chap1);
     final RenderImg Chap2 = new RenderImg(Img.chap2);
+    final AnimatedImage chap = new AnimatedImage(List.of(Chap1, Chap2),2);
     
-    final AnimatedImage chap = new AnimatedImage(List.of(Chap1, Chap2));
+    
+    final RenderImg tp1 = new RenderImg(Img.tp1);
+    final RenderImg tp2 = new RenderImg(Img.tp2);
+    final RenderImg tp3 = new RenderImg(Img.tp3);
+    final AnimatedImage tp = new AnimatedImage(List.of(tp1,tp2,tp3),3);
     
     final RenderImg w1 = new RenderImg(Img.Water1);
     final RenderImg w2 = new RenderImg(Img.Water2);
@@ -51,12 +56,11 @@ public class Renderer extends JPanel {
     final RenderImg w5 = new RenderImg(Img.Water5);
     final RenderImg w6 = new RenderImg(Img.Water6);
     final RenderImg w7 = new RenderImg(Img.Water7);
-    
-    final AnimatedImage water = new AnimatedImage(List.of(w1,w2,w3,w4,w5,w6,w7));
+    final AnimatedImage water = new AnimatedImage(List.of(w1,w2,w3,w4,w5,w6,w7),1);
     
     final RenderImg Actor1 = new RenderImg(Img.Actor);
     final RenderImg Actor2 = new RenderImg(Img.Actor); //Actor is meant to have one more image
-    final AnimatedImage Actor = new AnimatedImage(List.of(Actor1,Actor2));
+    final AnimatedImage Actor = new AnimatedImage(List.of(Actor1,Actor2),2);
     
     final RenderImg Wall = new RenderImg(Img.Wall_Tile);
     final RenderImg FreeTile = new RenderImg(Img.FreeTile);
@@ -221,7 +225,7 @@ public class Renderer extends JPanel {
     	}
     	
     	else if(i instanceof TeleportTile) {
-    		Kourie.drawImg(g,x,y);
+    		tp.draw(g,x,y);
     	}
     	
     	else if(i instanceof WaterTile) {

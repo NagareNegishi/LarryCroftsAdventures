@@ -190,6 +190,7 @@ public class Recorder {
 	 * @param currentTime Time when user inputed to move chap.
 	 */
 	public void ping(Direction direction, int currentTime) {
+		assert direction != null : "ChapEvent can't have null direction!";
 		ping(currentTime);
 		events.set(events.size() - 1, new ChapEvent(direction, currentTime));
 	}
@@ -203,6 +204,7 @@ public class Recorder {
 	 */
 	public void ping(int currentTime) {
 		assert events != null : "Recorder events storage is null!";
+		assert currentTime >= 0 : "Event time must be positive!";
 		if (events.size() == EventsLimit)
 			return;
 		if (headEventIndex < events.size() - 1) {
@@ -222,8 +224,7 @@ public class Recorder {
 	 * @return Rate that autoReplaySpeed was set to.
 	 */
 	public int setPlaybackSpeed(int eventsPerSecond) {
-		if (eventsPerSecond <= 0)
-			throw new IllegalArgumentException("Playback speed must be positive.");
+		assert eventsPerSecond > 0 : "Playback speed must be positive.";
 		return (autoReplaySpeed = eventsPerSecond);
 	}
 
@@ -258,11 +259,15 @@ public class Recorder {
 	 * updates App using its receiver after doing so.
 	 */
 	private void step() {
+		
 		headEventIndex = (currentEventIndex = Math.max(currentEventIndex, 0));
 		recordingGame = firstLevelSupplier.get();
-
+		
 		for (int i = 0; i <= currentEventIndex; i++) {
+			// This line is needed to initialize App notifier for sound
+			if(i == currentEventIndex) updateReciever.accept(new RecordingChanges(recordingGame, 0));
 			events.get(i).run(recordingGame);
+			
 		}
 
 		updateReciever.accept(new RecordingChanges(recordingGame, events.get(currentEventIndex).time()));
