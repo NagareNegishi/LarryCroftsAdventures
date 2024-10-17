@@ -80,6 +80,19 @@ public class PersistencyTest {
 		return Optional.empty();
 	}
 	
+	
+	private Coord mazeLocation(Coord roomLoc, Coord insideLoc) throws Exception {
+		try {
+			Class<?>[] argClasses = new Class<?>[] {File.class, Class.class};
+			Method mazeLocation = Builder.class.getDeclaredMethod("mazeLocation", argClasses);
+			mazeLocation.setAccessible(true);
+			return (Coord) mazeLocation.invoke(null , roomLoc, insideLoc);
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
+	
 //	@SuppressWarnings("unchecked")
 //	private <T> Optional<T> loadObjString(String path, Class<T> classType){
 //		try{
@@ -230,7 +243,28 @@ public class PersistencyTest {
 		} catch (NoSuchFieldException | IllegalAccessException | SecurityException e) {
 			e.printStackTrace();
 		}
+ 	}
+ 	
+ 	@Test
+ 	public void builderBuildTest() {
+ 		Builder build = new Builder();
+ 		Maze maze = build.build();
+ 		maze.printMaze();
+ 		Room room = new Room();
+ 		Coord roomLoc = new Coord(2, 2);
+ 		build.addRoom(new Coord(2, 2), room);
+ 		Maze maze2 = build.build();
+ 		maze2.printMaze();
  		
+ 		try {
+ 	 		assert mazeLocation(roomLoc, room.centre).equals(new Coord(15,15));
+ 		} catch(Exception e) {}
+ 		
+ 		
+ 	}	
+ 	
+ 	@Test
+ 	public void builderLocationTest() {
  		
  	}
  	
