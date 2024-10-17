@@ -1,6 +1,7 @@
-package nz.ac.wgtn.swen225.lc.domain;
+package test.nz.ac.wgtn.swen225.lc.domain;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertThrows;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +10,23 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
+import nz.ac.wgtn.swen225.lc.domain.Actor;
+import nz.ac.wgtn.swen225.lc.domain.Chap;
+import nz.ac.wgtn.swen225.lc.domain.Maze;
+import nz.ac.wgtn.swen225.lc.domain.TeleportTile;
+import nz.ac.wgtn.swen225.lc.domain.TreasureTile;
+import nz.ac.wgtn.swen225.lc.domain.WallTile;
+import nz.ac.wgtn.swen225.lc.domain.WaterTile;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
+import nz.ac.wgtn.swen225.lc.domain.Exit;
+import nz.ac.wgtn.swen225.lc.domain.ExitLockTile;
+import nz.ac.wgtn.swen225.lc.domain.FreeTile;
+import nz.ac.wgtn.swen225.lc.domain.GameState;
+import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+import nz.ac.wgtn.swen225.lc.domain.InfoFieldTile;
+import nz.ac.wgtn.swen225.lc.domain.Key;
+import nz.ac.wgtn.swen225.lc.domain.KeyTile;
+import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 
 
 /**
@@ -279,6 +296,7 @@ public class Tests {
 		public void testChapCanMoveToExitLockWithAllTreasures() {
 			GameState test = GameState.mockGameState();
 			GameStateController testController = new GameStateController(test);
+			assertEquals(1,testController.getTotalTreasures());
 			testController.getMaze().setTile(2, 3, new TreasureTile());
 			testController.getMaze().setTile(2, 4, new ExitLockTile());
 			testController.moveChap(Direction.Right);
@@ -331,26 +349,6 @@ public class Tests {
 			test.moveChap(Direction.Right);
 			assertEquals(true, test.checkForEnemy());
 		} */
-		
-	// helper method to print maze REMOVE THESE
-		@Test
-		public void testPrintMaze() {
-			Maze maze = Maze.createLevel1();
-			//maze.printMaze();
-		}
-		
-		@Test
-		public void testPrintMaze1() {
-			Maze maze = Maze.createCustomMaze();
-			//maze.printMaze();
-		}
-		
-		@Test
-		public void testPrintMaze2() {
-			Maze maze = Maze.createCustomMaze2();
-			//maze.printMaze();
-		}
-	
 		
 	// test TeleportTiles work
 		@Test
@@ -417,6 +415,7 @@ public class Tests {
 			assertEquals(true, waterTile.canMoveTo());
 		}
 		
+	// test tile types are accurate
 		@Test
 		public void testTileTypes() {
 			Exit exit = new Exit();
@@ -442,4 +441,39 @@ public class Tests {
 			assertEquals("Water Tile", waterTile.tileType());
 		}
 		
+	// test game time can be set and returns accurately
+		@Test
+		public void testTime() {
+			GameState test = GameState.mockGameState();
+			GameStateController testController = new GameStateController(test);
+			testController.setTime(10);
+			assertEquals(10,testController.getTime());
+		}
+	
+	// check level 1 has proper design
+		@Test
+		public void testPrintLevelOne() {
+			Maze level1 = Maze.createLevel1();
+			level1.printMaze();
+		}
+		
+	// check infoFieldTile prints its message
+		@Test
+		public void testInfoFieldPrints() {
+			GameState test = GameState.mockGameState();
+			GameStateController testController = new GameStateController(test);
+			InfoFieldTile infoFieldTile = new InfoFieldTile("Test");
+			testController.getMaze().setTile(2, 3, infoFieldTile);
+			testController.moveChap(Direction.Right);
+			assertEquals("Test", infoFieldTile.displayText());
+		}
+		
+	// check level returns accurately
+		@Test
+		public void testLevelIsAccurate() {
+			GameState test = GameState.mockGameState();
+			GameStateController testController = new GameStateController(test);
+			assertEquals(1,testController.getLevel());
+		}
+	
 }
