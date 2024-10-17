@@ -158,7 +158,6 @@ public class Maze {
 	
 	// helpful method to print maze using tile initials to check design is accurate
 	public void printMaze() {
-
 		for (int i = 0; i<rows; i++) {
 			for (int j = 0; j<cols; j++) {
 				System.out.print(maze[i][j].initial());
@@ -166,5 +165,6 @@ public class Maze {
 			System.out.println();
 		}
 	}
+
 	
 }
