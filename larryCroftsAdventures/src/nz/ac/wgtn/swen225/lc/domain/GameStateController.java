@@ -33,11 +33,10 @@ public class GameStateController{
 	}
 	
 	public void moveChap(Direction direction) {gameState.moveChap(direction);}
-	
 	public void moveActor() {
 		gameState.checkForEnemy();
 		gameState.enemies.forEach(a -> a.move(maze));
-		}
+	}
 	
 	@JsonIgnore
 	public List<Item> getChapInventory(){return gameState.getChap().inventory();}
@@ -54,10 +53,8 @@ public class GameStateController{
 	// Added by Adam
 	public int getTime() {return gameState.getTime();}
 	public void setTime(int time) {gameState.setTime(time);}
-
-	//////////////////////////////
 	public int getLevel() { return gameState.getLevel();}
-	//////////////////////////////
+
 
 	public Tile getTileAtChapPosition() { return maze.getTile(chap.getRow(), chap.getCol());}	 
 	public GameState getGameState() {return gameState;}

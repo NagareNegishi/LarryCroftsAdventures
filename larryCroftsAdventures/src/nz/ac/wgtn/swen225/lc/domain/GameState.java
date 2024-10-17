@@ -47,7 +47,11 @@ public class GameState{
 	@JsonSerialize(as = MockAppNotifier.class)
 	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
-	public int level;//////////////////////////////////make me json property too :)
+	@JsonProperty
+	public int level;
+
+	
+	private Direction chapDirection;
 	
 	/*public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
 		
@@ -118,7 +122,7 @@ public class GameState{
 	
 	public int totalTreasures() {return totalTreasures;}
 	public int getTreasuresCollected() {return treasuresCollected;}
-	public void treasureCollected() {this.treasuresCollected++;}	
+	public void treasureCollected() {this.treasuresCollected++;}
 	public boolean allTreasureCollected() {return treasuresCollected == totalTreasures ? true : false;}
 	public Map<Key,String> keysCollected(){return keysCollected;}
 	
