@@ -39,22 +39,18 @@ class Controller extends Keys{
         setAction(KeyEvent.VK_UP, 0,() -> {
             update.moveChap(Chap.Direction.Up);
             recorder.ping(Chap.Direction.Up, this.time);
-            System.out.println("UP");
             });
         setAction(KeyEvent.VK_DOWN, 0,() -> {
             update.moveChap(Chap.Direction.Down);
             recorder.ping(Chap.Direction.Down, this.time);
-            System.out.println("DOWN");
             });
         setAction(KeyEvent.VK_LEFT, 0,() -> {
             update.moveChap(Chap.Direction.Left);
             recorder.ping(Chap.Direction.Left, this.time);
-            System.out.println("LEFT");
             });
         setAction(KeyEvent.VK_RIGHT, 0,() -> {
             update.moveChap(Chap.Direction.Right);
             recorder.ping(Chap.Direction.Right, this.time);
-            System.out.println("RIGHT");
             });
 
         // Ctrl key combinations
@@ -89,9 +85,6 @@ class Controller extends Keys{
 
     /**
      * Set the GameStateController for the controller
-     * Currently not used.///////////////////////////////////////////////////////////////////////////////////////////////////
-     * Can be used to update the controller without creating a new controller.
-     * Depend on other modules, this method may or may not work.
      * @param gsc GameStateController
      */
     public void setGameStateController(GameStateController gsc){

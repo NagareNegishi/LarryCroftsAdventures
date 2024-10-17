@@ -2,7 +2,6 @@ package nz.ac.wgtn.swen225.lc.app;
 
 import java.awt.Color;
 import java.util.stream.Stream;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -16,19 +15,15 @@ import javax.swing.JPanel;
  * @studentID 300653779
  */
 public enum GameDialogs {
-    PAUSE(ComponentFactory.format("Game is paused",false), Color.BLACK, new Color(150, 150, 0)),
+    PAUSED(ComponentFactory.format("Game is paused",false), Color.BLACK, Color.ORANGE),
     START(ComponentFactory.format("New Game<br>Press 'Esc' to start",false), Color.BLUE, Color.YELLOW),
-    GAMEOVER(ComponentFactory.format("Game Over<br>'Esc' to retry",false), Color.RED, Color.BLACK),
-    VICTORY(ComponentFactory.format("Victory<br>'Esc' to play again",false), Color.GREEN, Color.ORANGE);
-
-    
-
+    GAMEOVER(ComponentFactory.format("Game Over<br>Press 'Esc' to retry",false), Color.RED, Color.BLACK),
+    VICTORY(ComponentFactory.format("Victory!!!<br>Press 'Esc' to play again",false), Color.GREEN, Color.RED);
 
     PauseDialog dialog;
     String message;
     Color backgroundColor;
     Color textColor;
-
 
     /**
      * Create a new GameDialogs with the given message, text color, background color, and opacity.
@@ -85,5 +80,17 @@ public enum GameDialogs {
         Stream.of(GameDialogs.values()).forEach(type -> type.hide());
         }
 
-
+    /**
+     * Show the dialog matching the given string.
+     * @param dialogName the name of the dialog to show
+     */
+    public static void showDialog(String dialogName) {
+        Stream.of(GameDialogs.values())
+            .filter(dialog -> dialog.name().equalsIgnoreCase(dialogName))
+            .findFirst()
+            .ifPresentOrElse(
+                GameDialogs::show,
+                () -> System.err.println("No matching dialog found for: " + dialogName)
+            );
+    }
 }

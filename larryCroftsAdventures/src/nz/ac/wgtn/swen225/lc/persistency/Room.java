@@ -11,7 +11,7 @@ import nz.ac.wgtn.swen225.lc.domain.WallTile;
 import nz.ac.wgtn.swen225.lc.domain.WaterTile;
 
 
-class Room {
+public class Room {
 	// Entry points to room
 //    public Tile top = new WallTile();
 //    public Tile bot = new WallTile();
@@ -100,9 +100,6 @@ class PortalRoom extends Room {
 			TeleportTile otherT = (TeleportTile) other.innerTile.get(centre);
 			//tele.setPartner(otherT);
 			//otherT.setPartner(tele);
-			
-			
-			
 			return true;
 		}
 		return false;

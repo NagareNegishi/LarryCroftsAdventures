@@ -33,6 +33,8 @@ public enum Img {
     InfoTile,
     Stairs,
     
+    tp1,tp2,tp3,
+    
     Treasure, // can likely make this an animation of sorts
     intro, //this is temp for intro, it will be it's own animated bg
     Red_key,Blue_key,

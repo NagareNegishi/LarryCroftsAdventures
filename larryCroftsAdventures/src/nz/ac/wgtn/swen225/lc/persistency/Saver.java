@@ -22,8 +22,9 @@ public interface Saver {
      * @param fileName: String, name for new JSON file
      * @param gameState: GameState, instance describing all game objects
      * @return boolean, success or failure of save
+     * @throws IOException 
      */
-    public static boolean saveGame(String fileName, GameStateController gameStateControl){
-        return false;
+    public static boolean saveGame(String fileName, GameStateController gameStateControl) throws IOException{
+        throw new IOException();
     };
 }
