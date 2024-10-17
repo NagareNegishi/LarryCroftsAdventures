@@ -28,6 +28,7 @@ public class Chap {
 	 * @param startCol
 	 * @param inventory
 	 */
+	
 	@JsonCreator
 	public Chap(@JsonProperty("startRow") int startRow,
 				@JsonProperty("startCol") int startCol,
@@ -39,7 +40,6 @@ public class Chap {
 		this.inventory = inventory;
 		
 		assert this.row == startRow && this.col == startCol;
-		assert inventory != null;
 	}
 	
 	public int getRow() {return row;}

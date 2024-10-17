@@ -47,7 +47,6 @@ public class Tests {
 	// test Chap is on correct row and col at start of game
 		@Test
 		public void testChapStartingPosition() {
-
 			Chap chap = new Chap(3,3, new ArrayList<>());
 			assertEquals(3,chap.getRow());
 			assertEquals(3,chap.getCol());
@@ -368,6 +367,10 @@ public class Tests {
 				@SuppressWarnings("unused")
 				Maze maze = new Maze(-1, -1);
 			});
+			assertThrows(IllegalArgumentException.class, () -> {
+				@SuppressWarnings("unused")
+				Maze maze = new Maze(null,-1, -1);
+			});
 		}
 		
 		@Test
@@ -415,7 +418,7 @@ public class Tests {
 		@Test
 		public void testTileTypes() {
 			Exit exit = new Exit();
-			ExitLockTile exitLocktile = new ExitLockTile();
+			ExitLockTile exitLocktile = new ExitLockTile(false,true);
 			FreeTile freeTile = new FreeTile();
 			InfoFieldTile infoFieldTile = new InfoFieldTile("Test");
 			KeyTile keyTile = new KeyTile(new Key("Blue"));

@@ -50,8 +50,6 @@ public class GameState{
 	@JsonProperty
 	public int level;
 
-	
-	
 	/**
 	 * @param maze
 	 * @param chap
@@ -87,14 +85,10 @@ public class GameState{
 		this.enemies = (ArrayList<Actor>) enemies;
 		this.level = level;
 		
-		assert this.chap != null;
-		assert this.maze != null;
+
 		assert this.treasuresCollected == treasuresCollected;
 		assert this.totalTreasures == totalTreasures;
-		assert this.keysCollected != null;
 		assert this.timeLeft == timeLeft;
-		assert this.appNotifier != null;
-		assert this.enemies != null;
 		assert this.level == level;
 	}
 	
@@ -127,6 +121,8 @@ public class GameState{
             if (checkForMatchingKey(tile.colour())) {
                 tile.unlock();
                 maze.setTile(newRow, newCol, new FreeTile()); // Replace the locked door with a free tile
+                assert maze.getTile(newRow, newCol) instanceof FreeTile;
+                
             } else {
                 return; // Stop Chap from moving if he doesn't have the right key
             }
@@ -134,12 +130,13 @@ public class GameState{
         case ExitLockTile tile -> {
             if (allTreasureCollected()) {
                 tile.unlock();
+                assert tile.canMoveTo() == true;
             } else {
                 return; // Stop Chap from moving if there's still treasure to collect
             }
         }
         case InfoFieldTile tile -> {
-            tile.displayText(); // Display information on the tile
+            tile.displayText();
         }
         case Exit tile ->{
 			Win();
@@ -149,6 +146,7 @@ public class GameState{
         }
         case TeleportTile tile ->{
         	chap.moveTo(tile.teleportRow(),tile.teleportCol(), maze);
+        	assert chap.getRow() == tile.teleportRow() && chap.getCol() == tile.teleportCol();
         	return;
         }
         default -> {}
@@ -167,17 +165,22 @@ public class GameState{
             chap.pickUpItem(item);
             switch (item) {
             case Treasure treasure -> {
+            	int treasuresCollectedBefore = treasuresCollected;
 				treasureCollected();
 				TreasurePickup(treasuresCollected); ////////////// Added by Nagi
+				int treasuresCollectedAfter = treasuresCollected;
+				assert treasuresCollectedAfter == treasuresCollectedBefore+1;
 			}
             case Key key -> {
 				keysCollected.put(key, key.colour());
 				KeyPickup(key.colour());
+				assert chap.inventory().contains(item);
 			}
             default -> {}
         }
             currentTile.removeItem();
             maze.setTile(chap.getRow(), chap.getCol() , new FreeTile());
+            assert maze.getTile(chap.getRow(), chap.getCol()) instanceof FreeTile;
         }
 	}
 	
@@ -192,6 +195,7 @@ public class GameState{
 		}
 	} 
 		
+	// check a given doorColour matching a key in chaps inventory
 	public boolean checkForMatchingKey(String doorColour) {
 		return chap.inventory().stream()
 							   .filter(item -> item instanceof Key)
