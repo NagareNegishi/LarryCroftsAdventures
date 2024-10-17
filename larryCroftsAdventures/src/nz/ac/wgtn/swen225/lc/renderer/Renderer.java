@@ -58,26 +58,40 @@ public class Renderer extends JPanel {
     final RenderImg w7 = new RenderImg(Img.Water7);
     final AnimatedImage water = new AnimatedImage(List.of(w1,w2,w3,w4,w5,w6,w7),1);
     
-    final RenderImg Actor1 = new RenderImg(Img.Actor);
-    final RenderImg Actor2 = new RenderImg(Img.Actor); //Actor is meant to have one more image
-    final AnimatedImage Actor = new AnimatedImage(List.of(Actor1,Actor2),2);
+    final RenderImg Actor1 = new RenderImg(Img.Actor1);
+    final RenderImg Actor2 = new RenderImg(Img.Actor2); //Actor is meant to have one more image
+    final AnimatedImage Actor = new AnimatedImage(List.of(Actor1,Actor2),1);
+    
+    final RenderImg T1 = new RenderImg(Img.Treasure1);
+    final RenderImg T2 = new RenderImg(Img.Treasure2);
+    final RenderImg T3 = new RenderImg(Img.Treasure3);
+    final RenderImg T4 = new RenderImg(Img.Treasure4);
+    final AnimatedImage Treasure = new AnimatedImage(List.of(T1,T2,T3,T4),1);
+    
     
     final RenderImg Wall = new RenderImg(Img.Wall_Tile);
     final RenderImg FreeTile = new RenderImg(Img.FreeTile);
-    final RenderImg Treasure = new RenderImg(Img.Treasure);
+    
     final RenderImg Blue_key = new RenderImg(Img.Blue_key);
     final RenderImg Red_key = new RenderImg(Img.Red_key);
     final RenderImg Exit = new RenderImg(Img.Stairs);
+    
     final RenderImg info = new RenderImg(Img.InfoTile);
+    
+    final RenderImg infolvl1 = new RenderImg(Img.intro1);
+    final RenderImg infolvl2 = new RenderImg(Img.intro2);
+    
     final RenderImg Blue_LockedDoor = new RenderImg(Img.LockedDoor_blue);
     final RenderImg Red_LockedDoor = new RenderImg(Img.LockedDoor_red);
     
+    final RenderImg exitOpen = new RenderImg(Img.ExitOpen);
+    final RenderImg exitLock = new RenderImg(Img.ExitLock);
     final RenderImg Kourie = new RenderImg(Img.Kourie);
     //Make a red Locked door
     //make open versions of those doors
     
     //This is a temp for a background image
-    final RenderImg bg = new RenderImg(Img.intro);
+    
     
     
     final int imgSize;
@@ -127,9 +141,15 @@ public class Renderer extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); 
         
+        
+        //I can make some particle system here for fun
+        
+        
         if(game == null) {return;}//in case the game is not set, display nothing
         
-        this.g = g;        
+        this.g = g;   
+        
+        
         
     	screenCenterX = getWidth() / 2; // Center of the screen horizontally
         screenCenterY = getHeight() / 2; // Center of the screen vertically
@@ -149,10 +169,31 @@ public class Renderer extends JPanel {
         drawTiles();
       //Draws Chap at the center of the screen after drawing all the tiles
         drawActors(game.enemies);
+        chipToriel();
         chap.draw(g, getWidth() / 2, getHeight()/2); 
         
-
-
+       
+    }
+    
+    private void chipToriel() {
+    	//find all Keys, Open all doors, find all Treasures, 
+    	
+    	//Water is dangerous, and Monsters even more
+    	//Hope is a virtue
+    	
+    	Tile t = game.getMaze().getTile(game.getChap().getRow(), game.getChap().getCol());
+    	int level = game.getLevel();
+    	
+    	if(t instanceof InfoFieldTile) {
+    		if(level == 1) {
+    			infolvl1.drawInfoTile(g, this.getSize());
+    		}else if (level == 2) {
+    			infolvl2.drawInfoTile(g, this.getSize());
+    		}
+    		
+    	}
+        
+    	
     }
     
     private void drawActors(List<Actor> actors) {
@@ -232,8 +273,19 @@ public class Renderer extends JPanel {
     		water.draw(g, x, y);
     	}
     	
-    	else if (i instanceof ExitLockTile) {
+    	else if (i instanceof Exit) {
     		Exit.drawImg(g, x, y);
+    	}
+    	
+    	else if(i instanceof ExitLockTile) {
+    		boolean open = ((ExitLockTile) i).canMoveTo();
+    		if(!open) {
+    			exitLock.drawImg(g,x,y);    			
+    		}else {
+    			exitOpen.drawImg(g, x, y);
+    			
+    		}
+    		
     	}
     	
     	else if (i instanceof InfoFieldTile) {
@@ -260,7 +312,7 @@ public class Renderer extends JPanel {
         	}
         	
         	if(i instanceof Treasure) {
-	        	Treasure.drawImg(g, x, y);
+	        	Treasure.draw(g, x, y);
         		
         	}
         }

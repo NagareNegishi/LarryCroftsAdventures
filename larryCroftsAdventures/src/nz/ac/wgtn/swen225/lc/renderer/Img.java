@@ -30,16 +30,21 @@ public enum Img {
 	FreeTile,
 	LockedDoor_blue,LockedDoor_red,
     Wall_Tile,
+    intro1, intro2,
     InfoTile,
     Stairs,
     
     tp1,tp2,tp3,
     
-    Treasure, // can likely make this an animation of sorts
-    intro, //this is temp for intro, it will be it's own animated bg
+    ExitLock,ExitOpen,
+    
+    Treasure1,Treasure2,Treasure3,Treasure4,// can likely make this an animation of sorts
+   
+    //
+    
     Red_key,Blue_key,
     chap1,chap2,
-    Actor,
+    Actor1,Actor2,
     Water1,Water2,Water3,Water4,Water5,Water6,Water7,
     Kourie; //Kourie is a test object, don't mind him.
 	
