@@ -51,8 +51,6 @@ public class GameState{
 	public int level;
 
 	
-	private Direction chapDirection;
-	
 	/*public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
 		
 		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}

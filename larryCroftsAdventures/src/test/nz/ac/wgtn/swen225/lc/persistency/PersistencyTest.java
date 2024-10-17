@@ -208,19 +208,19 @@ public class PersistencyTest {
     
     
     // Tests whether level1 is loadable from /levels
-// 	@Test
-//     public void level1Test() {
-// 		Level1.main(null);
-//     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
-//     	assert gscOptionLevel.isPresent();
-//     	}
-// 	
-// 	@Test
-// 	public void level2Test() {
-// 		level2.main(null);
-//     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level2);
-//     	assert gscOptionLevel.isPresent();
-// 	}
+ 	@Test
+     public void level1Test() {
+ 		Level1.main(null);
+     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level1);
+     	assert gscOptionLevel.isPresent();
+     	}
+ 	
+ 	@Test
+ 	public void level2Test() {
+ 		level2.main(null);
+     	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level2);
+     	assert gscOptionLevel.isPresent();
+ 	}
 
  	
  	@Test
@@ -270,10 +270,18 @@ public class PersistencyTest {
  	
  	@Test
  	public void builderInnerTile() {
- 		Builder build = new Builder();
- 		Room room = new Room();
- 		room.setTile(room.centre, new WallTile());
- 	
+ 		try {
+ 			Builder build = new Builder();
+ 	 		Room room = new Room();
+ 	 		room.setTile(room.centre, new WallTile());
+ 	 		Coord roomLoc = new Coord(2,2);
+ 	 		build.addRoom(roomLoc, room);
+ 	 		Maze maze = build.build();
+ 	 		Coord tileLoc = mazeLocation(roomLoc, room.centre);
+ 	 		assert maze.getTile(tileLoc.row(), tileLoc.col()) instanceof WallTile;
+ 		} catch(Exception e) {}
+ 		
+ 	}
  	@Test
  	public void builderLocationTest() {
  		
