@@ -31,9 +31,18 @@ public enum AudioP {
     death;
 
     public final Clip clip;
-
+    public static float master;
     AudioP() {
         this.clip = loadAudio(this.name());
+    }
+    
+    static {
+        for (AudioP audio : AudioP.values()) {
+            // Eagerly load all audio clips at initialization.
+            audio.clip.start();
+            audio.clip.stop();
+            audio.clip.setFramePosition(0);  // Reset the clip after loading.
+        }
     }
 
     	private static Path startPath() {
@@ -87,7 +96,23 @@ public enum AudioP {
     	        throw new RuntimeException("Failed to load audio file: " + name, e);
     	    }
     	}
-
+    
+    
+    public void setVolume(float p) {
+    	 if (clip != null) {
+			FloatControl volume = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+		    master = volume.getValue();
+		    volume.setValue(p);
+    	 }
+    }
+    	
+    public void setNVolume() {
+        if (clip != null) {
+        	FloatControl volume = (FloatControl) clip.getControl(FloatControl.Type.VOLUME);
+        	setVolume(volume.getMinimum());
+        }
+    }
+    
 
     // Play the audio
     public void play() {

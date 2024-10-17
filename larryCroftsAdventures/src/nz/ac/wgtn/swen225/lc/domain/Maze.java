@@ -21,19 +21,29 @@ public class Maze {
     private int cols;
 	
 	public Maze(int rows, int cols) {
-		if(rows < 0 || cols < 0) {throw new IllegalArgumentException("Maze must be created with more than 0 rows and cols");}
+		if(rows < 0 || cols < 0) {
+			throw new IllegalArgumentException("Maze must be created with more than 0 rows and cols");}
+		
 		this.rows = rows;
 		this.cols = cols;
 		maze = new Tile[rows][cols];
+		
+		assert rows > 0 && cols > 0;
 		}
 	
 	@JsonCreator
     public Maze(@JsonProperty("maze") Tile[][] maze, 
     			@JsonProperty("rows") int rows, 
                 @JsonProperty("cols") int cols) {
+		if(rows < 0 || cols < 0) {
+			throw new IllegalArgumentException("Rows and Cols must be greater than 0 to create maze");}
+		if(maze == null) {throw new IllegalArgumentException("Maze 2d array cannot be null to create new maze");}
         this.maze = maze;
         this.rows = rows;
         this.cols = cols;
+        
+        assert rows > 0 && cols > 0;
+        assert maze != null;
     }
 	
 	public int getRows() { return rows; }
@@ -48,8 +58,6 @@ public class Maze {
 	        throw new IllegalArgumentException("Row or column is outside the bounds of the maze.");
 	    }
 		maze[row][col] = tile;
-		// TODO: assert to check tile is correctly inserted
-		// assert tile instanceof ...
 	}
 	
 	public boolean validMove(int row, int col) {
@@ -59,65 +67,8 @@ public class Maze {
 		}
 		return maze[row][col] != null && maze[row][col].canMoveTo();
 		}
-
-	// helper method for creating a custom maze for testing different tiles
-	public static Maze createCustomMaze() {
-		int rows = 7;
-		int cols = 7;
-		Maze maze = new Maze(rows, cols);
-		for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                if (row == 0 || row == rows -1 || col == 0 || col == cols -1) {
-                    maze.setTile(row, col, new WallTile());
-                } 
-                else if(row == 1 && col == 1) {
-                	maze.setTile(row,col, new TreasureTile());}
-                else if(row == 1 && col == 5) {
-                	maze.setTile(row,col, new TreasureTile());}
-                //creating a Tile for testing
-                else if(row == 5 && col == 3) {
-                	maze.setTile(row, col, new LockedDoorTile("Blue"));}
-                // creating a Tile for testng
-                else if(row == 4 && col == 3) {
-                	maze.setTile(row, col, new KeyTile(new Key("Blue")));
-                }else {
-                    maze.setTile(row, col, new FreeTile());
-                }
-            }
-        }
-		return maze;
-	}
 	
-	
-	public static Maze createCustomMaze2() {
-		
-		int rows = 7;
-		int cols = 7;
-	
-		Maze maze = new Maze(rows, cols);
-		for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                if (row == 0 || row == rows -1 || col == 0 || col == cols -1) {
-                    maze.setTile(row, col, new WallTile());
-                } 
-                else if(row == 1 && col == 1) {
-                	maze.setTile(row,col, new TeleportTile(row,col,3,3));
-                	}
-                else if(row == 1 && col == 5) {
-                	maze.setTile(row,col, new TeleportTile(row,col,3,3));
-                	}
-                else {
-                    maze.setTile(row, col, new FreeTile());
-                }
-                
-            }
-        }
-		//t1.setPartner(t2);
-		//t2.setPartner(t1);
-		return maze;
-	} 
-	
-	// helper method for creating a square maze with FreeTiles in the middle and WallTiles on the outside
+	//helper method for creating a square maze with FreeTiles in the middle and WallTiles on the outside
 	public static Maze createBasicMaze(int rows, int cols) {
 		Maze maze = new Maze(rows, cols);
 		for (int row = 0; row < rows; row++) {
@@ -132,7 +83,7 @@ public class Maze {
                 return maze;
 	}
 
-	// method for creating level 1 *IN PROGRESS*
+	// method for creating level 1
 	public static Maze createLevel1() {
 	    Maze maze = new Maze(17, 17);
 
@@ -189,7 +140,7 @@ public class Maze {
 	    return maze;
 	}
 
-	// Helper method to create a 7x7 room with walls at the specified start position
+	// helper method to create a 7x7 room with walls at the specified start position
 	private static void createRoom(Maze maze, int startRow, int startCol) {
 	    // Create the outer walls (7x7 area)
 	    for (int row = startRow; row < startRow + 7; row++) {
@@ -205,13 +156,14 @@ public class Maze {
 	    }
 	}
 	
+	// helpful method to print maze using tile initials to check design is accurate
 	public void printMaze() {
 		for (int i = 0; i<rows; i++) {
 			for (int j = 0; j<cols; j++) {
 				System.out.print(maze[i][j].initial());
 			}
 			System.out.println();
-}
+		}
 	}
 
 	

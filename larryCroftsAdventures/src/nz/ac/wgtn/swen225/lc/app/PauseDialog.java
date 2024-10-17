@@ -1,6 +1,5 @@
 package nz.ac.wgtn.swen225.lc.app;
 
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridBagLayout;
@@ -26,7 +25,6 @@ public class PauseDialog extends JDialog {
     private JPanel content;
     private JLabel label;
     private static final int fontRatio = 8;
-    
 
     /**
      * Create a new PauseDialog with the given parent, renderer, text, background color, and text color.
@@ -52,7 +50,7 @@ public class PauseDialog extends JDialog {
      */
     private void initializeUI(String text, Color backgroundColor, Color textColor) {
         setUndecorated(true); // remove title bar
-        setBackground(new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 150)); // semi-transparent
+        setBackground(new Color(backgroundColor.getRed(), backgroundColor.getGreen(), backgroundColor.getBlue(), 130)); // semi-transparent
         content = new JPanel(new GridBagLayout());
         content.setOpaque(false); // make it transparent
 
@@ -89,7 +87,6 @@ public class PauseDialog extends JDialog {
             public void componentResized(ComponentEvent e) {
                 updateSizeAndPosition();
             }
-
             @Override
             public void componentMoved(ComponentEvent e) {
                 updateSizeAndPosition();

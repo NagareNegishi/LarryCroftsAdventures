@@ -20,7 +20,10 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 @JsonSerialize(using = SerialiseRunnable.class)
 @JsonDeserialize(using = DeserialiseRunnable.class)
 /**
- * Hopefully faithful recreation of a Runnable functional interface, made serialisable through byte recording
+ * Recreation of Runnable functional interface, that allows for serialisation
+ * Only works when interacting with static methods and fields
+ * 
+ * @author titheradam	300652933
  */
 public interface SerialRunnable extends Runnable, Serializable{
 	public void run();

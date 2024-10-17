@@ -8,6 +8,11 @@ import java.io.IOException;
 
 import nz.ac.wgtn.swen225.lc.domain.*;
 
+/**
+ * Enrty point for Persistency module 
+ * De-serialises .json files into levels 
+ * @author titheradam	300652933
+ */
 public interface Loader {
 	
 	/**

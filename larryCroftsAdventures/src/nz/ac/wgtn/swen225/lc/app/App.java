@@ -35,36 +35,35 @@ import nz.ac.wgtn.swen225.lc.renderer.Renderer;
  */
 class App extends JFrame{
   private static final long serialVersionUID= 1L;
-
-  private GameInfoPanel gameInfoPanel;
-  private SidePanel sidePanel;
-
-  private Timer gameTimer;
-  private int timeLeft;
-  private int currentLevel = 1;
-  private int keysCollectednum = 0;
-  private Set<String> keysCollected = new HashSet<>();
-  private int treasuresLeft;
-  private int pingcount = 0;
-  private static final int PINGMAX = 10;
-
-
-  Runnable closePhase= ()->{};
-  private Map<String, Runnable> actionBindings =  new HashMap<>(); // need to be passed to controller
-  private Map<String, Action> actions = new HashMap<>(); // contains actions for buttons
-  private GameStateController model;
-  private AppNotifier notifier = getAppNotifier(); // need to be passed to model
-  private Controller controller;
-  private Renderer renderer;
-  private Recorder recorder;
-  private enum AppState {PLAY, PAUSED, GAMEOVER, VICTORY}
-  private AppState state = AppState.PAUSED;
-
   private static final int width = 800;
   private static final int height = 400;
   private static final int MAX_LEVEL = 2;
-  private static boolean continueGame = false;
-  
+  private static final int PINGMAX = 10;
+  //fields related to information of the model
+  private Timer gameTimer;
+  private int timeLeft;
+  private int currentLevel;
+  private Set<String> keysCollected = new HashSet<>();
+  private int treasuresLeft;
+  private int pingcount = 0;
+  //fields related to the model and controller
+  private GameStateController model;
+  private AppNotifier notifier = getAppNotifier(); // need to be passed to model
+  private Controller controller;
+  private Recorder recorder;
+  //fields related to the UI
+  private Renderer renderer;
+  private GameInfoPanel gameInfoPanel;
+  private SidePanel sidePanel;
+  //fields related to the user input
+  private Map<String, Runnable> actionBindings =  new HashMap<>(); // need to be passed to controller
+  private Map<String, Action> actions = new HashMap<>(); // contains actions for buttons
+  //fields related to the state of application
+  private enum AppState {PLAY, PAUSED, START, GAMEOVER, VICTORY}
+  private AppState state;
+  private AppState beforeRecorder;
+  Runnable closePhase= ()->{};
+
   /**
    * Functional interface for actions
    * Used to store actions in a map and showcase the use of strategy pattern
@@ -91,8 +90,8 @@ class App extends JFrame{
     });
     initializeModel();
     initializeUI();
-    initializeActionBindings();
     initializeActions();
+    initializeActionBindings();
     initializeController();
     initializeGameTimer();
     pack();
@@ -105,25 +104,19 @@ class App extends JFrame{
     });
     setLevel(model);
     stopGame();
+    state = AppState.START;
   }
 
   /**
    * Initialize the model for the game by loading the first level or a saved game.
    */
   private void initializeModel(){
-    Optional<GameStateController> loadedGame = Optional.empty();
-    if (continueGame) {
-      loadedGame = LoadFile.loadLevel(Paths.saveAndQuit);
-    } else {
-      loadedGame = LoadFile.loadLevel(Paths.level1);
-    }
-    if (loadedGame.isPresent()) {
-      model = loadedGame.get();
-    } else {
-      handleFileError("Failed to load game", "Load Error", 
-      new String[]{"Chose different file", "start level 1", "quit"}, "Chose different file",
-      () -> loadGame(Paths.levelsDir, false));
-    }
+    LoadFile.loadLevel(Paths.saveAndQuit).ifPresentOrElse(
+      l -> model = l,
+      () -> handleFileError("Failed to load game", "Load Error",
+        new String[]{"Choose different file", "start level 1", "quit"}, "Choose different file",
+        () -> loadGame(Paths.levelsDir, false))
+    );
   }
 
   /**
@@ -197,18 +190,23 @@ class App extends JFrame{
    * @param isRecorder whether to set the panel to recorder mode
    */
   private void togglePanel(boolean isRecorder){
-    sidePanel.togglePanel();
-    gameInfoPanel.setRecorderMode(isRecorder);
-    controller.setRecorderMode(isRecorder);
-    if (isRecorder) {
-        recorder.nextStep();
-        GameDialogs.hideAll();
-        stopGame();
+    SwingUtilities.invokeLater(() -> {
+      sidePanel.togglePanel();
+      gameInfoPanel.setRecorderMode(isRecorder);
+      controller.setRecorderMode(isRecorder);
+      if (isRecorder) {
+          beforeRecorder = state;
+          recorder.nextStep();
+          GameDialogs.hideAll();
+          stopGame();
       } else {
-        state = AppState.PLAY;
-        gameRun();
-        if (timeLeft == 0) gameOver();
+          state = beforeRecorder;
+          GameDialogs.showDialog(state.name());
+          if (state == AppState.PLAY) {
+              gameRun();
+          }
       }
+    });
   }
 
   /**
@@ -225,12 +223,12 @@ class App extends JFrame{
   }
 
   /**
-   * Initialize the controller for the game
+   * Initialize the controller for the game.
    */
-  private void initializeController() {
-    controller = new Controller(model, actionBindings, model.getTime()); //initialize with level 1
-    addKeyListener(controller);
-    setFocusable(true);//could be remove??
+  private void initializeController(){
+    controller = new Controller(model, actionBindings, model.getTime());
+    renderer.addKeyListener(controller);
+    renderer.setFocusable(true);
   }
 
   /**
@@ -254,7 +252,6 @@ class App extends JFrame{
   private void stopGame(){
     state = AppState.PAUSED;
     controller.pause(true);
-    // renderer.setFocusable(false); i probably want it
     gameTimer.stop();
   }
 
@@ -264,7 +261,7 @@ class App extends JFrame{
   private void pauseGame() {
     if (state != AppState.PLAY) return;
     stopGame();
-    GameDialogs.PAUSE.show();
+    GameDialogs.PAUSED.show();
   }
 
   /**
@@ -274,12 +271,12 @@ class App extends JFrame{
     boolean unpause = switch (state) {
       case PLAY -> false; // Already playing
       case PAUSED -> true;
+      case START -> true;
       case GAMEOVER -> {
       checkModel(LoadFile.loadLevel("level" + currentLevel));
       yield true;
       }
       case VICTORY -> {
-        currentLevel = 1; // reset level to 1///////////////////this could go
         checkModel(LoadFile.loadLevel(Paths.level1));
         yield true;
       }
@@ -295,8 +292,7 @@ class App extends JFrame{
     GameDialogs.hideAll(); // a bit wasteful to hide all dialogs, but I chose safety and compact code here
     state = AppState.PLAY;
     controller.pause(false);
-    renderer.setFocusable(true);
-    renderer.requestFocus();
+    renderer.requestFocus(); //could be removed, but it's a good practice
     assert !gameTimer.isRunning(): "Game is already running";
     gameTimer.start();
   }
@@ -319,22 +315,17 @@ class App extends JFrame{
     controller.pause(true);
   }
 
-
-////////////////////////////////////////////////////////////////////////////////////////////
   /**
    * Save the game to a file in the saves directory.
    */
   private void saveGame() {
     model.setTime(timeLeft);
-
-    /////set level too??///////////////////////////
-
     JFileChooser fileChooser = ComponentFactory.customFileChooser(Paths.savesDir, "Save Game", "JSON files");
     int userSelection = fileChooser.showSaveDialog(this); // show dialog and wait user input
     if (userSelection == JFileChooser.APPROVE_OPTION) { // if user picked a file
       File fileToSave = fileChooser.getSelectedFile();
-      String filename = fileToSave.getName(); // i should pass file
-      boolean success = SaveFile.saveGame(filename, model); // do i need to pass model or gamestate? 2/10
+      String filename = fileToSave.getName();
+      boolean success = SaveFile.saveGame(filename, model);
       if (success) {
         JOptionPane.showMessageDialog(this, "Game Saved", "Save", JOptionPane.INFORMATION_MESSAGE);
       } else {
@@ -350,7 +341,7 @@ class App extends JFrame{
    * Paths class in nz.ac.wgtn.swen225.lc.persistency.Paths contains static final Files for desired directories.
    * @param dir it should use File from Paths class in nz.ac.wgtn.swen225.lc.persistency.Paths
    */
-  private Optional<GameStateController> loadFile(File dir) { // Added File parameter
+  private Optional<GameStateController> loadFile(File dir) {
     JFileChooser fileChooser = ComponentFactory.customFileChooser(dir, "Load Game", "JSON Game files");
     int picked = fileChooser.showOpenDialog(this);
     if (picked == JFileChooser.APPROVE_OPTION) { // if user picked a file
@@ -428,19 +419,18 @@ class App extends JFrame{
         case 2 -> exitGame(false);
       }
   }
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
   /**
    * Exit the game.
    * @param save whether to save the game before exiting
    */
   private void exitGame(boolean save) {
+    stopGame();
     if (save) {
-      SaveFile.saveGame("saveAndQuit", model);
-      continueGame = true;
+      SaveFile.saveAndQuit(model);
     } else {
-      continueGame = false;
+      Optional<GameStateController> level1 = LoadFile.loadLevel(Paths.level1);
+      level1.ifPresent(l1 -> SaveFile.saveAndQuit(l1));
     }
     closePhase.run();
     gameTimer.stop();
@@ -453,45 +443,36 @@ class App extends JFrame{
    * Once timer starts, the game will run.
    * @param level model of the game (GameStateController)
    */
-  void setLevel(GameStateController level){
+  private void setLevel(GameStateController level){
+    // set up the game information
     model = level;
     timeLeft = model.getTime();
+    currentLevel = model.getLevel();
     treasuresLeft = model.getTotalTreasures();
-    System.out.println("total treasures: " + treasuresLeft);/////////////////
-    keysCollectednum = model.getKeysCollected().size();
     keysCollected.clear();
     keysCollected.addAll(model.getKeysCollected().values());
-    gameInfoPanel.setKeys(keysCollectednum);
-    gameInfoPanel.setTreasures(treasuresLeft);
-
-    GameState gamestate = model.getGameState();
-////////////////////////////////////////////////
-    currentLevel = gamestate.getLevel();
-    //if(currentLevel == 0) currentLevel = 1;
+    gameInfoPanel.setKeys(keysCollected);
     gameInfoPanel.setLevel(currentLevel);
-//////////////////////////////////////////////
-
+    gameInfoPanel.setTreasures(treasuresLeft);
+    // set up the components for the game
+    GameState gamestate = model.getGameState();
     gamestate.setAppNotifier(notifier);
-    controller = new Controller(model, actionBindings, timeLeft);
-
-	recorder = new Recorder(currentLevel, (rc)-> {
-	  timeLeft = rc.updatedTime();
-	  model = rc.updatedGame();
-	  model.getGameState().setAppNotifier(notifier);
-	  gameInfoPanel.setTime(timeLeft);
-	  controller.setGameStateController(model);
-	  renderer.gameConsumer(model.getGameState());
-	  updateGameInfo(model);
-	});
+    controller.setGameStateController(model);
+    recorder = new Recorder(currentLevel, (rc)-> {
+      timeLeft = rc.updatedTime();
+      model = rc.updatedGame();
+      model.getGameState().setAppNotifier(notifier);
+      gameInfoPanel.setTime(timeLeft);
+      controller.setGameStateController(model);
+      renderer.gameConsumer(model.getGameState());
+      updateGameInfo(model);
+    });
     controller.setRecorder(recorder);
-
     renderer.gameConsumer(gamestate);
-    renderer.addKeyListener(controller);
-    renderer.setFocusable(true);
+    // set up the timer for the level
     Timer timer= new Timer(34, unused->{
       assert SwingUtilities.isEventDispatchThread();
       if (state == AppState.PLAY) {
-
         pingcount++;
         if (pingcount == PINGMAX) {
           model.moveActor();
@@ -513,9 +494,8 @@ class App extends JFrame{
    * @param level model of the game (GameStateController)
    */
   private void updateGameInfo(GameStateController level) {
-    keysCollectednum = level.getKeysCollected().size();
     treasuresLeft = level.getTotalTreasures() - level.getTreasuresCollected();
-    gameInfoPanel.setKeys(keysCollectednum);
+    gameInfoPanel.setKeys(keysCollected);
     gameInfoPanel.setTreasures(treasuresLeft);
   }
 
@@ -531,26 +511,14 @@ class App extends JFrame{
       }
       @Override
       public void onGameLose(){
-        recorder.onGameLose();
         gameOver();
-
         AudioP.death.play();
-
-        System.out.println("Game Over is called");
       }
-      /*@Override
-      public void onKeyPickup(int keyCount){
-        assert keyCount >= 0: "keyCount is negative";
-        //keysCollectednum = keyCount;
-        //gameInfoPanel.setKeys(keysCollectednum);
-        keysCollected.add(String.valueOf(keyCount));
-        gameInfoPanel.setKeys(keysCollected);
-      }*/
+
       @Override
       public void onKeyPickup(String keyName){
         keysCollected.add(keyName);
-        //gameInfoPanel.setKeys(keysCollected);
-        System.out.println("keyName: " + keyName);
+        gameInfoPanel.setKeys(keysCollected);
       }
 
       @Override
@@ -562,21 +530,4 @@ class App extends JFrame{
       }
     };
   }
-
 }
-
-/**
- * better if we let the player to pick up where they left off
- *
- * recorder = new Recorder((rc)-> {
-        
-      timeLeft = rc.updatedTime();
-      model = rc.updatedGame();
-      gameInfoPanel.setTime(timeLeft);
-      initializeGameTimer();
-      controller.setGameStateController(model);
-      renderer.gameConsumer(model.getGameState());
-      
-    });
-
- */

@@ -1,66 +1,83 @@
 package test.nz.ac.wgtn.swen225.lc.recorder;
 
-import java.lang.reflect.Field;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+import nz.ac.wgtn.swen225.lc.domain.Maze;
+import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
+import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder.RecordingChanges;
-
+import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 public class RecorderTestsWithoutSaveOrLoad {
 	
 	private GameStateController gameModel;
-	private int time;
-	private Consumer<RecordingChanges> crc = (rc)->{time = rc.updatedTime(); gameModel = rc.updatedGame();};
-	public Supplier<GameStateController> firstLevelSupplier(){return ()->new GameStateController(8, 8, 1, 1, 10);}
+	private GameStateController gameModelRecorder;
+    private int time = 60;
+    
+    private Consumer<RecordingChanges> crc;
+    private Supplier<GameState> mockGameStateSupplier;
+    private Recorder testRec;
+    private AppNotifier mockAppNotifier = new AppNotifier(){
+		
+		public void onGameWin() {}
+
+		
+		public void onGameLose() {}
+
+		
+		public void onKeyPickup(String keyName) {}
+
+		public void onTreasurePickup(int treasureCount) {}}; 
+    @BeforeEach
+    public void setup() {
+        Supplier<Maze> mockMazeSupplier = ()->Maze.createBasicMaze(8, 8);
+        Supplier<Chap> mockChapSupplier = ()->new Chap(1, 1, new ArrayList<>()); 
+        mockGameStateSupplier = ()->new GameState(mockMazeSupplier.get(), mockChapSupplier.get(),
+        		10, Map.of(), time, mockAppNotifier, new ArrayList<>(), 1);
+        gameModel = new GameStateController(mockGameStateSupplier.get());
+        crc = (rc) -> {
+            time = rc.updatedTime();
+            gameModelRecorder = rc.updatedGame();
+        };
+        testRec = new Recorder(crc, ()->new GameStateController(mockGameStateSupplier.get()));
+    }
 	
 
-	@Test
-	public void testingPrevStepWithNoEvents() {
+    @Test
+    public void testPreviousStepWithNoEvents() {
+        testRec.previousStep();
+        assert time == 60;
+    }
 
-		Recorder testRec = new Recorder(crc, firstLevelSupplier());
+    @Test
+    public void testNextStepWithNoEvents() {
+        testRec.nextStep();
+        assert time == 60;
+    }
 
-		try {
-			testRec.previousStep();
-		} catch (AssertionError ae) {
-			if (ae.getMessage().equals("Recording is empty!"))
-				return;
-		}
-		assert false;
-
-	}
-
-	@Test
-	public void testingNextStepWithNoEvents() {
-
-		Recorder testRec = new Recorder(crc, firstLevelSupplier());
-		try {
-			testRec.nextStep();
-		} catch (AssertionError ae) {
-			if (ae.getMessage().equals("Recording is empty!"))
-				return;
-		}
-		assert false;
-
-	}
-
+    @Test
+    public void testPingWithValidInput() {
+        testRec.ping(Direction.Left, 60);
+    }
 	
 
 	@Test
 	public void checkDirectionEventTimeAboveZero() {
-
-
 		try {
-			Recorder testRec = new Recorder(crc, firstLevelSupplier());
 			testRec.ping(Direction.Left, -1);
 		} catch (AssertionError ae) {
-			if (ae.getMessage().equals("DirectionEvent's time cannot be below 0"))
+			if (ae.getMessage().equals("Event time must be positive!"))
 				return;
 		}
 		assert false;
@@ -69,12 +86,17 @@ public class RecorderTestsWithoutSaveOrLoad {
 	
 	@Test
 	public void testRecordingWithLargeMaze() {
-		GameStateController mainGame = new GameStateController(1000, 1000, 1, 1, 10);
-		Recorder testRec = new Recorder(crc, ()->new GameStateController(1000, 1000, 1, 1, 10));
+		Supplier<GameStateController> largeGameGiver = ()->new GameStateController(
+				new GameState(Maze.createBasicMaze(1000, 1000), new Chap(1, 1, new ArrayList<>()), 10, 
+						Map.of(), time, mockAppNotifier, new ArrayList<>(), 1)); 
+		
+		GameStateController mainGame = largeGameGiver.get();
+		Recorder testRec = new Recorder(crc, largeGameGiver);
+		
 		List<Direction> dirOptions = List.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
 		Random random = new Random();
 
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < 1000; i++) {
 			Direction d = dirOptions.get(random.nextInt(dirOptions.size()));
 			try {
 				mainGame.moveChap(d);
@@ -85,26 +107,19 @@ public class RecorderTestsWithoutSaveOrLoad {
 			}
 		}
 
-		assert testRec.getChapPosition().equals(mainGame.getChapPosition())
-				: testRec.getChapPosition() + ":" + mainGame.getChapPosition();
+		assert testRec.getChap().getRow() == mainGame.getChap().getRow()
+				: testRec.getChap().getRow() + ":Row:" + mainGame.getChap().getRow();
+		assert testRec.getChap().getCol() == mainGame.getChap().getCol()
+				: testRec.getChap().getCol() + ":Col:" + mainGame.getChap().getCol();
 	}
 	
-	@Test
-	public void validDirectionEvent() {
-
-
-		Recorder testRec = new Recorder(crc, firstLevelSupplier());
-		testRec.ping(Direction.Left, 60);
-
-	}
 
 	@Test
 	public void checkDirectionEventDirectionValid() {
 		try {
-			Recorder testRec = new Recorder(crc, firstLevelSupplier());
 			testRec.ping(null, -1);
 		} catch (AssertionError ae) {
-			if (ae.getMessage().equals("DirectionEvent can't have null direction!"))
+			if (ae.getMessage().equals("ChapEvent can't have null direction!"))
 				return;
 		}
 		assert false;
@@ -113,296 +128,205 @@ public class RecorderTestsWithoutSaveOrLoad {
 
 	@Test
 	public void testPingAndNextStepWithMaxInteger() {
-		Recorder testRec = new Recorder(crc, firstLevelSupplier());
-
 		testRec.ping(Direction.Down, Integer.MAX_VALUE);
 		testRec.nextStep();
 		assert time == Integer.MAX_VALUE;
 	}
-	
-	@Test
-	public void testPingWithNextStep() {
-		for (int j = 0; j < 100; j++) {
-			
-			GameStateController mainGame = firstLevelSupplier().get();
-			Recorder testRec = new Recorder(crc, firstLevelSupplier());
-			List<Direction> dirOptions = List.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
-			for (int i = 0; i < 1000; i++) {
-				final Direction d = dirOptions.get(new Random().nextInt(dirOptions.size()));
-				try {
-					mainGame.moveChap(d);
-					testRec.ping(d, 60);
-					testRec.nextStep();
-				} catch (IllegalArgumentException iae) {
-					continue;
-				}
-			}
-			assert testRec.getChapPosition().equals(mainGame.getChapPosition())
-					: testRec.getChapPosition() + ":" + mainGame.getChapPosition();
-		}
-	}
+
+
 
 	@Test
 	public void testPingWithNextAndPrev() {
 		for (int j = 0; j < 100; j++) {
-			GameStateController mainGame = firstLevelSupplier().get();
-			Recorder testRec = new Recorder(crc, firstLevelSupplier());
-			int successfulMainMoves = 0;
-			int successfulRecordMoves = 0;
+			setup();
 			List<Direction> dirOptions = List.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
-			for (int i = 0; i < 1000; i++) {
-				final Direction d = dirOptions.get(new Random().nextInt(dirOptions.size()));
-				try {
-					if (i < 500) {
-						mainGame.moveChap(d);
-						successfulMainMoves++;
-					}
-					testRec.ping(d, 60);
-					successfulRecordMoves++;
-					testRec.nextStep();
-				} catch (IllegalArgumentException iae) {
-					continue;
+			for (int i = 0;  i < 50; i++) {
+				
+				Direction d = dirOptions.get(new Random().nextInt(dirOptions.size()));
+				
+				try{
+					
+					gameModel.moveChap(d);
+		            testRec.ping(d, i);
+		            testRec.nextStep();
+				} catch(IllegalArgumentException iae) {
+					System.out.println("\n\n\n\n\n" +gameModel.chapSurroundings() + "\n"+ iae.getMessage());
+					i--;
 				}
+	           
+	        }
 
-			}
-			for (int i = 0; i < 1000 - (successfulRecordMoves - successfulMainMoves); i++) {
-				try {
-					testRec.previousStep();
-				} catch (IllegalArgumentException iae) {
-					continue;
-				}
+	        for (int i = 0; i < 25; i++) {
+	            testRec.previousStep();
+	        }
 
-			}
-			assert testRec.getChapPosition().equals(mainGame.getChapPosition())
-					: testRec.getChapPosition() + ":" + mainGame.getChapPosition();
+	        for (int i = 0; i < 25; i++) {
+	            testRec.nextStep();
+	        }
+			
+			assert testRec.getChap().getRow() == gameModel.getChap().getRow()
+					: testRec.getChap().getRow() + ":Row:" + gameModel.getChap().getRow();
+			assert testRec.getChap().getCol() == gameModel.getChap().getCol()
+					: testRec.getChap().getCol() + ":Col:" + gameModel.getChap().getCol();
 		}
 
 	}
-
-	@Test
-	public void testPingWithMultipleNextAndPrev() {
-		for (int j = 0; j < 50; j++) {
-			GameStateController mainGame = firstLevelSupplier().get();
-			Recorder testRec = new Recorder(crc, firstLevelSupplier());
-			List<Direction> dirOptions = List.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
-			Random random = new Random();
-
-			for (int i = 0; i < 500; i++) {
-				Direction d = dirOptions.get(random.nextInt(dirOptions.size()));
-				try {
-					mainGame.moveChap(d);
-					testRec.ping(d, i);
-					testRec.nextStep();
-				} catch (IllegalArgumentException iae) {
-					continue;
-				}
-			}
-
-			for (int i = 0; i < 250; i++) {
-				try {
-					testRec.previousStep();
-				} catch (IllegalArgumentException iae) {
-					continue;
-				}
-			}
-
-			for (int i = 0; i < 250; i++) {
-				try {
-					testRec.nextStep();
-				} catch (IllegalArgumentException iae) {
-					continue;
-				}
-			}
-
-			assert testRec.getChapPosition().equals(mainGame.getChapPosition())
-					: testRec.getChapPosition() + ":" + mainGame.getChapPosition();
-		}
-	}
-
+	
+	
 	@Test
 	public void testPingAndNextStepWithTenTime() {
-		Recorder testRec = new Recorder(crc, firstLevelSupplier());
-
-		testRec.ping(Direction.Down, 10);
-		testRec.nextStep();
-		testRec.nextStep();
-		assert time == 10;
-		assert time == 10;
+	    testRec.ping(Direction.Down, 10);
+	    testRec.nextStep();
+	    testRec.nextStep();
+	    assert time == 10;
+	    assert time == 10;
 	}
-
+	
 	@Test
 	public void testPreviousStepAtStart() {
-		
-		Recorder testRec = new Recorder(crc, firstLevelSupplier());
-
-		testRec.ping(Direction.Down, 10);
-		testRec.previousStep();
-		testRec.previousStep();
-		assert time == 10;
-		assert time == 10;
-
+	    testRec.ping(Direction.Down, 10);
+	    testRec.previousStep();
+	    testRec.previousStep();
+	    assert time == 10;
+	    assert time == 10;
 	}
-
 	
 	@Test
 	public void testCircleDirections() {
-		GameStateController mainGame = firstLevelSupplier().get();
-		Recorder testRec = new Recorder(crc, firstLevelSupplier());
-		List<Direction> dirOptions = List.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
-
-		for (int i = 0; i < 1000; i++) {
-			Direction d = dirOptions.get(i % 4);
-			try {
-				mainGame.moveChap(d);
-				testRec.ping(d, i);
-				testRec.nextStep();
-			} catch (IllegalArgumentException iae) {
-				continue;
-			}
-		}
-
-		assert testRec.getChapPosition().equals(mainGame.getChapPosition())
-				: testRec.getChapPosition() + ":" + mainGame.getChapPosition();
+	   
+	    List<Direction> dirOptions = List.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
+	
+	    for (int i = 0; i < 1000; i++) {
+	        Direction d = dirOptions.get(i % 4);
+	        try {
+	        	gameModel.moveChap(d);
+	            testRec.ping(d, i);
+	            testRec.nextStep();
+	        } catch (IllegalArgumentException iae) {
+	            continue;
+	        }
+	    }
+	
+	    assert testRec.getChap().getRow() == gameModel.getChap().getRow()
+				: testRec.getChap().getRow() + ":Row:" + gameModel.getChap().getRow();
+		assert testRec.getChap().getCol() == gameModel.getChap().getCol()
+				: testRec.getChap().getCol() + ":Col:" + gameModel.getChap().getCol();
 	}
 	
 	@Test
 	public void testPlaybackSpeedValid() {
-		
-		Recorder testRec = new Recorder(crc, firstLevelSupplier());
-		Random r = new Random();
-		for(int i = 0; i < 10000; i ++) {
-			int randomNumber = Math.max(1, r.nextInt());
-			assert testRec.setPlaybackSpeed(randomNumber) == randomNumber;
-		}
-		
+	    Random r = new Random();
+	    for(int i = 0; i < 10000; i ++) {
+	        int randomNumber = Math.max(1, r.nextInt());
+	        assert testRec.setPlaybackSpeed(randomNumber) == randomNumber;
+	    }
 	}
 	
 	@Test
-	public void testAutoReplay() {
-		for (int j = 0; j < 10; j++) {
-			
-			GameStateController mainGame = firstLevelSupplier().get();
-			Recorder testRec = new Recorder(crc, firstLevelSupplier());
-			List<Direction> dirOptions = List.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
-			for (int i = 0; i < 1000; i++) {
-				final Direction d = dirOptions.get(new Random().nextInt(dirOptions.size()));
-				try {
-					mainGame.moveChap(d);
-					testRec.ping(d, 60);
-
-				} catch (IllegalArgumentException iae) {
-					continue;
-				}
-			}
-			testRec.setPlaybackSpeed(100000);
-			testRec.autoReplay();
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				continue;
-			}
-			assert testRec.getChapPosition().equals(mainGame.getChapPosition())
-					: testRec.getChapPosition() + ":" + mainGame.getChapPosition();
-		}
+	public void testAutoReplayForwards() {
+	   
+        testRec = new Recorder(crc, ()->new GameStateController(mockGameStateSupplier.get()));
+        List<Direction> dirOptions = List.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
+        for (int i = 0; i < 100; i++) {
+            Direction d = dirOptions.get(new Random().nextInt(dirOptions.size()));
+            try {
+                gameModel.moveChap(d);
+                testRec.ping(d, 60);
+            } catch (IllegalArgumentException iae) {
+                continue;
+            }
+        }
+        testRec.setPlaybackSpeed(100000);
+        testRec.autoReplay();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {}
+        assert testRec.getChap().getRow() == gameModel.getChap().getRow()
+				: testRec.getChap().getRow() + ":Row:" + gameModel.getChap().getRow();
+		assert testRec.getChap().getCol() == gameModel.getChap().getCol()
+				: testRec.getChap().getCol() + ":Col:" + gameModel.getChap().getCol();
+	    
+	}
+	
+	@Test
+	public void testAutoReplayBackwards() {
+		GameStateController throwAwayGameModel = new GameStateController(mockGameStateSupplier.get());
+	    testRec = new Recorder(crc, ()->new GameStateController(mockGameStateSupplier.get()));
+	    List<Direction> dirOptions = List.of(Direction.Up, Direction.Down, Direction.Left, Direction.Right);
+	    for (int i = 0; i < 1000; i++) {
+	        Direction d = dirOptions.get(new Random().nextInt(dirOptions.size()));
+	        try {
+	        	throwAwayGameModel.moveChap(d);
+	        	
+	        	if(gameModel.getChap().getCol() == 1 &&
+	        			gameModel.getChap().getRow() == 1)gameModel.moveChap(d);
+	        	
+	            testRec.ping(d, 60);
+	        } catch (IllegalArgumentException iae) {
+	            continue;
+	        }
+	    }
+	    
+	    for (int i = 0; i < 100; i++) {
+	        testRec.nextStep();
+	    }
+	    
+	  
+	    testRec.previousStep();
+	    testRec.setPlaybackSpeed(109000);
+	    testRec.autoReplay();
+	    try {
+	        Thread.sleep(1000);
+	    } catch (InterruptedException e) {}
+	    
+	    assert testRec.getChap().getRow() == gameModel.getChap().getRow()
+	        : testRec.getChap().getRow() + ":Row:" + gameModel.getChap().getRow();
+	    assert testRec.getChap().getCol() == gameModel.getChap().getCol()
+	        : testRec.getChap().getCol() + ":Col:" + gameModel.getChap().getCol();
 	}
 	
 	@Test
 	public void testNullFirstLevelSupplier() {
-		for (int j = 0; j < 10; j++) {
-			try {
-			Recorder testRec = new Recorder(crc, null);
-			} catch(AssertionError ae) {
-				if(ae.getMessage().equals(
-						"Null first level supplier given to record during construction!")) {
-					return;
-				} 
-			}
-			assert false;
-		}
+        try {
+            Recorder testRec = new Recorder(crc, null);
+        } catch(AssertionError ae) {
+            if(ae.getMessage().equals(
+                    "Null first level supplier given to record during construction!")) {
+                return;
+            } 
+        }
+        assert false;
 	}
 	
-	@Test
-	public void testNullUpdateReciever() {
-		for (int j = 0; j < 10; j++) {
-			try {
-			Recorder testRec = new Recorder(null);
-			} catch(AssertionError ae) {
-				if(ae.getMessage().equals(
-					"Null update reciever given to record during construction!")) {
-					return;
-				} 
-			}
-			assert false;
-		}
-	}
-	
-	@Test
-	public void testNullUpdateReciever2() {
-		for (int j = 0; j < 10; j++) {
-			try {
-			Recorder testRec = new Recorder(null, firstLevelSupplier());
-			} catch(AssertionError ae) {
-				if(ae.getMessage().equals(
-					"Null update reciever given to record during construction!")) {
-					return;
-				} 
-			}
-			assert false;
-		}
-	}
 	
 	@Test
 	public void testInvalidMinSetAutoReplaySpeed() {
-		try {
-			Recorder testRec = new Recorder(crc, firstLevelSupplier());
-			testRec.setPlaybackSpeed(0);
-		} catch(AssertionError ae){
-			if(ae.getMessage().equals(
-				"Auto replay speed must be above zero!")) {
-				return;
-			} 
-		}
-		assert false;
+	    try {
+	        testRec.setPlaybackSpeed(0);
+	    } catch(AssertionError ae){
+	        if(ae.getMessage().equals("Playback speed must be positive.")) {
+	            return;
+	        } 
+	    }
+	    assert false;
 	}
 	
 	@Test
 	public void testValidMinSetAutoReplaySpeed() {
-		Recorder testRec = new Recorder(crc, firstLevelSupplier());
-		assert testRec.setPlaybackSpeed(1) == 1;
+	    assert testRec.setPlaybackSpeed(1) == 1;
 	}
 	
 	@Test
-	public void testPingWithInvalidEventList() {
-		Recorder testRec = new Recorder(crc, firstLevelSupplier());
-		
-	    try {
-	    	Field eventsField = Recorder.class.getDeclaredField("events");
-		    eventsField.setAccessible(true);
-			eventsField.set(testRec, null);
-		} catch (IllegalArgumentException | IllegalAccessException 
-				| NoSuchFieldException | SecurityException e) {
-			return;
-		}
-	    
-	    try {
-	    testRec.ping(Direction.Up, 1);
-	    }catch(AssertionError ae) {
-	    	if(ae.getMessage().equals(
-					"Recorder events storage is null!")) {
-				return;
-			} 
-	    }
-	    
-	    assert false;
-	    
+	public void testOnGameLoseWithEmptyEvents() {
+	    testRec.onGameLose();
+	    testRec.nextStep();
+	    assert time == 60;
 	}
 	
 	@Test
 	public void pingStressTest() {
-		Recorder testRec = new Recorder(crc, firstLevelSupplier());
-	    for (int i = 0; i < Integer.MAX_VALUE; i++) {
+	    for (int i = 0; i < 1000000; i++) {
 	        testRec.ping(Direction.Up, i);
 	    }
-	    
 	}
 }

@@ -1,6 +1,7 @@
 package nz.ac.wgtn.swen225.lc.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -34,11 +35,11 @@ public class GameState{
 	private int totalTreasures;
 	@JsonProperty
 	private Map<Key, String> keysCollected;
-	private int currentLevel;
 	// Added by Adam
 	// seconds left for level
 	@JsonProperty
 	private int timeLeft;
+	public Direction chapDirection;
 	// List for enemies in the level
 	@JsonProperty
 	public ArrayList<Actor> enemies;
@@ -47,37 +48,12 @@ public class GameState{
 	@JsonSerialize(as = MockAppNotifier.class)
 	@JsonDeserialize(as = MockAppNotifier.class)
 	public AppNotifier appNotifier;
-
-
 	@JsonProperty
-	public int level;//////////////////////////////////make me json property too :)
+	public int level;
 
-
-	
-	private Direction chapDirection;
-	
-	/*public GameState(Maze maze, Chap chap, int totalTreasures, AppNotifier appNotifier) {
-		
-		if(maze == null || chap == null) {throw new IllegalArgumentException("Chap or Maze is null");}
-		if(totalTreasures < 0) {throw new IllegalArgumentException("Total treasures must be greater than 0");}
-		if(appNotifier.equals(null)) {throw new IllegalArgumentException("App notifier is null");}
-		
-		this.maze = maze;
-		this.chap = chap;
-		this.treasuresCollected = 0;
-		this.totalTreasures = totalTreasures;
-		this.keysCollected = new HashMap<>();
-		this.timeLeft = 60; // 60 seconds by default
-		this.appNotifier = appNotifier;
-		this.enemies = new ArrayList<Actor>();
-
-		assert this.totalTreasures == totalTreasures;
-		assert keysCollected.isEmpty() == true;
-	} */
 	
 	
 	/**
-	 * New constructor specifically for Jackson reconstruction
 	 * @param maze
 	 * @param chap
 	 * @param totalTreasures
@@ -88,6 +64,7 @@ public class GameState{
 	public GameState(@JsonProperty("maze") Maze maze,
 					@JsonProperty("chap") Chap chap,
 					@JsonProperty("totalTreasures") int totalTreasures,
+					@JsonProperty("treasuresCollected")int treasuresCollected,
 					@JsonProperty("keysCollected") Map<Key, String> keysCollected,
 					@JsonProperty("timeLeft") int timeLeft,
 					@JsonProperty("appNotifier") AppNotifier appNotifier,
@@ -99,34 +76,44 @@ public class GameState{
 		if(keysCollected == null) {throw new IllegalArgumentException("KeysCollected list is null");}
 		if(enemies == null) {throw new IllegalArgumentException("List of enemies is null");}
 		if(appNotifier.equals(null)) {throw new IllegalArgumentException("App notifier is null");}
+		if(level < 0) {throw new IllegalArgumentException("Level must be greater than 0");}
 		
 		this.maze = maze;
 		this.chap = chap;
-		this.treasuresCollected = 0;
+		this.treasuresCollected = treasuresCollected;
 		this.totalTreasures = totalTreasures;
 		this.keysCollected = keysCollected;
 		this.timeLeft =timeLeft;
 		this.appNotifier = appNotifier;
 		this.enemies = (ArrayList<Actor>) enemies;
 		this.level = level;
-		assert this.totalTreasures == totalTreasures;
-		assert this.timeLeft == timeLeft;
 		
+		assert this.chap != null;
+		assert this.maze != null;
+		assert this.treasuresCollected == treasuresCollected;
+		assert this.totalTreasures == totalTreasures;
+		assert this.keysCollected != null;
+		assert this.timeLeft == timeLeft;
+		assert this.appNotifier != null;
+		assert this.enemies != null;
+		assert this.level == level;
 	}
 	
 	
 	public int totalTreasures() {return totalTreasures;}
 	public int getTreasuresCollected() {return treasuresCollected;}
-	public void treasureCollected() {this.treasuresCollected++;}	
+	public void treasureCollected() {this.treasuresCollected++;}
 	public boolean allTreasureCollected() {return treasuresCollected == totalTreasures ? true : false;}
 	public Map<Key,String> keysCollected(){return keysCollected;}
 	
 	// Added by Adam
 	public int getTime() {return timeLeft;}
 	public void setTime(int time) {this.timeLeft = time;}
-	public int getLevel() { return level;}
 
+	// if we want to store the time at the save/load we probably need it for level too
+	public int getLevel() { return level;}
 	public Direction chapDirection() {return chapDirection;}
+	
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
 		this.chapDirection = direction;
@@ -175,8 +162,7 @@ public class GameState{
         	Fuzz.events.add("chap got teleported");
         	return;
         }
-        default -> {
-        }
+        default -> {}
     }
 	    chap.move(direction, maze);
 	    
@@ -216,16 +202,6 @@ public class GameState{
 			}
 		}
 	} 
-	
-	public void moveActor() {
-		enemies.forEach(a -> a.move(maze));
-		for(Actor a : enemies) {
-			if(a.getRow() == chap.getRow() && a.getCol() == chap.getCol()) {
-				Fuzz.events.add("chap got owned by enemy, lose");
-				Lose();
-			}
-		}
-	}
 		
 	public boolean checkForMatchingKey(String doorColour) {
 		return chap.inventory().stream()
@@ -255,7 +231,7 @@ public class GameState{
 		//System.out.println("Game Over is called in GameStateController");
 	}
 
-public void KeyPickup(String keyName){
+	public void KeyPickup(String keyName){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onKeyPickup(keyName);
 	}
@@ -264,6 +240,21 @@ public void KeyPickup(String keyName){
 	public void TreasurePickup(int treasureCount){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onTreasurePickup(treasureCount);
+	}
+	
+	// creating a mock game state for testing basic logic and functionality
+	public static GameState mockGameState() {
+		return new GameState(Maze.createBasicMaze(5, 5), new Chap(2,2, 
+				new ArrayList<>()),1, 0, new HashMap<Key,String>(), 0, new AppNotifier() {
+		@Override
+		public void onGameWin() {}
+		@Override
+	    public void onGameLose() {}
+		@Override
+	    public void onKeyPickup(String keyName) {}
+		@Override
+	    public void onTreasurePickup(int treasureCount) {}
+	}, new ArrayList<Actor>(), 1);
 	}
 }
 

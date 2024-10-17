@@ -87,6 +87,10 @@ public class SidePanel extends JPanel {
         menuPanel.setPauseButton(text);
     }
 
+    /**
+     * Check if the current panel is the recorder panel.
+     * @return true if the current panel is the recorder panel
+     */
     public boolean isRecorder() {
         return current == Mode.RECORDER;
     }

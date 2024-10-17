@@ -4,9 +4,6 @@ package nz.ac.wgtn.swen225.lc.app;
  * Domain need to be able to notify App certain events,
  * such as the game being won or lost.
  * when chap picked up the key/ treasure.
- *
- *
- *
  * @author Nagare Negishi
  * @studentID 300653779
  */
@@ -25,9 +22,6 @@ public interface AppNotifier {
      * @param keyName
      */
     void onKeyPickup(String keyName);
-
-
-
     /**
      * Notify the App that the chap has picked up a treasure.
      * @param treasureCount the number of treasures picked up so far
@@ -38,10 +32,4 @@ public interface AppNotifier {
      * However it will require the change in other modules.
      */
     void onTreasurePickup(int treasureCount);
-
-    /**
-     * onPickup may need String version of the key/treasure
-     * if we want to desplay image instead of number.
-     */
-
 }
