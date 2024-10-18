@@ -8,6 +8,11 @@ import java.io.IOException;
 
 import nz.ac.wgtn.swen225.lc.domain.*;
 
+/**
+ * Enrty point for Persistency module 
+ * De-serialises .json files into levels 
+ * @author titheradam	300652933
+ */
 public interface Loader {
 	
 	/**
@@ -19,15 +24,4 @@ public interface Loader {
 	public static Optional<GameStateController> loadLevel(String level) throws IOException {
 		throw new IOException("Default method");
 	}
-	
-	
-	/**
-	 * 
-	 * Used to load game from saves folder
-	 * @param fileName
-	 * @return
-	 */
-//	public static Optional<GameStateController> loadSave(String fileName) throws IOException {
-//		throw new IOException("Default method");
-//	}
 }

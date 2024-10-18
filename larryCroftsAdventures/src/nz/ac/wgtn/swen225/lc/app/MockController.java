@@ -1,9 +1,20 @@
 package nz.ac.wgtn.swen225.lc.app;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import nz.ac.wgtn.swen225.lc.domain.Actor;
+import nz.ac.wgtn.swen225.lc.domain.Chap;
+import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+import nz.ac.wgtn.swen225.lc.domain.Item;
+import nz.ac.wgtn.swen225.lc.domain.Key;
+import nz.ac.wgtn.swen225.lc.domain.Maze;
+import nz.ac.wgtn.swen225.lc.domain.Tile;
+import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 
 /**
  * Mock Controller for fuzz testing.
@@ -43,4 +54,10 @@ public class MockController extends Controller{
         mockBindings.put("unpause", () -> {});
         return mockBindings;
 	}
+	public void moveChap(Direction direction) {stateController.moveChap(direction);}
+	public void moveActor() {stateController.moveActor();}
+	public Maze getMaze() {return stateController.getMaze();}
+	public Chap getChap() {return stateController.getChap();}
+	public Tile getTileAtChapPosition() { return stateController.getMaze().getTile(stateController.getChap().getRow(), stateController.getChap().getCol());}	 
+
 }
