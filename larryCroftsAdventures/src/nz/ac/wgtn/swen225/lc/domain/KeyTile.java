@@ -20,7 +20,7 @@ public class KeyTile extends Tile{
 	
 	@JsonCreator
 	public KeyTile(@JsonProperty("key") Key key) {
-		if(key.equals(null)) {throw new IllegalArgumentException("Cannot initalise KeyTile with null key");}
+		if(key == null) {throw new IllegalArgumentException("Cannot initalise KeyTile with null key");}
 		this.key = key;
 		}
 

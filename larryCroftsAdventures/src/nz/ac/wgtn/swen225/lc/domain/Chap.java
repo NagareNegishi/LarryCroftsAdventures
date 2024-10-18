@@ -28,6 +28,7 @@ public class Chap {
 	 * @param startCol
 	 * @param inventory
 	 */
+	
 	@JsonCreator
 	public Chap(@JsonProperty("startRow") int startRow,
 				@JsonProperty("startCol") int startCol,
@@ -39,7 +40,6 @@ public class Chap {
 		this.inventory = inventory;
 		
 		assert this.row == startRow && this.col == startCol;
-		assert inventory != null;
 	}
 	
 	public int getRow() {return row;}
@@ -107,7 +107,7 @@ public class Chap {
 	}
 	
 	public void pickUpItem(Item item) {
-		if(item.equals(null)) {throw new IllegalArgumentException("Cannot pick up item because it is null");}
+		if(item == null) {throw new IllegalArgumentException("Cannot pick up item because it is null");}
 		if(item instanceof Key) {
 		inventory.add(item);
 		assert inventory.contains(item);
