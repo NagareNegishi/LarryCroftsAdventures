@@ -94,6 +94,7 @@ class App extends JFrame{
     initializeActionBindings();
     initializeController();
     initializeGameTimer();
+    AudioP.TreasureCollected.setVolume(4);
     pack();
     setLocationRelativeTo(null);
     setVisible(true);
@@ -135,6 +136,8 @@ class App extends JFrame{
     add(sidePanel, BorderLayout.WEST);
     // Center panel for game rendering
     renderer = new Renderer();
+    AudioP.TreasureCollected.setNVolume();
+    AudioP.TreasureCollected.play();
     add(renderer, BorderLayout.CENTER);
     // Dialogs to pause the game
     GameDialogs.initializeDialogs(this, renderer);
@@ -430,7 +433,7 @@ class App extends JFrame{
       SaveFile.saveAndQuit(model);
     } else {
       Optional<GameStateController> level1 = LoadFile.loadLevel(Paths.level1);
-      level1.ifPresent(l1 -> SaveFile.saveAndQuit(l1));
+      level1.ifPresent(l1 -> SaveFile.saveAndQuit(l1)); // overwrite saveAndQuit file with level1
     }
     closePhase.run();
     gameTimer.stop();
@@ -518,6 +521,7 @@ class App extends JFrame{
 
       @Override
       public void onKeyPickup(String keyName){
+        assert keyName != null: "keyName is null";
         keysCollected.add(keyName);
         gameInfoPanel.setKeys(keysCollected);
       }

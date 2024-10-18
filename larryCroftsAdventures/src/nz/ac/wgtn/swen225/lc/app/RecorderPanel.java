@@ -100,14 +100,12 @@ public class RecorderPanel extends JPanel {
      */
     private void autoMode() {
         isAuto = autoReplayToggle.isSelected();
-        
         stepButton.setEnabled(!isAuto);
         backButton.setEnabled(!isAuto);
         loadRecordingButton.setEnabled(!isAuto);
         saveRecordingButton.setEnabled(!isAuto);
         helpButton.setEnabled(!isAuto);
         toggleButton.setEnabled(!isAuto);
-        
         // Speed control remains enabled
         speedControl.setEnabled(true);
     }
