@@ -148,7 +148,7 @@ public class Renderer extends JPanel {
         
         drawTiles();
       //Draws Chap at the center of the screen after drawing all the tiles
-        drawActors(game.enemies);
+        drawActors(game.enemies());
         chap.draw(g, getWidth() / 2, getHeight()/2); 
         
 
