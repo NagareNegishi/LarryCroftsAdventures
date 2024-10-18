@@ -32,13 +32,21 @@ public class GameStateController{
 		this.maze = gameState.getMaze();
 	}
 	
+	/**
+	 * move chap in a given direction in the level
+	 * @param direction for Chap to move in
+	 */
 	public void moveChap(Direction direction) {gameState.moveChap(direction);}
 	
+	/**
+	 *  move each enemy one step and check for collision with Chap
+	 */
 	public void moveActor() {
 		gameState.moveActor();
 		gameState.checkForEnemy();
 		}
 	
+	// getters for gamestate fields 
 	@JsonIgnore
 	public List<Item> getChapInventory(){return gameState.getChap().inventory();}
 	public Map<Key,String> getKeysCollected(){return gameState.keysCollected();}
@@ -46,18 +54,27 @@ public class GameStateController{
 	public int getTreasuresCollected() {return gameState.getTreasuresCollected();}
 	public boolean isAllTreasureCollected() {return gameState.allTreasureCollected();}
 	public Direction getChapDirection() {return gameState.chapDirection();}
-	 
 	public Maze getMaze() {return gameState.getMaze();}
 	public Chap getChap() {return gameState.getChap();}
-	public List<Actor> getActors(){return gameState.enemies;}
+	public List<Actor> getActors(){return gameState.enemies();}
 	
 	// Added by Adam
 	public int getTime() {return gameState.getTime();}
 	public void setTime(int time) {gameState.setTime(time);}
 
+	/**
+	 * @return current level
+	 */
 	public int getLevel() { return gameState.getLevel();}
 
-	public Tile getTileAtChapPosition() { return maze.getTile(chap.getRow(), chap.getCol());}	 
+	/**
+	 * @return tile chap is standing on currently
+	 */
+	public Tile getTileAtChapPosition() { return maze.getTile(chap.getRow(), chap.getCol());}	
+	
+	/**
+	 * @return current GameState
+	 */
 	public GameState getGameState() {return gameState;}
 	
 }
