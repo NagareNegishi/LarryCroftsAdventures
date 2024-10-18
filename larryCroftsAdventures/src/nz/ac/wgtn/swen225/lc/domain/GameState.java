@@ -39,24 +39,24 @@ public class GameState{
 	// seconds left for level
 	@JsonProperty
 	private int timeLeft;
-	public Direction chapDirection;
+	private Direction chapDirection;
 	// List for enemies in the level
 	@JsonProperty
-	public ArrayList<Actor> enemies;
+	private ArrayList<Actor> enemies;
 	// AppNotifier
 	@JsonProperty
 	@JsonSerialize(as = MockAppNotifier.class)
 	@JsonDeserialize(as = MockAppNotifier.class)
-	public AppNotifier appNotifier;
+	private AppNotifier appNotifier;
 	@JsonProperty
-	public int level;
+	private int level;
 
 	/**
-	 * @param maze
-	 * @param chap
-	 * @param totalTreasures
-	 * @param keysCollected
-	 * @param time
+	 * @param maze that the level is based on
+	 * @param current chap 
+	 * @param totalTreasures in the level
+	 * @param keysCollected in the level
+	 * @param time of the level
 	 */
 	@JsonCreator
 	public GameState(@JsonProperty("maze") Maze maze,
@@ -102,13 +102,24 @@ public class GameState{
 	
 	// Added by Adam
 	public int getTime() {return timeLeft;}
+
+	public ArrayList<Actor> enemies(){
+		return enemies;
+	}
+	
+	/**
+	 * @param time to set for the level
+	 */
 	public void setTime(int time) {this.timeLeft = time;}
 
 	// if we want to store the time at the save/load we probably need it for level too
 	public int getLevel() { return level;}
 	public Direction chapDirection() {return chapDirection;}
 	
-	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
+	/** move Chap in a given direction, will see where Chap is planning to move and take care of actions
+	 *
+	 * @param direction for chap to move in 
+	 */
 	public void moveChap(Direction direction) {
 		this.chapDirection = direction;
 		if(direction == null) {throw new IllegalArgumentException("Cannot move because direction is null");}
@@ -133,6 +144,9 @@ public class GameState{
         case ExitLockTile tile -> {
             if (allTreasureCollected()) {
                 tile.unlock();
+
+                assert tile.canMoveTo() == true;
+
                 Fuzz.events.add("chap unlocked the exit");
 
             } else {
@@ -155,7 +169,11 @@ public class GameState{
         }
         case TeleportTile tile ->{
         	chap.moveTo(tile.teleportRow(),tile.teleportCol(), maze);
+
+        	assert chap.getRow() == tile.teleportRow() && chap.getCol() == tile.teleportCol();
+
         	Fuzz.events.add("chap got teleported");
+
         	return;
         }
         default -> {}
@@ -171,6 +189,9 @@ public class GameState{
 		enemies.forEach(a -> a.move(maze));
 		}
 
+	/**
+	 * check for an item each time it is called and execute behaviour based on instance of the item
+	 */
 	public void checkForItem() {
 		Tile currentTile = maze.getTile(chap.getRow(), chap.getCol());
         if (currentTile.hasItem()) {
@@ -197,6 +218,9 @@ public class GameState{
         }
 	}
 	
+	/**
+	 * checks for a collision with Chap and an enemy and if there is a collision the game is over
+	 */
 	public void checkForEnemy() {
 		int row = chap.getRow();
 		int col = chap.getCol();
@@ -208,7 +232,11 @@ public class GameState{
 		}
 	} 
 		
-	// check a given doorColour matching a key in chaps inventory
+	/**
+	 * check a given doorColour matching a key in chaps inventory
+	 * @param doorColour
+	 * @return true if key colour matches door, false otherwise 
+	 */
 	public boolean checkForMatchingKey(String doorColour) {
 		return chap.inventory().stream()
 							   .filter(item -> item instanceof Key)
@@ -219,11 +247,12 @@ public class GameState{
 	public Chap getChap() {return chap;}
 	public Maze getMaze() {return maze;}
 	
-	// this should go but for the test, I need it
+	// added by Nagi
 	public void setAppNotifier(AppNotifier appNotifier) {
 		this.appNotifier = appNotifier;
 	}
 
+	// added by Nagi
 	public void Win(){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onGameWin();
@@ -231,24 +260,29 @@ public class GameState{
 		//System.out.println("Game Win is called in GameStateController");
 	}
 
+	// added by Nagi
 	public void Lose(){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onGameLose();
 		//System.out.println("Game Over is called in GameStateController");
 	}
 
+	// added by Nagi
 	public void KeyPickup(String keyName){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onKeyPickup(keyName);
 	}
 
-
+	// added by Nagi
 	public void TreasurePickup(int treasureCount){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onTreasurePickup(treasureCount);
 	}
 	
-	// creating a mock game state for testing basic logic and functionality
+	/**
+	 * creating a mock game state for testing basic logic and functionality
+	 * @return the mockGameState to be used for testing/debugging etc.
+	 */
 	public static GameState mockGameState() {
 		return new GameState(Maze.createBasicMaze(5, 5), new Chap(2,2, 
 				new ArrayList<>()),1, 0, new HashMap<Key,String>(), 0, new AppNotifier() {
