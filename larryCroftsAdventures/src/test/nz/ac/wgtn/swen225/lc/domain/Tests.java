@@ -47,7 +47,6 @@ public class Tests {
 	// test Chap is on correct row and col at start of game
 		@Test
 		public void testChapStartingPosition() {
-			Maze maze = new Maze(5,5);
 			Chap chap = new Chap(3,3, new ArrayList<>());
 			assertEquals(3,chap.getRow());
 			assertEquals(3,chap.getCol());
@@ -56,7 +55,6 @@ public class Tests {
 	// test Chap has empty inventory when game begins
 		@Test
 		public void testChapStartingInventory() {
-			Maze maze = new Maze(5,5);
 			Chap chap = new Chap(3,3, new ArrayList<>());
 			assertTrue(chap.inventory().isEmpty());
 		}
@@ -338,25 +336,18 @@ public class Tests {
 			assertEquals(2,actor.getCol());
 		}
 		
-	/* test when Actor touches Chap game ends
-		@Test
-		public void testGameEndWhenActorTouchesChap() {
-			Maze maze = Maze.createBasicMaze(7, 7);
-			Chap chap = new Chap(1,2);
-			GameState test = new GameState(maze,chap,0, List.of(new Actor(1,3)));
-			// add actor to 1,3
-			// move chap right
-			test.moveChap(Direction.Right);
-			assertEquals(true, test.checkForEnemy());
-		} */
-		
 	// test TeleportTiles work
 		@Test
 		public void testTeleportTiles() {
 			GameState test = GameState.mockGameState();
 			GameStateController testController = new GameStateController(test);
-			testController.getMaze().setTile(1, 2, new TeleportTile(1,2,3,3));
+			TeleportTile teleportTile = new TeleportTile(1,2,3,3);
+			testController.getMaze().setTile(1, 2, teleportTile);
 			testController.moveChap(Direction.Up);
+			assertEquals(1, teleportTile.row());
+			assertEquals(2, teleportTile.col());
+			assertEquals(3, teleportTile.teleportRow());
+			assertEquals(3, teleportTile.teleportCol());
 			assertEquals(3,testController.getChap().getRow());
 			assertEquals(3,testController.getChap().getCol());
 		}
@@ -365,6 +356,7 @@ public class Tests {
 		@Test
 		public void testIncorrectChap() {
 			assertThrows(IllegalArgumentException.class, () -> {
+				@SuppressWarnings("unused")
 				Chap chap = new Chap(-1, -1, null);
 			});
 		}
@@ -372,19 +364,26 @@ public class Tests {
 		@Test
 		public void testIncorrectMaze() {
 			assertThrows(IllegalArgumentException.class, () -> {
+				@SuppressWarnings("unused")
 				Maze maze = new Maze(-1, -1);
+			});
+			assertThrows(IllegalArgumentException.class, () -> {
+				@SuppressWarnings("unused")
+				Maze maze = new Maze(null,-1, -1);
 			});
 		}
 		
 		@Test
 		public void testIncorrectGameState() {
 			assertThrows(IllegalArgumentException.class, () -> {
+				@SuppressWarnings("unused")
 				GameState test = new GameState(null, null, -1, -1, null, -1, null,null,-1);
 			});
 		}
 		@Test
 		public void testIncorrectGameStateController() {
 			assertThrows(IllegalArgumentException.class, () -> {
+				@SuppressWarnings("unused")
 				GameStateController test = new GameStateController(null);
 			});
 		}
@@ -419,7 +418,7 @@ public class Tests {
 		@Test
 		public void testTileTypes() {
 			Exit exit = new Exit();
-			ExitLockTile exitLocktile = new ExitLockTile();
+			ExitLockTile exitLocktile = new ExitLockTile(false,true);
 			FreeTile freeTile = new FreeTile();
 			InfoFieldTile infoFieldTile = new InfoFieldTile("Test");
 			KeyTile keyTile = new KeyTile(new Key("Blue"));
@@ -474,6 +473,32 @@ public class Tests {
 			GameState test = GameState.mockGameState();
 			GameStateController testController = new GameStateController(test);
 			assertEquals(1,testController.getLevel());
+		}
+		
+	// check tiles correctly return boolean for holding item or not
+		@Test
+		public void testHasItemBooleans() {
+			Exit exit = new Exit();
+			ExitLockTile exitLocktile = new ExitLockTile();
+			FreeTile freeTile = new FreeTile();
+			InfoFieldTile infoFieldTile = new InfoFieldTile("Test");
+			KeyTile keyTile = new KeyTile(new Key("Blue"));
+			LockedDoorTile lockedDoorTile = new LockedDoorTile("Red");
+			TeleportTile teleportTile = new TeleportTile(4,3,5,5);
+			TreasureTile treasureTile = new TreasureTile();
+			WallTile wallTile = new WallTile();
+			WaterTile waterTile = new WaterTile();
+			
+			assertEquals(false, exit.hasItem());
+			assertEquals(false, exitLocktile.hasItem());
+			assertEquals(false, freeTile.hasItem());
+			assertEquals(false, infoFieldTile.hasItem());
+			assertEquals(true, keyTile.hasItem());
+			assertEquals(false, lockedDoorTile.hasItem());
+			assertEquals(false, teleportTile.hasItem());
+			assertEquals(true, treasureTile.hasItem());
+			assertEquals(false, wallTile.hasItem());
+			assertEquals(false, waterTile.hasItem());
 		}
 	
 }

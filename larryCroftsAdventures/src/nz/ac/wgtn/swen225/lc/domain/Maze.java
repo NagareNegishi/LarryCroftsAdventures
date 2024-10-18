@@ -35,15 +35,14 @@ public class Maze {
     public Maze(@JsonProperty("maze") Tile[][] maze, 
     			@JsonProperty("rows") int rows, 
                 @JsonProperty("cols") int cols) {
-		if(rows < 0 || cols < 0) {
-			throw new IllegalArgumentException("Rows and Cols must be greater than 0 to create maze");}
-		if(maze == null) {throw new IllegalArgumentException("Maze 2d array cannot be null to create new maze");}
+		if(rows < 0 || cols < 0 || maze == null) {
+			throw new IllegalArgumentException("Rows and Cols must be greater than 0  and 2d array cannot be nullto create maze");}
+		
         this.maze = maze;
         this.rows = rows;
         this.cols = cols;
         
         assert rows > 0 && cols > 0;
-        assert maze != null;
     }
 	
 	public int getRows() { return rows; }

@@ -51,8 +51,6 @@ public class GameState{
 	@JsonProperty
 	public int level;
 
-	
-	
 	/**
 	 * @param maze
 	 * @param chap
@@ -75,7 +73,7 @@ public class GameState{
 		if(totalTreasures < 0 || timeLeft < 0) {throw new IllegalArgumentException("Total treasures and time left must be greater than 0");}
 		if(keysCollected == null) {throw new IllegalArgumentException("KeysCollected list is null");}
 		if(enemies == null) {throw new IllegalArgumentException("List of enemies is null");}
-		if(appNotifier.equals(null)) {throw new IllegalArgumentException("App notifier is null");}
+		if(appNotifier == null) {throw new IllegalArgumentException("App notifier is null");}
 		if(level < 0) {throw new IllegalArgumentException("Level must be greater than 0");}
 		
 		this.maze = maze;
@@ -88,14 +86,10 @@ public class GameState{
 		this.enemies = (ArrayList<Actor>) enemies;
 		this.level = level;
 		
-		assert this.chap != null;
-		assert this.maze != null;
+
 		assert this.treasuresCollected == treasuresCollected;
 		assert this.totalTreasures == totalTreasures;
-		assert this.keysCollected != null;
 		assert this.timeLeft == timeLeft;
-		assert this.appNotifier != null;
-		assert this.enemies != null;
 		assert this.level == level;
 	}
 	
@@ -117,7 +111,7 @@ public class GameState{
 	// move Chap in a given direction, will see where Chap is planning to move and take care of actions
 	public void moveChap(Direction direction) {
 		this.chapDirection = direction;
-		if(direction.equals(null)) {throw new IllegalArgumentException("Cannot move because direction is null");}
+		if(direction == null) {throw new IllegalArgumentException("Cannot move because direction is null");}
 		
 		int newRow = chap.getRow() + direction.rowDirection();
 		int newCol = chap.getCol() + direction.colDirection();
@@ -129,6 +123,8 @@ public class GameState{
                 tile.unlock();
                 Fuzz.events.add("chap unlocked the door");
                 maze.setTile(newRow, newCol, new FreeTile()); // Replace the locked door with a free tile
+                assert maze.getTile(newRow, newCol) instanceof FreeTile;
+                
             } else {
             	Fuzz.events.add("chap tried the door");
                 return; // Stop Chap from moving if he doesn't have the right key
@@ -170,6 +166,10 @@ public class GameState{
 	    checkForEnemy();
 	    checkForItem();
 	}
+	
+	public void moveActor() {
+		enemies.forEach(a -> a.move(maze));
+		}
 
 	public void checkForItem() {
 		Tile currentTile = maze.getTile(chap.getRow(), chap.getCol());
@@ -178,17 +178,22 @@ public class GameState{
             chap.pickUpItem(item);
             switch (item) {
             case Treasure treasure -> {
+            	int treasuresCollectedBefore = treasuresCollected;
 				treasureCollected();
 				TreasurePickup(treasuresCollected); ////////////// Added by Nagi
+				int treasuresCollectedAfter = treasuresCollected;
+				assert treasuresCollectedAfter == treasuresCollectedBefore+1;
 			}
             case Key key -> {
 				keysCollected.put(key, key.colour());
 				KeyPickup(key.colour());
+				assert chap.inventory().contains(item);
 			}
             default -> {}
         }
             currentTile.removeItem();
             maze.setTile(chap.getRow(), chap.getCol() , new FreeTile());
+            assert maze.getTile(chap.getRow(), chap.getCol()) instanceof FreeTile;
         }
 	}
 	
@@ -203,6 +208,7 @@ public class GameState{
 		}
 	} 
 		
+	// check a given doorColour matching a key in chaps inventory
 	public boolean checkForMatchingKey(String doorColour) {
 		return chap.inventory().stream()
 							   .filter(item -> item instanceof Key)
