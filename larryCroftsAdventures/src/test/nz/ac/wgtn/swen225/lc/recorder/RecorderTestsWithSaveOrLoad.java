@@ -7,7 +7,6 @@ import nz.ac.wgtn.swen225.lc.domain.Chap.Direction;
 import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder;
 import nz.ac.wgtn.swen225.lc.recorder.Recorder.RecordingChanges;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ public class RecorderTestsWithSaveOrLoad {
         Supplier<Maze> mockMazeSupplier = ()->Maze.createBasicMaze(8, 8);
         Supplier<Chap> mockChapSupplier = ()->new Chap(1, 1, new ArrayList<>()); 
         mockGameStateSupplier = ()->new GameState(mockMazeSupplier.get(), mockChapSupplier.get(),
-        		10, Map.of(), time, mockAppNotifier, new ArrayList<>(), 1);
+        		10, 0, Map.of(), time, mockAppNotifier, new ArrayList<>(), 1);
         gameModel = new GameStateController(mockGameStateSupplier.get());
         crc = (rc) -> {
             time = rc.updatedTime();

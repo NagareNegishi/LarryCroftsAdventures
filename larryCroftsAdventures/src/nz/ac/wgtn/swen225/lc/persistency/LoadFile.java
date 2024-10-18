@@ -10,9 +10,18 @@ import java.util.Optional;
 
 import java.io.IOException;
 
-
+/**
+ * De-serialises .json files into levels
+ * @author titheradam	300652933
+ */
 public class LoadFile implements Loader {
 	
+	/**
+	 * Persistency entry point
+	 * Used to de-serialise valid .json file into a GameStateController
+	 * @param levelName , String : filename to be used for .json file
+	 * @return Optional of GameStateController that may be empty if non valid file
+	 */
 	public static Optional<GameStateController> loadLevel(String levelName) {
 		if(levelName == null || levelName.isEmpty()) {
 			throw new IllegalArgumentException();
@@ -23,33 +32,7 @@ public class LoadFile implements Loader {
 		//String path = pathPrefix + levelName;
 		return loadObj(new File(Paths.levelsDir, levelName + ".json") , GameStateController.class);
 	}
-
-//	public static Optional<GameStateController> loadSave(String saveName){
-//		assert saveName != null;
-//		assert !saveName.isEmpty();
-//		//final String pathPrefix = "saves/";
-//		//String path = pathPrefix + saveName;
-//		return loadObj(new File(Paths.savesDir, saveName + ".json"), GameStateController.class);
-//	}
 	
-	
-	/**
-     * Generic method to load a file using ObjectMapper
-     * @param path, String : file path
-     * @param valueType : the class type to deserialize to
-     * @return an Optional containing the deserialized object
-     */
-//    public static <T> Optional<T> loadObj(String path, Class<T> classType) {
-//        try {
-//            File file = new File(path + ".json");
-//            ObjectMapper mapper = new ObjectMapper();
-//            T loadedObject = mapper.readValue(file, classType);
-//            return Optional.of(loadedObject);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return Optional.empty();
-//    }
     
     /**
      * Overload for file
@@ -62,25 +45,11 @@ public class LoadFile implements Loader {
 		}
     	assert file != null;
     	return loadObj(file, GameStateController.class);		
-
 	}
     
-    /**
-     * Overload for file
-     * @param file : .json file containing serialised GameStateControllerInterface
-     * @return de-serialsed GameStateControllerInterface
-     */
-//    public static Optional<GameStateController> loadSave(File file){
-//		if(file == null) {
-//			throw new IllegalArgumentException("Null file");
-//		}
-//    	assert file != null;
-//		return loadObj(file, GameStateController.class);
-//	}
-    
     
     /**
-     * Overloaded to accept files directly
+     * Generic method to deserialise any object
      * @param <T>
      * @param file
      * @param classType

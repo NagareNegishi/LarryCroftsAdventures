@@ -10,14 +10,13 @@ import nz.ac.wgtn.swen225.lc.domain.Tile;
 import nz.ac.wgtn.swen225.lc.domain.WallTile;
 import nz.ac.wgtn.swen225.lc.domain.WaterTile;
 
-
+/**
+ * Composite class for persistency.Builder
+ * Used to set rooms within the produced Maze 
+ * @author titheradam	300652933
+ */
 public class Room {
-	// Entry points to room
-//    public Tile top = new WallTile();
-//    public Tile bot = new WallTile();
-//    public Tile left = new WallTile();
-//    public Tile right = new WallTile();
-    
+	// Potential doors to room
     public final Coord left = new Coord(2, -1); // original top
     public final Coord right = new Coord(2, 5);
     public final Coord top = new Coord(-1, 2);
@@ -30,37 +29,11 @@ public class Room {
     
     public Room() {}
     
-    
     public void setTile(Coord coord, Tile tile) {
     	innerTile.put(coord, tile);
     }
-    
-//    public void setTile(Direction dir, Tile tile) {
-//        switch (dir) {
-//            case Up:
-//                top = tile;
-//                break; // Add break to prevent fall-through
-//            case Down:
-//                bot = tile;
-//                break;
-//            case Left:
-//                left = tile;
-//                break;
-//            case Right:
-//                right = tile;
-//                break;
-//            default:
-//                return; // Default case if none of the directions match
-//        }
-//    }
-    
-    public enum Direction {
-        Up,
-        Down,
-        Left,
-        Right;
-    }
 }
+
 
 /**
  * Room with water around centre
@@ -75,6 +48,7 @@ class WaterRoom extends Room {
 		super.innerTile.put(new Coord(3, 2), new WaterTile());
 	}
 }
+
 
 /**
  * 
@@ -94,28 +68,24 @@ class PortalRoom extends Room {
 		super.innerTile.put(this.centre, new TeleportTile(self.row(), self.col(), dest.row(), dest.col()));
 	}
 	
+	
+	/**
+	 * Used to set the teleportTile in each PortalRoom as each other's destination
+	 * @param other
+	 * @return boolean : true if successful
+	 * 					false if failed
+	 */
 	public boolean pairPortal(Room other) {
 		if(other instanceof PortalRoom) {
 			TeleportTile tele = ((TeleportTile) innerTile.get(centre));
 			TeleportTile otherT = (TeleportTile) other.innerTile.get(centre);
-			//tele.setPartner(otherT);
-			//otherT.setPartner(tele);
 			return true;
 		}
 		return false;
 	}
-	
 }
 
-
-
-
-class EnemyRoom extends Room{
-	
-	
-}
-
-
+// Used to place Room with exit tile and exitLockedDoor
 class ExitRoom extends Room{
 	ExitRoom(){
 		super.innerTile.put(new Coord(1,1), new WallTile());

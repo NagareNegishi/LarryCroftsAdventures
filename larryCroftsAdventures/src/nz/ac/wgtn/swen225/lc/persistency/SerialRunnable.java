@@ -20,7 +20,12 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 @JsonSerialize(using = SerialiseRunnable.class)
 @JsonDeserialize(using = DeserialiseRunnable.class)
 /**
- * Hopefully faithful recreation of a Runnable functional interface, made serialisable through byte recording
+ * Recreation of Runnable functional interface, that allows for serialisation
+ * Only works when interacting with static methods and fields
+ * Used below reference heavily in initial implementation. Class never used by App so never refactored for project
+ * Reference: https://stackoverflow.com/questions/63760920/serializing-and-deserializing-lambda-with-jackson
+ * 
+ * @author titheradam	300652933
  */
 public interface SerialRunnable extends Runnable, Serializable{
 	public void run();
@@ -30,6 +35,9 @@ class SerialiseRunnable extends JsonSerializer<SerialRunnable>{
 	
 	
 	@Override
+	/**
+	 * Serialises into bytecode before writing as JSON to JsonGenerator
+	 */
     public void serialize(SerialRunnable runnable, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
              ObjectOutputStream outputStream = new ObjectOutputStream(byteArrayOutputStream)) {
@@ -38,7 +46,6 @@ class SerialiseRunnable extends JsonSerializer<SerialRunnable>{
         }
     }
 }
-
 
 class DeserialiseRunnable extends JsonDeserializer<SerialRunnable> {
     @Override
