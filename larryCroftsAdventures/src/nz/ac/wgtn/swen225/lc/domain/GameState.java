@@ -157,6 +157,10 @@ public class GameState{
 	    checkForEnemy();
 	    checkForItem();
 	}
+	
+	public void moveActor() {
+		enemies.forEach(a -> a.move(maze));
+		}
 
 	public void checkForItem() {
 		Tile currentTile = maze.getTile(chap.getRow(), chap.getCol());

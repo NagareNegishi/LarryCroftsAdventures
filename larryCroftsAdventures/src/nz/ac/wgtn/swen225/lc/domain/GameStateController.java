@@ -35,7 +35,7 @@ public class GameStateController{
 	public void moveChap(Direction direction) {gameState.moveChap(direction);}
 	
 	public void moveActor() {
-		gameState.enemies.forEach(a -> a.move(maze));
+		gameState.moveActor();
 		gameState.checkForEnemy();
 		}
 	
