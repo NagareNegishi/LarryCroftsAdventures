@@ -19,7 +19,7 @@ team.md located in the root folder of the repository that contains a table)
 | Domain     | Ben Ferguson     | fergusbenj1                |
 | App        | Nagare Negishi   | negishnaga / negimakushi   |
 | Renderer   | Marwan Mohamed   | mohamemarw1                |
-| Persistency| Adam Tither      | titheradam                 |
+| Persistency| Adam Tither      | titheradam / AdamT-code    |
 | Recorder   | Joshua Neylan    | neylanjosh                 |
 | Fuzz       | Anthony Wen      | wenanth                    |
 
