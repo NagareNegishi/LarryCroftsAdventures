@@ -76,7 +76,7 @@ public class Fuzz {
 		//timer, currently set to 30 seconds
 		//note: System time was used, because Timeout annotation was not working in eclipse.
 		long startTime = System.currentTimeMillis();
-		long duration = 3000;
+		long duration = 30000;
 		
 		//add the current tile as a base
 		visitedTiles.add(mockController.getTileAtChapPosition());
