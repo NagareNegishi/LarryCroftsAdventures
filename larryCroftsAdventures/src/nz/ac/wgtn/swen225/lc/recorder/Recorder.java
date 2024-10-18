@@ -159,6 +159,7 @@ public class Recorder {
 	public Recorder(Consumer<RecordingChanges> updateReciever, Supplier<GameStateController> levelSupplier) {
 		assert updateReciever != null : "Null update reciever given to record during construction!";
 		assert levelSupplier != null : "Null first level supplier given to record during construction!";
+		this.levelSupplier = levelSupplier;
 		this.updateReciever = updateReciever;
 		recordingGame = levelSupplier.get();
 	}
