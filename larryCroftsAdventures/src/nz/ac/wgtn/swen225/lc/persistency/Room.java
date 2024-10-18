@@ -16,8 +16,7 @@ import nz.ac.wgtn.swen225.lc.domain.WaterTile;
  * @author titheradam	300652933
  */
 public class Room {
-	// Entry points / potential doors to room
-    
+	// Potential doors to room
     public final Coord left = new Coord(2, -1); // original top
     public final Coord right = new Coord(2, 5);
     public final Coord top = new Coord(-1, 2);
