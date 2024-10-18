@@ -16,7 +16,7 @@ import nz.ac.wgtn.swen225.lc.domain.WaterTile;
  * @author titheradam	300652933
  */
 public class Room {
-	// Entry points to room
+	// Entry points / potential doors to room
     
     public final Coord left = new Coord(2, -1); // original top
     public final Coord right = new Coord(2, 5);
@@ -30,19 +30,11 @@ public class Room {
     
     public Room() {}
     
-    
     public void setTile(Coord coord, Tile tile) {
     	innerTile.put(coord, tile);
     }
-    
-    
-    public enum Direction {
-        Up,
-        Down,
-        Left,
-        Right;
-    }
 }
+
 
 /**
  * Room with water around centre
@@ -57,6 +49,7 @@ class WaterRoom extends Room {
 		super.innerTile.put(new Coord(3, 2), new WaterTile());
 	}
 }
+
 
 /**
  * 
@@ -76,20 +69,24 @@ class PortalRoom extends Room {
 		super.innerTile.put(this.centre, new TeleportTile(self.row(), self.col(), dest.row(), dest.col()));
 	}
 	
+	
+	/**
+	 * Used to set the teleportTile in each PortalRoom as each other's destination
+	 * @param other
+	 * @return boolean : true if successful
+	 * 					false if failed
+	 */
 	public boolean pairPortal(Room other) {
 		if(other instanceof PortalRoom) {
 			TeleportTile tele = ((TeleportTile) innerTile.get(centre));
 			TeleportTile otherT = (TeleportTile) other.innerTile.get(centre);
-			//tele.setPartner(otherT);
-			//otherT.setPartner(tele);
 			return true;
 		}
 		return false;
 	}
 }
 
-
-
+// Used to place Room with exit tile and exitLockedDoor
 class ExitRoom extends Room{
 	ExitRoom(){
 		super.innerTile.put(new Coord(1,1), new WallTile());
