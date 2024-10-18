@@ -210,10 +210,12 @@ public class PersistencyTest {
     	assertEquals(loadObj(Paths.level1, null), Optional.empty());
     }
     
+    
     @Test
     public void loadObjFail_3() {
     	assertEquals(loadObj(Paths.level1, Canary.class), Optional.empty());
     }
+    
     
     
     // Tests whether level1 is loadable from /levels
@@ -574,6 +576,12 @@ public class PersistencyTest {
     	assertThrows(IllegalArgumentException.class, ()-> new Coord(2, -4));
     	coord = new Coord(-1, -1);
     	assert coord.row() == -1 && coord.col() == -1;
+    }
+    
+    @Test
+    public void roomDirectionTest() {
+    	Room.Direction dir = Room.Direction.Up;
+    	assert dir.
     }
     
     

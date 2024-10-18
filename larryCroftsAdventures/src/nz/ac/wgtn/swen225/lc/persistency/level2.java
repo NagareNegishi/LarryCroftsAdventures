@@ -24,7 +24,10 @@ import nz.ac.wgtn.swen225.lc.persistency.Room.Direction;
  */
 public class level2 {
 	
-	
+	/**
+	 * Creates / modifies level2.json in /saves folder
+	 * @param args : Not used
+	 */
 	public static void main(String args[]) {
 		
 		
@@ -50,11 +53,7 @@ public class level2 {
 		leftRoom.setTile(leftRoom.centre, redTile);
 		
 		Room exitRoom = new ExitRoom();
-		// To be removed one portals added
-		//exitRoom.setTile(exitRoom.top, new FreeTile());
-		
-		
-		
+
 		
 		Builder build = new Builder();
 		build.addRoom(new Coord(1, 0), leftRoom);
@@ -73,12 +72,6 @@ public class level2 {
 		build.addRoom(entryPortal, portal1);
 		build.addRoom(destPortal, portal2);
 		
-//		PortalRoom portal1 = new PortalRoom();
-//		PortalRoom portal2 = new PortalRoom();
-//		portal1.pairPortal(portal2);
-//		build.addRoom(new Coord(0, 1), portal1);
-//		build.addRoom(new Coord(2, 1), leftRoom);
-		
 		Maze maze = build.build();
 		maze.printMaze();
 		
@@ -88,7 +81,7 @@ public class level2 {
 		Coord portalRoomCentre = Builder.mazeLocation(entryPortal, portal1.centre);
 		enemies.add(new Actor(portalRoomCentre.row()-1, portalRoomCentre.col()-1));
 		Chap chap = new Chap(10, 10, new ArrayList<Item>());
-		GameState gs = new GameState(maze, chap, 2, 2, new HashMap<Key, String>() , 60, new MockAppNotifier(), enemies, 2);
+		GameState gs = new GameState(maze, chap, 2, 0, new HashMap<Key, String>() , 60, new MockAppNotifier(), enemies, 2);
 		GameStateController gsc = new GameStateController(gs);
 		
 		boolean saved = SaveFile.saveGame("level2", gsc);

@@ -28,7 +28,7 @@ public class Level1 {
 		//assert maze.getTile(4, 3) instanceof KeyTile : "Not keytile";
 		
 		Chap chap = new Chap(13, 9, new ArrayList<Item>());
-		GameState gs = new GameState(maze, chap, 4, 1, new HashMap<Key, String>(), 60, new MockAppNotifier(), new ArrayList<>(), 1);
+		GameState gs = new GameState(maze, chap, 4, 0, new HashMap<Key, String>(), 60, new MockAppNotifier(), new ArrayList<>(), 1);
 		
 		GameStateController gsc = new GameStateController(gs);
 
