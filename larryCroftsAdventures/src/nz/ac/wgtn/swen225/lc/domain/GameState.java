@@ -102,6 +102,10 @@ public class GameState{
 	
 	// Added by Adam
 	public int getTime() {return timeLeft;}
+
+	public ArrayList<Actor> enemies(){
+		return enemies;
+	}
 	
 	/**
 	 * @param time to set for the level
@@ -152,7 +156,6 @@ public class GameState{
         }
         case InfoFieldTile tile -> {
 
-            tile.displayText();
         	Fuzz.events.add("chap opened info ");
             tile.displayText(); // Display information on the tile
         }
@@ -216,6 +219,9 @@ public class GameState{
         }
 	}
 	
+	/**
+	 * checks for a collision with Chap and an enemy and if there is a collision the game is over
+	 */
 	public void checkForEnemy() {
 		int row = chap.getRow();
 		int col = chap.getCol();
@@ -242,10 +248,12 @@ public class GameState{
 	public Chap getChap() {return chap;}
 	public Maze getMaze() {return maze;}
 	
+	// added by Nagi
 	public void setAppNotifier(AppNotifier appNotifier) {
 		this.appNotifier = appNotifier;
 	}
 
+	// added by Nagi
 	public void Win(){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onGameWin();
@@ -253,25 +261,23 @@ public class GameState{
 		//System.out.println("Game Win is called in GameStateController");
 	}
 
+	// added by Nagi
 	public void Lose(){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onGameLose();
 		//System.out.println("Game Over is called in GameStateController");
 	}
 
+	// added by Nagi
 	public void KeyPickup(String keyName){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onKeyPickup(keyName);
 	}
 
-
+	// added by Nagi
 	public void TreasurePickup(int treasureCount){
 		assert appNotifier != null: "AppNotifier is null";
 		appNotifier.onTreasurePickup(treasureCount);
-	}
-	
-	public ArrayList<Actor> enemies(){
-		return enemies;
 	}
 	
 	/**
