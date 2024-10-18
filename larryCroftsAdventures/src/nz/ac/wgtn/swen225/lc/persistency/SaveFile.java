@@ -33,24 +33,13 @@ public class SaveFile implements Saver{
         gameControl = removeAppNotifier(gameControl);
         
         return saveObj(Paths.savePath + fileName, gameControl);
-        
-//        ObjectMapper mapper = new ObjectMapper();
-//        
-//        // Map obj to JSON file
-//        try{
-//            mapper.writeValue( new File(Paths.savePath + fileName + ".json"), gameControl );
-//            return true;
-//        } catch(IOException e){
-//            e.printStackTrace();
-//        }
-        // Failed to send
-        //return false;
     }
+    
     
     /**
      * Used to set the saveAndQuit file
      * @param gsc
-     * @return
+     * @return boolean return from saveObj
      */
     public static boolean saveAndQuit(GameStateController gsc) {
     	if(gsc == null) {
@@ -97,10 +86,8 @@ public class SaveFile implements Saver{
         return false;
     }
         
-    /**
-     * Removes non-serialisable appNotifier before serialisation
-     * @return
-     */
+
+     // Removes non-serialisable appNotifier before serialisation
     private static GameStateController removeAppNotifier(GameStateController gsc) {
     	GameState gs = gsc.getGameState();
     	gs.setAppNotifier(new MockAppNotifier());

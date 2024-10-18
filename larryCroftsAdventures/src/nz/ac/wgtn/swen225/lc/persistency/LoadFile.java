@@ -49,7 +49,7 @@ public class LoadFile implements Loader {
     
     
     /**
-     * Overloaded to accept files directly
+     * Generic method to deserialise any object
      * @param <T>
      * @param file
      * @param classType
