@@ -94,6 +94,7 @@ class App extends JFrame{
     initializeActionBindings();
     initializeController();
     initializeGameTimer();
+    AudioP.TreasureCollected.setVolume(4);
     pack();
     setLocationRelativeTo(null);
     setVisible(true);
@@ -135,6 +136,8 @@ class App extends JFrame{
     add(sidePanel, BorderLayout.WEST);
     // Center panel for game rendering
     renderer = new Renderer();
+    AudioP.TreasureCollected.setNVolume();
+    AudioP.TreasureCollected.play();
     add(renderer, BorderLayout.CENTER);
     // Dialogs to pause the game
     GameDialogs.initializeDialogs(this, renderer);
