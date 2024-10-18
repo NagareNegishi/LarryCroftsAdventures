@@ -155,7 +155,6 @@ public class GameState{
             }
         }
         case InfoFieldTile tile -> {
-
         	Fuzz.events.add("chap opened info ");
             tile.displayText(); // Display information on the tile
         }
