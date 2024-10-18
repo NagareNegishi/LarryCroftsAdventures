@@ -7,12 +7,17 @@ import java.awt.image.BufferedImage;
 
 /**
  * 
+ * This is a Deprecated but still functional imgClass
+ * 
+ * 
  * RenderImg takes in 1 Image and renders that one image properly, adjusting for the image size 
  * and rendering at a certain location
  * 
  * @author Marwan Mohamed
  * @studentID 300653693
  */
+
+@Deprecated
 public class RenderImg {
 
     private final BufferedImage image;
@@ -27,8 +32,9 @@ public class RenderImg {
     Dimension canvas;
     
     
-    public RenderImg(Img img) {
-        this.image = img.image;
+    public RenderImg(ImgOld img) {
+		this.image = img.image;
+        
     }
     
 

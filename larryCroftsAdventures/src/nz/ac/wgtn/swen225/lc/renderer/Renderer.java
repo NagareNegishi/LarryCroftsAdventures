@@ -9,8 +9,6 @@ import java.util.List;
 import nz.ac.wgtn.swen225.lc.domain.*;
 
 import javax.swing.JPanel;
-import javax.swing.Timer;
-
 
 /**
  * This is the Renderer that handles the logic for rendering. 
@@ -23,14 +21,13 @@ import javax.swing.Timer;
  * 
  * 
  * @author Marwan Mohamed
+ * @studentID 300653693
  */
 
 public class Renderer extends JPanel {
 
     
 	private static final long serialVersionUID = 1L;
-	private final int FPS = 2; // 60 frames per second
-    private final int frameTime = 1000 / FPS; // time per frame in milliseconds
     
     private int playerX;
     private int playerY;
@@ -38,61 +35,18 @@ public class Renderer extends JPanel {
     
     private Graphics g;
     
-    //I can most definitely improve this
-    final RenderImg Chap1 = new RenderImg(Img.chap1);
-    final RenderImg Chap2 = new RenderImg(Img.chap2);
-    final AnimatedImage chap = new AnimatedImage(List.of(Chap1, Chap2),2);
+    final UpdatedAnimation chap = new UpdatedAnimation("chap",2,2);
+    
+    final UpdatedAnimation tp = new UpdatedAnimation("tp",3,3);
+    
+    final UpdatedAnimation water = new UpdatedAnimation("Water",7,1);
+    
+    final UpdatedAnimation Actor = new UpdatedAnimation("Actor",2,1);
+    
+    final UpdatedAnimation Treasure = new UpdatedAnimation("Treasure",2,1);
     
     
-    final RenderImg tp1 = new RenderImg(Img.tp1);
-    final RenderImg tp2 = new RenderImg(Img.tp2);
-    final RenderImg tp3 = new RenderImg(Img.tp3);
-    final AnimatedImage tp = new AnimatedImage(List.of(tp1,tp2,tp3),3);
-    
-    final RenderImg w1 = new RenderImg(Img.Water1);
-    final RenderImg w2 = new RenderImg(Img.Water2);
-    final RenderImg w3 = new RenderImg(Img.Water3);
-    final RenderImg w4 = new RenderImg(Img.Water4);
-    final RenderImg w5 = new RenderImg(Img.Water5);
-    final RenderImg w6 = new RenderImg(Img.Water6);
-    final RenderImg w7 = new RenderImg(Img.Water7);
-    final AnimatedImage water = new AnimatedImage(List.of(w1,w2,w3,w4,w5,w6,w7),1);
-    
-    final RenderImg Actor1 = new RenderImg(Img.Actor1);
-    final RenderImg Actor2 = new RenderImg(Img.Actor2); //Actor is meant to have one more image
-    final AnimatedImage Actor = new AnimatedImage(List.of(Actor1,Actor2),1);
-    
-    final RenderImg T1 = new RenderImg(Img.Treasure1);
-    final RenderImg T2 = new RenderImg(Img.Treasure2);
-    final RenderImg T3 = new RenderImg(Img.Treasure3);
-    final RenderImg T4 = new RenderImg(Img.Treasure4);
-    final AnimatedImage Treasure = new AnimatedImage(List.of(T1,T2,T3,T4),1);
-    
-    
-    final RenderImg Wall = new RenderImg(Img.Wall_Tile);
-    final RenderImg FreeTile = new RenderImg(Img.FreeTile);
-    
-    final RenderImg Blue_key = new RenderImg(Img.Blue_key);
-    final RenderImg Red_key = new RenderImg(Img.Red_key);
-    final RenderImg Exit = new RenderImg(Img.Stairs);
-    
-    final RenderImg info = new RenderImg(Img.InfoTile);
-    
-    final RenderImg infolvl1 = new RenderImg(Img.intro1);
-    final RenderImg infolvl2 = new RenderImg(Img.intro2);
-    
-    final RenderImg Blue_LockedDoor = new RenderImg(Img.LockedDoor_blue);
-    final RenderImg Red_LockedDoor = new RenderImg(Img.LockedDoor_red);
-    
-    final RenderImg exitOpen = new RenderImg(Img.ExitOpen);
-    final RenderImg exitLock = new RenderImg(Img.ExitLock);
-    final RenderImg Kourie = new RenderImg(Img.Kourie);
-    //Make a red Locked door
-    //make open versions of those doors
-    
-    //This is a temp for a background image
-    
-    
+    Img img = Img.getInstance();
     
     final int imgSize;
     
@@ -115,7 +69,7 @@ public class Renderer extends JPanel {
         
         System.out.println(this.getSize().getHeight());
         System.out.println(this.getSize().getWidth());
-        imgSize = Chap1.size();
+        imgSize = img.imgSize;
         this.setBackground(Color.BLACK);
     }
     
@@ -139,11 +93,7 @@ public class Renderer extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g); 
-        
-        
-        //I can make some particle system here for fun
-        
+        super.paintComponent(g);         
         
         if(game == null) {return;}//in case the game is not set, display nothing
         
@@ -156,8 +106,6 @@ public class Renderer extends JPanel {
 
     	offsetX = screenCenterX - (playerX);  // Offset for X
         offsetY = screenCenterY - (playerY);  // Offset for Y
-    	
-        //Can move this somewhere else
     	maxCol = game.getMaze().getCols(); //Max Col for maze
     	maxRow = game.getMaze().getRows(); //max Row for maze
         
@@ -167,7 +115,6 @@ public class Renderer extends JPanel {
         
         
         drawTiles();
-      //Draws Chap at the center of the screen after drawing all the tiles
         drawActors(game.enemies);
         chipToriel();
         chap.draw(g, getWidth() / 2, getHeight()/2); 
@@ -175,37 +122,38 @@ public class Renderer extends JPanel {
        
     }
     
-    private void chipToriel() {
-    	//find all Keys, Open all doors, find all Treasures, 
-    	
-    	//Water is dangerous, and Monsters even more
-    	//Hope is a virtue
-    	
+    /**
+     * Draws the Tutorial fields
+     */
+    private void chipToriel() {    	
     	Tile t = game.getMaze().getTile(game.getChap().getRow(), game.getChap().getCol());
     	int level = game.getLevel();
     	
     	if(t instanceof InfoFieldTile) {
     		if(level == 1) {
-    			infolvl1.drawInfoTile(g, this.getSize());
+    			img.drawInfoTile(g, "intro1",this.getSize() );
     		}else if (level == 2) {
-    			infolvl2.drawInfoTile(g, this.getSize());
+    			img.drawInfoTile(g, "intro2",this.getSize());
     		}
     		
     	}
-        
-    	
     }
     
+    /**
+     * Draws Actors based on the list found in the GameState
+     * 
+     * @param actors
+     */
     private void drawActors(List<Actor> actors) {
     	if (actors != null){
-    	for (Actor actor : actors) {
-    		int col = actor.getCol();
-    		int row = actor.getRow();
-    		int currentX = col * imgSize + offsetX;
-			int currentY = row * imgSize + offsetY;
-    		
-			Actor.draw(g, currentX, currentY);
-    	}
+	    	for (Actor actor : actors) {
+	    		int col = actor.getCol();
+	    		int row = actor.getRow();
+	    		int currentX = col * imgSize + offsetX;
+				int currentY = row * imgSize + offsetY;
+	    		
+				Actor.draw(g, currentX, currentY);
+	    	}
     	}
     	
     }
@@ -241,20 +189,27 @@ public class Renderer extends JPanel {
     	}
     }
     
+    /**
+     * Draws a single tile where x and y is based off of the screen space
+     * 
+     * @param i
+     * @param x
+     * @param y
+     */
     private void drawTile(Tile i, int x, int y) {
     	
     	if (i instanceof FreeTile || i instanceof KeyTile || i instanceof TreasureTile) {
-    		FreeTile.drawImg(g,x,y);
+    		img.drawImg(g,"FreeTile",x,y);
     	}
 
     	else if (i instanceof LockedDoorTile) {
-    		FreeTile.drawImg(g, x, y);
+    		img.drawImg(g,"FreeTile",x,y);
     		
     		String col = ((LockedDoorTile) i).colour();
     		if(col.equals("Blue")) {
-    			Blue_LockedDoor.drawImg(g, x, y);
+    			img.drawImg(g,"LockedDoor_blue", x, y);
     		}else if(col.equals("Red")) {
-    			Red_LockedDoor.drawImg(g, x, y);
+    			img.drawImg(g,"LockedDoor_red", x, y);
     		}
     		
     		
@@ -262,7 +217,7 @@ public class Renderer extends JPanel {
     	}
     	
     	else if (i instanceof WallTile){
-    		Wall.drawImg(g,x,y);
+    		img.drawImg(g,"Wall_Tile",x,y);
     	}
     	
     	else if(i instanceof TeleportTile) {
@@ -274,28 +229,28 @@ public class Renderer extends JPanel {
     	}
     	
     	else if (i instanceof Exit) {
-    		Exit.drawImg(g, x, y);
+    		img.drawImg(g,"Stairs", x, y);
     	}
     	
     	else if(i instanceof ExitLockTile) {
     		boolean open = ((ExitLockTile) i).canMoveTo();
     		if(!open) {
-    			exitLock.drawImg(g,x,y);    			
+    			img.drawImg(g,"ExitLock",x,y);    			
     		}else {
-    			exitOpen.drawImg(g, x, y);
+    			img.drawImg(g,"ExitOpen", x, y);
     			
     		}
     		
     	}
     	
     	else if (i instanceof InfoFieldTile) {
-    		info.drawImg(g, x, y);
+    		img.drawImg(g,"InfoTile", x, y);
     	}    	
     	
     }
     
     /**
-     * draws the item set on the current Tile
+     * Draws a single Item where x and y is based off of the screen space
      * 
      * @param Item i and x and y
      */
@@ -304,9 +259,9 @@ public class Renderer extends JPanel {
         	if(i instanceof Key) {
         		String col = ((Key) i).colour();
         		if(col.equals("Blue")) {
-        			Blue_key.drawImg(g, x, y);
+        			img.drawImg(g,"Blue_key", x, y);
         		}else if(col.equals("Red")) {
-        			Red_key.drawImg(g, x, y);
+        			img.drawImg(g,"Red_key", x, y);
         		}
         		
         	}
