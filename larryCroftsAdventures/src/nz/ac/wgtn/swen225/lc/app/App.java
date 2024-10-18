@@ -465,6 +465,7 @@ class App extends JFrame{
       gameInfoPanel.setTime(timeLeft);
       controller.setGameStateController(model);
       renderer.gameConsumer(model.getGameState());
+      keysCollected = rc.keysCollected();
       updateGameInfo(model);
     });
     controller.setRecorder(recorder);

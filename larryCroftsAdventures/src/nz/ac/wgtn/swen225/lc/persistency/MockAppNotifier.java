@@ -8,6 +8,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import nz.ac.wgtn.swen225.lc.app.AppNotifier;
 
+/**
+ * Mock class for AppNotifier
+ * Used to test SerialRunnable
+ * @author titheradam	300652933
+ */
 public class MockAppNotifier implements AppNotifier, Serializable{
 
 	@JsonProperty
@@ -15,8 +20,6 @@ public class MockAppNotifier implements AppNotifier, Serializable{
 	
 	@JsonProperty
 	private SerialRunnable win = () -> log.add("win");
-//	@JsonProperty
-//	private SerialRunnable win = () -> System.out.println("win");
 	
 	public void run() {
 		win.run();
@@ -25,32 +28,19 @@ public class MockAppNotifier implements AppNotifier, Serializable{
 	@JsonCreator
 	public MockAppNotifier() {}
 	
-	//public MockAppNotifier() {}
 	
 	@Override
-	public void onGameWin() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onGameWin() {}
 
 	@Override
-	public void onGameLose() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onGameLose() {}
 
 	
 	@Override
-	public void onKeyPickup(String keyName) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onKeyPickup(String keyName) {}
 
 
 	@Override
-	public void onTreasurePickup(int treasureCount) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onTreasurePickup(int treasureCount) {}
 
 }

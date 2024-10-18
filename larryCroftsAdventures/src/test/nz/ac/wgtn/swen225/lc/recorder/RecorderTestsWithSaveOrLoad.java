@@ -39,7 +39,7 @@ public class RecorderTestsWithSaveOrLoad {
         Supplier<Maze> mockMazeSupplier = ()->Maze.createBasicMaze(8, 8);
         Supplier<Chap> mockChapSupplier = ()->new Chap(1, 1, new ArrayList<>()); 
         mockGameStateSupplier = ()->new GameState(mockMazeSupplier.get(), mockChapSupplier.get(),
-        		10, Map.of(), time, mockAppNotifier, new ArrayList<>(), 1);
+        		10, 0, Map.of(), time, mockAppNotifier, new ArrayList<>(), 1);
         gameModel = new GameStateController(mockGameStateSupplier.get());
         crc = (rc) -> {
             time = rc.updatedTime();

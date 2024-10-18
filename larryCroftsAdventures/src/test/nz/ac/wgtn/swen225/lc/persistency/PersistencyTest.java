@@ -17,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,8 +39,17 @@ public class PersistencyTest {
 		return new Chap(2, 2, new ArrayList<Item>());
 	}
 	
+	private Maze genMaze() {
+		
+		Builder build = new Builder();
+		Room room = new Room();
+		build.addRoom(new Coord(0, 0), new Room());
+		build.addRoom(new Coord(0, 1), new Room());
+		return build.build();	
+	}
+	
 	private GameState genGameState() {
-		return new GameState(Maze.createCustomMaze(),
+		return new GameState(genMaze(),
 						genChap(),
 						2,
 						0, new HashMap<Key, String>(),
@@ -85,32 +95,22 @@ public class PersistencyTest {
 		return Optional.empty();
 	}
 	
-	
-	private Coord mazeLocation(Coord roomLoc, Coord insideLoc) throws Exception {
+	// Reflection of private method mazeLocation
+	private Coord mazeLocation(Coord roomLoc, Coord insideLoc) throws Throwable {
 		try {
 			Class<?>[] argClasses = new Class<?>[] {Coord.class, Coord.class};
 			Method mazeLocation = Builder.class.getDeclaredMethod("mazeLocation", argClasses);
 			mazeLocation.setAccessible(true);
 			return (Coord) mazeLocation.invoke(null , roomLoc, insideLoc);
-		} catch(Exception e) {
+		} catch(InvocationTargetException e) {
 			e.printStackTrace();
-			throw e;
+			
+			throw (IllegalArgumentException) e.getCause();	
 		}
 	}
 	
-//	@SuppressWarnings("unchecked")
-//	private <T> Optional<T> loadObjString(String path, Class<T> classType){
-//		try{
-//			Class<?>[] argClasses = new Class<?>[] {String.class, Class.class};
-//			Method loadObj = LoadFile.class.getDeclaredMethod("loadObj", argClasses);
-//			loadObj.setAccessible(true);
-//			return (Optional<T>)loadObj.invoke(null, path, classType);
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//		}
-//		return Optional.empty();
-//	}
 	
+	//			*** Tests Below ***
 	
 	// Test if JUnit is working as expected
     @Test
@@ -120,7 +120,6 @@ public class PersistencyTest {
     }
 	
 	
-	 
     // Test default methods of Loader
     @Test
     public void loaderTest() {
@@ -128,6 +127,7 @@ public class PersistencyTest {
     	assertThrows(IOException.class, ()-> Loader.loadLevel("level1"));
     	//assertThrows(IOException.class, ()-> Loader.loadSave)
     }
+    
     
     @Test
     public void saverTest() {
@@ -145,11 +145,13 @@ public class PersistencyTest {
     	assert saveObj("saveObj", c);
     }
     
+    
     // Tests expected failure of saveObj
     @Test 
     public void saveObjFail() {
     	assert !saveObj("saveObj", null);
     }
+    
     
     @Test 
     public void saveObjFail_2() {
@@ -158,10 +160,12 @@ public class PersistencyTest {
     	assert !saveObj("", c);
     }
     
+    
     @Test 
     public void saveObjFail_3() {
     	assert saveObj("Fail", (Function<Integer, Integer>)((i)-> 1));
     }
+    
     
     @Test public void saveObjFail_4() {
     	Seeds s = new Seeds(1000);
@@ -169,26 +173,24 @@ public class PersistencyTest {
     	assert !saveObj("/n", c);
     }
     
+    
     @Test 
     public void saveGameFail() {
     	GameStateController gsc = genGsc();
     	assertThrows(IllegalArgumentException.class,()-> SaveFile.saveGame("", gsc));
     }
     
+    
     @Test 
     public void saveGameFail_2() {
     	assertThrows(IllegalArgumentException.class, ()-> SaveFile.saveGame(null, genGsc()));	
     }
     
+    
     @Test 
     public void saveGameFail_3() {
     	assertThrows(IllegalArgumentException.class, ()-> SaveFile.saveGame("NullGsc", null));
     }
-    
-//    @Test
-//    public void saveGameSubString() {
-//    	SaveFile.save
-//    }
     
     
     @Test
@@ -196,10 +198,12 @@ public class PersistencyTest {
     	assertEquals(loadObj(null, Canary.class), Optional.empty());
     }
     
+    
     @Test
     public void loadObjFail_2() {
     	assertEquals(loadObj(Paths.level1, null), Optional.empty());
     }
+    
     
     @Test
     public void loadObjFail_3() {
@@ -215,8 +219,10 @@ public class PersistencyTest {
      	assert gscOptionLevel.isPresent();
      	}
  	
+ 	
  	@Test
  	public void level2Test() {
+ 		
  		level2.main(null);
      	Optional<GameStateController> gscOptionLevel = LoadFile.loadLevel(Paths.level2);
      	assert gscOptionLevel.isPresent();
@@ -229,6 +235,7 @@ public class PersistencyTest {
  		assertThrows(IllegalArgumentException.class, ()-> build.addRoom(new Coord(-1, 2), new Room()));
  		assertThrows(IllegalArgumentException.class, ()-> build.addRoom(new Coord(3, -1), new Room()));
  	}
+ 	
  	
  	@Test
  	public void builderBotRightTest() {
@@ -250,8 +257,9 @@ public class PersistencyTest {
 		}
  	}
  	
+ 	
  	@Test
- 	public void builderBuildTest() {
+ 	public void builderBuildTest() throws Throwable {
  		Builder build = new Builder();
  		Maze maze = build.build();
  		maze.printMaze();
@@ -263,13 +271,14 @@ public class PersistencyTest {
  		
  		try {
  	 		assert mazeLocation(roomLoc, room.centre).equals(new Coord(15,15));
+ 	 		assertThrows(IllegalArgumentException.class, ()-> mazeLocation(new Coord(2, -1), room.centre));
+ 	 		assertThrows(IllegalArgumentException.class, ()-> mazeLocation(new Coord(-1, 2), room.centre));
  		} catch(Exception e) {}
- 		
- 		
  	}
  	
+ 	
  	@Test
- 	public void builderInnerTile() {
+ 	public void builderInnerTile() throws Throwable {
  		try {
  			Builder build = new Builder();
  	 		Room room = new Room();
@@ -280,10 +289,6 @@ public class PersistencyTest {
  	 		Coord tileLoc = mazeLocation(roomLoc, room.centre);
  	 		assert maze.getTile(tileLoc.row(), tileLoc.col()) instanceof WallTile;
  		} catch(Exception e) {}
- 		
- 	}
- 	@Test
- 	public void builderLocationTest() {
  		
  	}
  	
@@ -306,22 +311,24 @@ public class PersistencyTest {
     	assert LoadFile.loadLevel("level1").isPresent();
     }
  	
+ 	
  	@Test
  	public void loadLevelStringFail() {
  		assertThrows(IllegalArgumentException.class, ()-> LoadFile.loadLevel(""));
  		assertThrows(IllegalArgumentException.class, ()-> LoadFile.loadLevel((String)null));
  	}
  	
+ 	
  	@Test
  	public void loadLevelFile() {
  		assert LoadFile.loadLevel(Paths.level1).isPresent();
  	}
  	
+ 	
  	@Test
  	public void loadLevelFileFail() {
  		assertThrows(IllegalArgumentException.class, ()-> LoadFile.loadLevel((File)null));
  	}
- 	
  	
  	
  	// Tests whether level1 is loadable from /saves
@@ -332,17 +339,14 @@ public class PersistencyTest {
      	GameStateController gsc = gscOption.get();	
  	}
     
-    
-    
-    
-    
-    
+
     // Tests serialisation of Maze
     @Test public void mazeSave() {
     	Maze maze = Maze.createBasicMaze(5, 5);
     	assert saveObj("MazeTest", maze);
     	Maze maze2 = loadObj(new File(Paths.root,"MazeTest.json"), Maze.class).get();
     }
+    
     
     // Tests serialisation / deserialisation of Chap
     @Test public void ChapLoad() {
@@ -367,11 +371,8 @@ public class PersistencyTest {
     	chap.pickUpItem(redKey);
     	MockAppNotifier notif = new MockAppNotifier();
 		GameState gs = genGameState();
-    	//GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
     	GameStateController gsc = new GameStateController(gs);
 
-    	
-    	
     	assert saveObj("inventoryTest", gsc);
     	Optional<GameStateController> gsOption = loadObj(new File(Paths.root,"inventoryTest.json"), GameStateController.class);
     	assert gsOption.isPresent();
@@ -386,11 +387,7 @@ public class PersistencyTest {
     
     // Tests serialisation of GameState
     @Test public void gameStateLoad() {
-    	Maze maze = Maze.createBasicMaze(5, 5);
-    	Chap chap = new Chap(2, 2, new ArrayList<Item>());
-    	MockAppNotifier notif = new MockAppNotifier();
 		GameState gs = genGameState();
-    	//GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
     	assert saveObj("GameStateTest", gs);
     	Optional<GameState> gsOption = loadObj(new File(Paths.root,"GameStateTest.json"), GameState.class);
     	assert gsOption.isPresent();
@@ -399,15 +396,9 @@ public class PersistencyTest {
     }
     
     
-    
     @Test 
     public void integrationTestInit() {
-		
-		Maze maze = Maze.createCustomMaze();
-		Chap chap = new Chap(2, 2, new ArrayList<Item>());
-		MockAppNotifier notif = new MockAppNotifier();
 		GameState gs = genGameState();
-		//GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
 		GameStateController gsc = new GameStateController(gs);
 		
 		Boolean saved = SaveFile.saveGame("integrationTest", gsc);
@@ -420,44 +411,30 @@ public class PersistencyTest {
     
     
     @Test
-    public void newTest() {
-    	Maze maze = Maze.createCustomMaze();
-    	Chap chap = new Chap(2,2, new ArrayList<Item>());
-    	MockAppNotifier notif = new MockAppNotifier();
+    public void loadStringTest() {
 		GameState gs = genGameState();
-    	//GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, notif, new ArrayList<Actor>(), 0);
 		GameStateController gsc = new GameStateController(gs);
 		Boolean saved = SaveFile.saveGame("IntegrationEx", gsc);
-		assert saved;   
-		
+		assert saved;
     }
-    
-//    @Test
-//    public void pathTest() {
-//    	assert false : Paths.level1.getAbsolutePath();
-//    }
+
     
     @Test
     public void workingController() {
     	
-    GameStateController gsc = genGsc();
-    
-    assert SaveFile.saveGame("controlTest", gsc);
-    
-    Optional<GameStateController> gscO = LoadFile.loadLevel(new File(Paths.savePath ,"controlTest.json"));
-    assert gscO.isPresent();
-    GameStateController gscD = gscO.get();
-    
-    //System.out.println(gscD.getChapPosition());
-    gscD.moveChap(Direction.Right);
-    //System.out.println(gscD.getChapPosition());
-    gscD.moveChap(Direction.Left);
-    //System.out.println(gscD.getChapPosition());
-    gscD.getChap().moveTo(3, 3, gscD.getMaze());
-    
+		GameStateController gsc = genGsc();
+		
+		assert SaveFile.saveGame("controlTest", gsc);
+		
+		Optional<GameStateController> gscO = LoadFile.loadLevel(new File(Paths.savePath ,"controlTest.json"));
+		assert gscO.isPresent();
+		GameStateController gscD = gscO.get();
+		
+		gscD.moveChap(Direction.Right);
+		gscD.moveChap(Direction.Left);
+		gscD.getChap().moveTo(3, 3, gscD.getMaze());
     }
-    
-
+   
     
     @Test
     public void runnableTest() {
@@ -470,8 +447,6 @@ public class PersistencyTest {
     	MockAppNotifier notifD = notifO.get();
     	notifD.run();
     }
-    
-   
     
     
     @Test
@@ -490,42 +465,9 @@ public class PersistencyTest {
     	MockAppNotifier notifD = notifO.get();
     }
     
-    @Test
-    public void roomTest() {
-    	
-    	
-    	
-    }
     
     @Test
-    public void saveNullField() {
-    	
-    	
-    }
-    
-    @Test
-    public void keyColourTest() {
-    	Maze maze = Maze.createLevel1();
-				
-		Chap chap = new Chap(13, 9, new ArrayList<Item>());
-		Key keyBlue =  new Key("Blue");
-		Key keyRed = new Key("Red");
-		chap.pickUpItem(keyRed);
-		chap.pickUpItem(keyBlue);
-		GameState gs = genGameState();
-		//GameState gs = new GameState(maze, chap, 2, new HashMap<Key, String>(), 60, new MockAppNotifier(), new ArrayList<Actor>(), 0);
-		maze.printMaze();
-		System.out.println("");
-		GameStateController gsc = new GameStateController(gs);
-    	gsc.moveChap(Direction.Right);
-    	gsc.moveChap(Direction.Right);
-    	
-    	assert chap.getRow() != 9 || chap.getCol() != 13;
-    	maze.printMaze();
-    }
-    
-    @Test
-    public void keySerial() {
+    public void keySerialTest() {
     	Key key = new Key("red");
     	assert saveObj("keyTest", key);
     	Optional<Key> keyO = loadObj(new File(Paths.root,"keyTest.json"), Key.class);
@@ -533,6 +475,7 @@ public class PersistencyTest {
     	Key keyD = keyO.get();
     	assert keyD.colour().equals("red");
     }
+    
     
     @Test
     public void keyInventoryTest() {
@@ -549,8 +492,6 @@ public class PersistencyTest {
     	assert chapO.isPresent();
     	Chap chapD = chapO.get();
     	((Key)chapD.inventory().get(0)).colour().equals("Blue");
-    	
-    	
     }
     
     
@@ -563,9 +504,4 @@ public class PersistencyTest {
     	coord = new Coord(-1, -1);
     	assert coord.row() == -1 && coord.col() == -1;
     }
-    
-    
-    
-    
-    
 }
