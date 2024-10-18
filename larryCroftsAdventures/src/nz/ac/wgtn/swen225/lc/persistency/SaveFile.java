@@ -26,31 +26,19 @@ public class SaveFile implements Saver{
         if(fileName == null || fileName.isEmpty() || gameControl == null) {
         	throw new IllegalArgumentException("Null or empty filename");
         }
-    	//System.out.println(fileName.substring(fileName.length()-5, fileName.length()));
 
         // removes .json from filename if included
         fileName = removeJsonExt(fileName);
         gameControl = removeAppNotifier(gameControl);
         
         return saveObj(Paths.savePath + fileName, gameControl);
-        
-//        ObjectMapper mapper = new ObjectMapper();
-//        
-//        // Map obj to JSON file
-//        try{
-//            mapper.writeValue( new File(Paths.savePath + fileName + ".json"), gameControl );
-//            return true;
-//        } catch(IOException e){
-//            e.printStackTrace();
-//        }
-        // Failed to send
-        //return false;
     }
+    
     
     /**
      * Used to set the saveAndQuit file
      * @param gsc
-     * @return
+     * @return boolean return from saveObj
      */
     public static boolean saveAndQuit(GameStateController gsc) {
     	if(gsc == null) {
@@ -58,7 +46,6 @@ public class SaveFile implements Saver{
     	}
     	assert gsc != null;
     	assert gsc instanceof GameStateController;
-    	
     	
     	gsc = removeAppNotifier(gsc);
     	return saveObj(removeJsonExt(Paths.saveAndQuit + ""), gsc);
@@ -68,7 +55,6 @@ public class SaveFile implements Saver{
     private static String removeJsonExt(String fileName) {
     	if(fileName.substring(fileName.length()-5, fileName.length()).equals(".json")) {
         	return fileName.substring(0, fileName.length()-5);
-        	//System.out.println(fileName);
         }
     	return fileName;
     }
@@ -97,10 +83,8 @@ public class SaveFile implements Saver{
         return false;
     }
         
-    /**
-     * Removes non-serialisable appNotifier before serialisation
-     * @return
-     */
+
+     // Removes non-serialisable appNotifier before serialisation
     private static GameStateController removeAppNotifier(GameStateController gsc) {
     	GameState gs = gsc.getGameState();
     	gs.setAppNotifier(new MockAppNotifier());

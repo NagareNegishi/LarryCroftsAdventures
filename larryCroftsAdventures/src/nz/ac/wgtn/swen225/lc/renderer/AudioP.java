@@ -108,7 +108,7 @@ public enum AudioP {
     	
     public void setNVolume() {
         if (clip != null) {
-        	FloatControl volume = (FloatControl) clip.getControl(FloatControl.Type.VOLUME);
+        	FloatControl volume = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
         	setVolume(volume.getMinimum());
         }
     }

@@ -7,12 +7,17 @@ import java.awt.image.BufferedImage;
 
 /**
  * 
+ * This is a Deprecated but still functional imgClass
+ * 
+ * 
  * RenderImg takes in 1 Image and renders that one image properly, adjusting for the image size 
  * and rendering at a certain location
  * 
  * @author Marwan Mohamed
  * @studentID 300653693
  */
+
+@Deprecated
 public class RenderImg {
 
     private final BufferedImage image;
@@ -27,8 +32,9 @@ public class RenderImg {
     Dimension canvas;
     
     
-    public RenderImg(Img img) {
-        this.image = img.image;
+    public RenderImg(ImgOld img) {
+		this.image = img.image;
+        
     }
     
 
@@ -68,6 +74,21 @@ public class RenderImg {
  
     }
     
+    public void drawInfoTile(Graphics g, Dimension d ) {
+        int imageWidth = image.getWidth();
+        int imageHeight = image.getHeight();
+        
+        int x1 = d.width/5;
+        int y1 = d.height* 3/5;
+        
+        int x2 = d.width - d.width/5;
+        int y2 = d.height;
+
+        g.drawImage(image, x1, y1 , x2, y2, 0, 0, imageWidth, imageHeight, null);
+
+    	
+    }
+    
     
     /**
      * drawBG is reserved for drawing an image across the whole screen
@@ -75,13 +96,12 @@ public class RenderImg {
      * @param g
      * @param dimension
      */
-    public void drawBg(Graphics g, Dimension dimension) {
-    	canvas = dimension;
+    public void drawBg(Graphics g, Dimension d) {
         int imageWidth = image.getWidth();
         int imageHeight = image.getHeight();
 
-        int canvasWidth = canvas.width;
-        int canvasHeight = canvas.height;
+        int canvasWidth = d.width;
+        int canvasHeight = d.height;
 
         g.drawImage(image, 0, 0, canvasWidth, canvasHeight, 0, 0, imageWidth, imageHeight, null);
 

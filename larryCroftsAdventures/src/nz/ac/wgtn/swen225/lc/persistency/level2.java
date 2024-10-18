@@ -8,6 +8,7 @@ import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.FreeTile;
 import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+import nz.ac.wgtn.swen225.lc.domain.InfoFieldTile;
 import nz.ac.wgtn.swen225.lc.domain.Item;
 import nz.ac.wgtn.swen225.lc.domain.Key;
 import nz.ac.wgtn.swen225.lc.domain.KeyTile;
@@ -15,8 +16,6 @@ import nz.ac.wgtn.swen225.lc.domain.LockedDoorTile;
 import nz.ac.wgtn.swen225.lc.domain.Maze;
 import nz.ac.wgtn.swen225.lc.domain.Tile;
 import nz.ac.wgtn.swen225.lc.domain.TreasureTile;
-import nz.ac.wgtn.swen225.lc.persistency.Room.Direction;
-
 
 /**
  * Used to build level2.json file 
@@ -24,20 +23,22 @@ import nz.ac.wgtn.swen225.lc.persistency.Room.Direction;
  */
 public class level2 {
 	
-	
+	/**
+	 * Creates / modifies level2.json in /saves folder
+	 * @param args : Not used
+	 */
 	public static void main(String args[]) {
 		
-		
 		Room chapRoom = new Room();
-		//chapRoom.setTile(Direction.Right, new LockedDoorTile("Red")); // Locked door to right
 		chapRoom.setTile(chapRoom.right, new LockedDoorTile("Red")); // Locked door to right
 		chapRoom.setTile(new Coord(1,1), new TreasureTile());
+		chapRoom.setTile(chapRoom.centre, new InfoFieldTile("") );
 		
 
 		Key redKey = new Key("Red");
 		KeyTile redTile = new KeyTile(redKey);
-		//chapRoom.setTile(Direction.Left, new FreeTile());
 		chapRoom.setTile(chapRoom.left, new FreeTile());
+		
 		chapRoom.setTile(chapRoom.top, new LockedDoorTile("Blue"));
 		Key blueKey = new Key("Blue");
 		KeyTile blueTile =  new KeyTile(blueKey);
@@ -50,11 +51,6 @@ public class level2 {
 		leftRoom.setTile(leftRoom.centre, redTile);
 		
 		Room exitRoom = new ExitRoom();
-		// To be removed one portals added
-		//exitRoom.setTile(exitRoom.top, new FreeTile());
-		
-		
-		
 		
 		Builder build = new Builder();
 		build.addRoom(new Coord(1, 0), leftRoom);
@@ -62,9 +58,7 @@ public class level2 {
 		build.addRoom(new Coord(1, 2), waterRoom);
 		build.addRoom(new Coord(2, 1), exitRoom);
 		
-		
-		// ************** CURRENTLY WORING ************************
-		Coord entryPortal = new Coord(0, 1);
+				Coord entryPortal = new Coord(0, 1);
 		Coord destPortal = new Coord(2, 2);
 		PortalRoom portal1 = new PortalRoom(entryPortal, destPortal);
 		PortalRoom portal2 = new PortalRoom(destPortal, entryPortal);
@@ -72,12 +66,6 @@ public class level2 {
 		
 		build.addRoom(entryPortal, portal1);
 		build.addRoom(destPortal, portal2);
-		
-//		PortalRoom portal1 = new PortalRoom();
-//		PortalRoom portal2 = new PortalRoom();
-//		portal1.pairPortal(portal2);
-//		build.addRoom(new Coord(0, 1), portal1);
-//		build.addRoom(new Coord(2, 1), leftRoom);
 		
 		Maze maze = build.build();
 		maze.printMaze();
@@ -88,10 +76,10 @@ public class level2 {
 		Coord portalRoomCentre = Builder.mazeLocation(entryPortal, portal1.centre);
 		enemies.add(new Actor(portalRoomCentre.row()-1, portalRoomCentre.col()-1));
 		Chap chap = new Chap(10, 10, new ArrayList<Item>());
-		GameState gs = new GameState(maze, chap, 2, 2, new HashMap<Key, String>() , 60, new MockAppNotifier(), enemies, 2);
+		GameState gs = new GameState(maze, chap, 2, 0, new HashMap<Key, String>() , 60, new MockAppNotifier(), enemies, 2);
 		GameStateController gsc = new GameStateController(gs);
 		
 		boolean saved = SaveFile.saveGame("level2", gsc);
-		
+		assert saved;
 	}
 }
