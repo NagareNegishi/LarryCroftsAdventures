@@ -8,6 +8,7 @@ import nz.ac.wgtn.swen225.lc.domain.Chap;
 import nz.ac.wgtn.swen225.lc.domain.FreeTile;
 import nz.ac.wgtn.swen225.lc.domain.GameState;
 import nz.ac.wgtn.swen225.lc.domain.GameStateController;
+import nz.ac.wgtn.swen225.lc.domain.InfoFieldTile;
 import nz.ac.wgtn.swen225.lc.domain.Item;
 import nz.ac.wgtn.swen225.lc.domain.Key;
 import nz.ac.wgtn.swen225.lc.domain.KeyTile;
@@ -31,6 +32,7 @@ public class level2 {
 		Room chapRoom = new Room();
 		chapRoom.setTile(chapRoom.right, new LockedDoorTile("Red")); // Locked door to right
 		chapRoom.setTile(new Coord(1,1), new TreasureTile());
+		chapRoom.setTile(chapRoom.centre, new InfoFieldTile("") );
 		
 
 		Key redKey = new Key("Red");
