@@ -14,14 +14,14 @@ team.md located in the root folder of the repository that contains a table)
 
 # Team Allocation
 
-| Module     | Team Member Name | Team Member GitLab Account |
-|------------|------------------|----------------------------|
-| Domain     | Ben Ferguson     | fergusbenj1                |
-| App        | Nagare Negishi   | negishnaga / negimakushi   |
-| Renderer   | Marwan Mohamed   | mohamemarw1                |
-| Persistency| Adam Tither      | titheradam / AdamT-code    |
-| Recorder   | Joshua Neylan    | neylanjosh                 |
-| Fuzz       | Anthony Wen      | wenanth                    |
+| Module     | Team Member Name | Team Member GitLab Account            |
+|------------|------------------|----------------------------           |
+| Domain     | Ben Ferguson     | fergusbenj1 / Ben Ferguson            |
+| App        | Nagare Negishi   | negishnaga / negimakushi              |
+| Renderer   | Marwan Mohamed   | mohamemarw1 / Marwan Mohamed / Kourie |
+| Persistency| Adam Tither      | titheradam / AdamT-code / Adam Tither |
+| Recorder   | Joshua Neylan    | neylanjosh / Joshua Neylan            |
+| Fuzz       | Anthony Wen      | wenanth / Anthony Wen                 |
 
 
 
