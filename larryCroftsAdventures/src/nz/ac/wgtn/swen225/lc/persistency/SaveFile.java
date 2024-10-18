@@ -26,7 +26,6 @@ public class SaveFile implements Saver{
         if(fileName == null || fileName.isEmpty() || gameControl == null) {
         	throw new IllegalArgumentException("Null or empty filename");
         }
-    	//System.out.println(fileName.substring(fileName.length()-5, fileName.length()));
 
         // removes .json from filename if included
         fileName = removeJsonExt(fileName);
@@ -48,7 +47,6 @@ public class SaveFile implements Saver{
     	assert gsc != null;
     	assert gsc instanceof GameStateController;
     	
-    	
     	gsc = removeAppNotifier(gsc);
     	return saveObj(removeJsonExt(Paths.saveAndQuit + ""), gsc);
     }
@@ -57,7 +55,6 @@ public class SaveFile implements Saver{
     private static String removeJsonExt(String fileName) {
     	if(fileName.substring(fileName.length()-5, fileName.length()).equals(".json")) {
         	return fileName.substring(0, fileName.length()-5);
-        	//System.out.println(fileName);
         }
     	return fileName;
     }
